@@ -1,0 +1,294 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════
+   THEME — the two brand colours and the type stack.
+   Change --red and --cream here and the entire site follows.
+   ═══════════════════════════════════════════════════════════ */
+
+@theme {
+  --color-red: #e43222;
+  --color-cream: #fee2d1;
+
+  /* Tints of the red, for borders, hovers, and quiet text. */
+  --color-red-soft: #e4322226;
+  --color-red-line: #e4322240;
+  --color-red-wash: #e432220d;
+  --color-cream-deep: #fbd5bf;
+
+  /* Display stack: Transcity first, Schoolbook picks up every glyph
+     Transcity is missing (all digits and punctuation). */
+  --font-display: var(--font-transcity), var(--font-schoolbook), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-schoolbook), Georgia, "Times New Roman", serif;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════ */
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-cream);
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-red);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-red);
+  color: var(--color-cream);
+}
+
+/* Keyboard focus stays visible and on-brand. */
+:focus-visible {
+  outline: 2px solid var(--color-red);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TYPE
+   ═══════════════════════════════════════════════════════════ */
+
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* Big playful headline. Fluid so it never wraps awkwardly on phones. */
+.headline {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 9vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: -0.005em;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5.5vw, 3.5rem);
+  line-height: 1;
+}
+
+/* The serious half of the brand: small, wide-tracked, all caps. */
+.eyebrow {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.lede {
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  line-height: 1.65;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PIECES
+   ═══════════════════════════════════════════════════════════ */
+
+/* The sprocket band from the brand guide: rounded-rectangle perforations
+   punched out of a red bar, drawn as a repeating SVG tile so the corner radius
+   stays true at any width. */
+.sprockets,
+.sprockets-solid {
+  height: 1.5rem;
+  background-color: var(--color-red);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='34' viewBox='0 0 26 34'%3E%3Crect x='6' y='8' width='14' height='18' rx='5' fill='%23fee2d1'/%3E%3C/svg%3E");
+  background-size: 1.15rem 1.5rem;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+
+@media (max-width: 640px) {
+  .sprockets,
+  .sprockets-solid {
+    height: 1.1rem;
+    background-size: 0.85rem 1.1rem;
+  }
+}
+
+/* Hero backdrop: the interlocking lattice from the brand guide — circles
+   overlapping into a quatrefoil grid with diamonds at the intersections.
+   Drawn as an SVG tile and kept very faint, because it sits behind text and
+   photographs need to stay the loudest thing on the page. */
+.tile-pattern {
+  background-color: var(--color-cream);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23e43222' stroke-width='5' opacity='0.05'%3E%3Ccircle cx='0' cy='0' r='27'/%3E%3Ccircle cx='72' cy='0' r='27'/%3E%3Ccircle cx='0' cy='72' r='27'/%3E%3Ccircle cx='72' cy='72' r='27'/%3E%3Ccircle cx='36' cy='36' r='27'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 7rem 7rem;
+}
+
+/* Photo frames get a hairline rule rather than a heavy border, so the
+   grid reads as a contact sheet. */
+.frame {
+  background: var(--color-cream-deep);
+  overflow: hidden;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.85rem 1.6rem;
+  border: 2px solid var(--color-red);
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  transition:
+    background-color 0.25s var(--ease-out-soft),
+    color 0.25s var(--ease-out-soft),
+    transform 0.25s var(--ease-out-soft);
+}
+
+.btn-solid {
+  background: var(--color-red);
+  color: var(--color-cream);
+}
+
+.btn-solid:hover {
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  color: var(--color-red);
+}
+
+.btn-ghost:hover {
+  background: var(--color-red);
+  color: var(--color-cream);
+  transform: translateY(-2px);
+}
+
+/* Underline that draws itself on hover — the playful bit. */
+.link-draw {
+  position: relative;
+  display: inline-block;
+}
+
+.link-draw::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.35s var(--ease-out-soft);
+}
+
+.link-draw:hover::after,
+.link-draw[data-active="true"]::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MOTION — entrance animations, disabled for anyone who has
+   asked their system to reduce motion.
+   ═══════════════════════════════════════════════════════════ */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.88);
+  }
+}
+
+.rise {
+  animation: rise 0.7s var(--ease-out-soft) both;
+}
+
+.twinkle {
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+
+.twinkle-slow {
+  animation: twinkle 3.8s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+/* ── Film strip marquee ──────────────────────────────────────
+   Two identical copies of the frames sit side by side; sliding the
+   track exactly half its width lands copy 2 where copy 1 started, so
+   the loop has no visible seam. */
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee {
+  overflow: hidden;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-duration, 55s) linear infinite;
+}
+
+/* Keeps running under the cursor — only a keyboard focus inside the strip
+   pauses it, so tabbing through doesn't chase a moving target. */
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Both copies must be exactly the same width for the -50% loop to line up,
+   so each group carries the same trailing gap and no leading one. */
+.marquee-group {
+  display: flex;
+  gap: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  /* Don't collapse the marquee to its end position — stop it where it
+     starts and let the strip be scrolled by hand instead. */
+  .marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+  .marquee {
+    overflow-x: auto;
+  }
+}

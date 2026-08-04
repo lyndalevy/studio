@@ -1,0 +1,14 @@
+# Firebase App Hosting configuration.
+# Docs: https://firebase.google.com/docs/app-hosting/configure
+
+runConfig:
+  # A photography site is bursty, not busy. These keep the bill near zero
+  # while still handling a rush of visitors.
+  minInstances: 0
+  maxInstances: 2
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
+
+  # Image optimisation and the Lightroom proxy do real work on first hit.
+  timeoutSeconds: 60
