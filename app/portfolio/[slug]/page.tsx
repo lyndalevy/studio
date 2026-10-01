@@ -41,7 +41,7 @@ export default async function GalleryPage({
 
   return (
     <>
-      <PageHeader eyebrow="Portfolio" title={gallery.name} lede={gallery.blurb} />
+      <PageHeader title={gallery.name} lede={gallery.blurb} />
 
       <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-20">
         <Link href="/portfolio" className="link-draw eyebrow mb-10 inline-block">

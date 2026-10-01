@@ -26,7 +26,9 @@ const SPARKS: Spark[] = [
   { top: "12%", left: "76%", size: "1.1rem", delay: "0.6s", duration: "2.6s" },
   { top: "88%", left: "68%", size: "2.2rem", delay: "2.9s", duration: "4.0s" },
   { top: "78%", left: "34%", size: "1rem", delay: "1.4s", duration: "3.7s" },
-  { top: "30%", left: "80%", size: "1.6rem", delay: "3.3s", duration: "3.0s" },
+  // Nudged 50px clear of the wordmark's right edge, which the hero logo
+  // now reaches at large sizes.
+  { top: "30%", left: "calc(80% + 50px)", size: "1.6rem", delay: "3.3s", duration: "3.0s" },
 ];
 
 export default function SparkleField({ className = "" }: { className?: string }) {

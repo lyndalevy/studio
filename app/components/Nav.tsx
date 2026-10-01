@@ -39,15 +39,9 @@ export default function Nav() {
     <header className="sticky top-0 z-50 border-b-2 border-red bg-cream/95 backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-5 py-3.5 sm:px-8">
         <Link href="/" aria-label={`${site.name} home`} className="shrink-0 text-red">
-          {/* Short lockup on phones so it never crowds the menu button.
-              The wrappers do the showing/hiding — Wordmark sets its own
-              display, so a `hidden` class on it would be overridden. */}
-          <span className="block sm:hidden">
-            <Wordmark full={false} className="h-9 text-xl" />
-          </span>
-          <span className="hidden sm:block">
-            <Wordmark className="h-11 text-2xl" />
-          </span>
+          {/* The compact "Studio L" lockup throughout — the full wordmark is
+              too wide to sit next to the menu without crowding it. */}
+          <Wordmark full={false} className="h-9 sm:h-11" />
         </Link>
 
         {/* Desktop */}

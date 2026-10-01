@@ -75,7 +75,7 @@ export const packages: Package[] = [
   },
 
   {
-    name: "Party / Event",
+    name: "Party & Events",
     blurb: "Birthdays, showers, celebrations, corporate",
     price: "$100/hr",
     minimum: "Minimum 2 hours",

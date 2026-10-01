@@ -10,24 +10,13 @@ export const site = {
   // Shows in the browser tab and in Google results.
   tagline: "Real estate and event photography across New Jersey",
 
-  // ── Logo ─────────────────────────────────────────────────
-  // Your real transparent exports. `wide` is the full lockup used on desktop
-  // and the homepage; `compact` is the shorter "Studio L" used on phones,
-  // where the full one would crowd the menu button.
-  // Set logo to null to fall back to the type-only lockup.
-  logo: {
-    wide: { src: "/brand/logo-wide.png", width: 1750, height: 500 },
-    compact: { src: "/brand/logo-med.png", width: 1000, height: 500 },
-  } as {
-    wide: { src: string; width: number; height: number };
-    compact: { src: string; width: number; height: number };
-  } | null,
+  // The logo artwork itself lives in content/brand.ts — swap the files in
+  // app/assets/ to change it.
 
   // The paragraph under the logo on the homepage.
   intro:
-    "My photography business, covering real estate and events across New Jersey. " +
-    "I handle the whole job: lighting, shooting, editing and retouching, and " +
-    "everything the client sees in between.",
+    "I photograph houses, parties, people, and the occasional lion. Based in " +
+    "New Jersey — and I do every part myself: lighting, shooting, editing, retouching.",
 
   // ── Contact ──────────────────────────────────────────────
   email: "lynda.studiolphotos@gmail.com",
@@ -45,8 +34,8 @@ export const site = {
       "From real estate to portraits to wildlife — I want to share stories through photos. I showcase properties, capture memories, and make products shine.",
       "When I'm not behind the camera, you can find me studying, painting, at a concert, or planning my next photography journey.",
     ],
-    // Optional portrait of you. Set to null to hide it.
-    portrait: "/brand/portrait.png" as string | null,
+    // Show the portrait from content/brand.ts on the About page.
+    showPortrait: true,
   },
 
   // ── Booking page ─────────────────────────────────────────

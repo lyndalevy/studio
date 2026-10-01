@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { site } from "@/content/site";
-import { Sparkles } from "./Marks";
+import { Instagram, Sparkles } from "./Marks";
 import Wordmark from "./Wordmark";
 
 export default function Footer() {
@@ -30,7 +30,10 @@ export default function Footer() {
               rel="noopener noreferrer"
               className="link-draw text-lg"
             >
-              {site.instagramHandle}
+              <span className="flex items-center gap-2">
+                <Instagram className="h-5 w-5 shrink-0" />
+                {site.instagramHandle}
+              </span>
             </a>
           </div>
 

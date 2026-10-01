@@ -57,15 +57,15 @@ export const galleries: Gallery[] = [
   {
     name: "Real Estate",
     slug: "real-estate",
-    blurb: "Listings that make people book the showing",
+    blurb: "Giving your spaces their time to shine",
     source: { kind: "lightroom", url: "https://adobe.ly/4yUECAO" },
     cover: null,
     hidden: false,
   },
   {
-    name: "Party & Event",
+    name: "Party & Events",
     slug: "events",
-    blurb: "Celebrations, and the moments between the posed ones",
+    blurb: "Your celebrations captured with emotion and care",
     source: { kind: "lightroom", url: "https://adobe.ly/4w8uFx9" },
     cover: null,
     hidden: false,
@@ -73,39 +73,31 @@ export const galleries: Gallery[] = [
   {
     name: "Private",
     slug: "private",
-    blurb: "Portraits, seniors, families",
+    blurb: "Portraits, senior photos, families, and more",
     source: { kind: "lightroom", url: "https://adobe.ly/3RyNJqi" },
-    cover: null,
-    hidden: false,
-  },
-  {
-    name: "Food",
-    slug: "food",
-    blurb: "Plates and drinks that need to look worth ordering",
-    source: { kind: "lightroom", url: "https://adobe.ly/4h9RYD1" },
-    cover: null,
-    hidden: false,
-  },
-  {
-    name: "Nature",
-    slug: "nature",
-    blurb: "Whatever holds still long enough",
-    source: { kind: "lightroom", url: "https://adobe.ly/4fDYp03" },
     cover: null,
     hidden: false,
   },
   {
     name: "Safari",
     slug: "safari",
-    blurb: "Long lens, long wait",
+    blurb: "Animals in their habitat — that's the most authentic it can get",
     source: { kind: "lightroom", url: "https://adobe.ly/4fAQnVE" },
+    cover: null,
+    hidden: false,
+  },
+  {
+    name: "Nature",
+    slug: "nature",
+    blurb: "Earth's beauty is always right in front of you",
+    source: { kind: "lightroom", url: "https://adobe.ly/4fDYp03" },
     cover: null,
     hidden: false,
   },
   {
     name: "Europe",
     slug: "europe",
-    blurb: "Streets, light, and getting pleasantly lost",
+    blurb: "Views, architecture, and streets to get lost in",
     source: { kind: "lightroom", url: "https://adobe.ly/4fOyC3V" },
     cover: null,
     hidden: false,
@@ -113,8 +105,16 @@ export const galleries: Gallery[] = [
   {
     name: "Local",
     slug: "local",
-    blurb: "New Jersey, close to home",
+    blurb: "New Jersey and New York. Close to home",
     source: { kind: "lightroom", url: "https://adobe.ly/4fUYk72" },
+    cover: null,
+    hidden: false,
+  },
+  {
+    name: "Food",
+    slug: "food",
+    blurb: "Plates and drinks that definitely look worth ordering",
+    source: { kind: "lightroom", url: "https://adobe.ly/4h9RYD1" },
     cover: null,
     hidden: false,
   },
@@ -126,7 +126,7 @@ export const galleryBySlug = (slug: string) =>
   galleries.find((g) => g.slug === slug && !g.hidden) ?? null;
 
 // ── Homepage film strip ──────────────────────────────────────
-// Which galleries feed the moving strip on the homepage, and how many
-// photos to take from each. Keep it short so the homepage stays quick.
-export const featuredSlugs = ["real-estate", "events", "private", "food", "europe"];
-export const featuredPerGallery = 3;
+// The strip pulls from every visible gallery, so the front page shows the
+// full range of work rather than a chosen few. This is how many photos come
+// from each one — keep it small so the homepage stays quick to load.
+export const featuredPerGallery = 2;

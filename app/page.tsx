@@ -1,34 +1,39 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { brand } from "@/content/brand";
 import { site } from "@/content/site";
-import {
-  featuredPerGallery,
-  featuredSlugs,
-  galleryBySlug,
-  visibleGalleries,
-} from "@/content/galleries";
+import { featuredPerGallery, visibleGalleries } from "@/content/galleries";
 import { packages } from "@/content/rates";
 import { loadGallery } from "@/lib/sources";
 import FilmStrip from "./components/FilmStrip";
 import SparkleField from "./components/SparkleField";
 import Wordmark from "./components/Wordmark";
-import { Divider } from "./components/Marks";
+import { Divider, Instagram } from "./components/Marks";
 
 // Re-check the albums every 5 minutes so new uploads show up on their own.
 export const revalidate = 300;
 
-/** A few photos from each featured gallery, for the moving strip. */
+/**
+ * A couple of photos from every gallery, interleaved so the strip cycles
+ * through the different kinds of work rather than showing them in blocks.
+ */
 async function loadFeatured() {
-  const picks = await Promise.all(
-    featuredSlugs.map(async (slug) => {
-      const gallery = galleryBySlug(slug);
-      if (!gallery) return [];
+  const perGallery = await Promise.all(
+    visibleGalleries().map(async (gallery) => {
       const { photos } = await loadGallery(gallery.source, gallery.name);
       return photos.slice(0, featuredPerGallery).map((p) => ({ src: p.thumb, alt: p.alt }));
     })
   );
-  return picks.flat();
+
+  // Round-robin: one from each gallery, then the next from each, and so on.
+  const strip: { src: string; alt: string }[] = [];
+  for (let i = 0; i < featuredPerGallery; i++) {
+    for (const photos of perGallery) {
+      if (photos[i]) strip.push(photos[i]);
+    }
+  }
+  return strip;
 }
 
 export default async function Home() {
@@ -45,7 +50,7 @@ export default async function Home() {
       <section className="relative overflow-hidden border-b-2 border-red">
         <SparkleField />
         <div className="relative mx-auto max-w-5xl px-5 py-20 text-center sm:px-8 sm:py-28">
-          <Wordmark className="rise mx-auto h-[clamp(4.5rem,18vw,12rem)] text-[clamp(1.9rem,7.5vw,4.5rem)]" />
+          <Wordmark className="rise mx-auto h-[clamp(5.5rem,24vw,17rem)]" />
 
           <p className="lede rise mx-auto mt-8 max-w-2xl" style={{ animationDelay: "0.1s" }}>
             {site.intro}
@@ -62,6 +67,21 @@ export default async function Home() {
               Book a shoot
             </Link>
           </div>
+
+          <a
+            href={site.instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link-draw rise mt-8 text-lg"
+            style={{ animationDelay: "0.3s" }}
+          >
+            {/* The flex lives on an inner span: .link-draw sets its own
+                display, so flex on the anchor itself gets overridden. */}
+            <span className="flex items-center gap-2.5">
+              <Instagram className="h-5 w-5 shrink-0" />
+              {site.instagramHandle}
+            </span>
+          </a>
         </div>
       </section>
 
@@ -71,7 +91,6 @@ export default async function Home() {
       {/* ── What I shoot ─────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <div className="mb-12 text-center">
-          <p className="eyebrow mb-3 opacity-70">What I shoot</p>
           <h2 className="section-title">Pick your poison</h2>
         </div>
 
@@ -100,24 +119,23 @@ export default async function Home() {
       <section className="border-y-2 border-red bg-red text-cream">
         <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-24">
           <div className="mb-14 text-center">
-            <p className="eyebrow mb-3 opacity-80">The whole job</p>
             <h2 className="section-title">You hire one person. That&rsquo;s the point.</h2>
           </div>
 
           <ul className="grid gap-12 sm:grid-cols-3">
             {[
               {
-                icon: "/brand/mark-camera.png",
+                icon: brand.markCamera,
                 title: "Lighting and shooting",
                 body: "I show up with the gear, read the room, and get the shots the space or the day actually needs.",
               },
               {
-                icon: "/brand/mark-reel.png",
+                icon: brand.markReel,
                 title: "Editing and retouching",
                 body: "Grass, sky, lighting, blemishes. The corrections happen before you ever see a file.",
               },
               {
-                icon: "/brand/mark-polaroid.png",
+                icon: brand.markPolaroid,
                 title: "Delivery on schedule",
                 body: "Turnaround is quoted up front and met. Need it faster? That is a listed add-on, not a favour.",
               },
@@ -126,7 +144,7 @@ export default async function Home() {
                 {/* The marks are red artwork, so they sit on a cream disc to
                     stay legible against the red band. */}
                 <span className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-cream">
-                  <Image src={icon} alt="" width={500} height={500} className="h-12 w-12 object-contain" />
+                  <Image src={icon} alt="" className="h-12 w-12 object-contain" />
                 </span>
                 <h3 className="font-display mt-5 text-2xl">{title}</h3>
                 <p className="mt-3 leading-relaxed opacity-90">{body}</p>
@@ -138,7 +156,6 @@ export default async function Home() {
 
       {/* ── Rates teaser ─────────────────────────────────── */}
       <section className="mx-auto max-w-3xl px-5 py-20 text-center sm:px-8 sm:py-28">
-        <p className="eyebrow mb-3 opacity-70">Rates</p>
         <h2 className="section-title">
           Starting at{" "}
           <strong className="font-bold">
@@ -175,6 +192,7 @@ export default async function Home() {
             rel="noopener noreferrer"
             className="btn btn-ghost"
           >
+            <Instagram className="h-4 w-4" />
             {site.instagramHandle}
           </a>
         </div>

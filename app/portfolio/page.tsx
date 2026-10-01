@@ -36,9 +36,8 @@ export default async function PortfolioPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Portfolio"
-        title="The work"
-        lede="Five things I shoot. Click into whichever one brought you here."
+        title="Portfolio"
+        lede="Properties, parties, portraits, plates, and whatever I met on the way. Click into whichever one brought you here."
       />
 
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">

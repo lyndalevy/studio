@@ -15,8 +15,7 @@ export default function RatesPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Rates"
-        title="Prices"
+        title="Rates"
         lede="Everything is listed. What you see is what you pay, plus whatever add-ons you pick."
       />
 
