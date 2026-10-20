@@ -71,8 +71,17 @@ export default async function Photography() {
   const photos = await loadPhotos();
 
   return (
-    <main className="mx-auto max-w-[110rem] px-4 py-12 sm:px-8 sm:py-20">
-      <header className="text-center">
+    <main className="mx-auto max-w-[110rem] px-4 py-10 sm:px-8 sm:py-16">
+      <nav className="eyebrow flex justify-between">
+        <Link href="/" className="link-draw">
+          Studio L
+        </Link>
+        <Link href="/social" className="link-draw">
+          Social
+        </Link>
+      </nav>
+
+      <header className="mt-10 text-center sm:mt-14">
         <Link href="/" aria-label="Studio L home" className="inline-block">
           <Wordmark className="mx-auto h-[clamp(3.5rem,13vw,9rem)]" />
         </Link>
