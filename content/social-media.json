@@ -1,0 +1,595 @@
+{
+ "feeds": {
+  "bold-and-bright": [
+   {
+    "id": "01-beach",
+    "kind": "video",
+    "src": "/social/feeds/bold-and-bright/01-beach.mp4",
+    "poster": "/social/feeds/bold-and-bright/01-beach.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "02-kiwi-sky",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/02-kiwi-sky.jpg",
+    "poster": "/social/feeds/bold-and-bright/02-kiwi-sky.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "03-good-fats",
+    "kind": "carousel",
+    "slides": [
+     {
+      "src": "/social/feeds/bold-and-bright/03-good-fats/1.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/03-good-fats/2.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/03-good-fats/3.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/03-good-fats/4.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/03-good-fats/5.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/03-good-fats/6.jpg",
+      "w": 1080,
+      "h": 1350
+     }
+    ],
+    "poster": "/social/feeds/bold-and-bright/03-good-fats/1.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "04-potatoes",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/04-potatoes.jpg",
+    "poster": "/social/feeds/bold-and-bright/04-potatoes.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "05-cucumbers",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/05-cucumbers.jpg",
+    "poster": "/social/feeds/bold-and-bright/05-cucumbers.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "06-whats-in-the-bowl",
+    "kind": "carousel",
+    "slides": [
+     {
+      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/1.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/2.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/3.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/4.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/5.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/6.jpg",
+      "w": 1080,
+      "h": 1350
+     }
+    ],
+    "poster": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/1.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "07-kiwi-salad",
+    "kind": "video",
+    "src": "/social/feeds/bold-and-bright/07-kiwi-salad.mp4",
+    "poster": "/social/feeds/bold-and-bright/07-kiwi-salad.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "08-avocado-float",
+    "kind": "video",
+    "src": "/social/feeds/bold-and-bright/08-avocado-float.mp4",
+    "poster": "/social/feeds/bold-and-bright/08-avocado-float.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "09-chickpea-crunch",
+    "kind": "carousel",
+    "slides": [
+     {
+      "src": "/social/feeds/bold-and-bright/09-chickpea-crunch/1.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/09-chickpea-crunch/2.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/09-chickpea-crunch/3.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/bold-and-bright/09-chickpea-crunch/4.jpg",
+      "w": 1080,
+      "h": 1350
+     }
+    ],
+    "poster": "/social/feeds/bold-and-bright/09-chickpea-crunch/1.jpg",
+    "w": 1080,
+    "h": 1350
+   }
+  ],
+  "light-and-airy": [
+   {
+    "id": "01-pasta-making",
+    "kind": "video",
+    "src": "/social/feeds/light-and-airy/01-pasta-making.mp4",
+    "poster": "/social/feeds/light-and-airy/01-pasta-making.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "02-wine-pour",
+    "kind": "image",
+    "src": "/social/feeds/light-and-airy/02-wine-pour.jpg",
+    "poster": "/social/feeds/light-and-airy/02-wine-pour.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "03-al-dente",
+    "kind": "image",
+    "src": "/social/feeds/light-and-airy/03-al-dente.jpg",
+    "poster": "/social/feeds/light-and-airy/03-al-dente.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "04-parmigiano",
+    "kind": "image",
+    "src": "/social/feeds/light-and-airy/04-parmigiano.jpg",
+    "poster": "/social/feeds/light-and-airy/04-parmigiano.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "05-tomato",
+    "kind": "image",
+    "src": "/social/feeds/light-and-airy/05-tomato.jpg",
+    "poster": "/social/feeds/light-and-airy/05-tomato.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "06-cheese-bread",
+    "kind": "image",
+    "src": "/social/feeds/light-and-airy/06-cheese-bread.jpg",
+    "poster": "/social/feeds/light-and-airy/06-cheese-bread.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "07-basilico",
+    "kind": "image",
+    "src": "/social/feeds/light-and-airy/07-basilico.jpg",
+    "poster": "/social/feeds/light-and-airy/07-basilico.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "08-parmesan-snow",
+    "kind": "video",
+    "src": "/social/feeds/light-and-airy/08-parmesan-snow.mp4",
+    "poster": "/social/feeds/light-and-airy/08-parmesan-snow.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "09-long-lunch",
+    "kind": "image",
+    "src": "/social/feeds/light-and-airy/09-long-lunch.jpg",
+    "poster": "/social/feeds/light-and-airy/09-long-lunch.jpg",
+    "w": 1080,
+    "h": 1350
+   }
+  ],
+  "dark-and-romantic": [
+   {
+    "id": "01-corn",
+    "kind": "video",
+    "src": "/social/feeds/dark-and-romantic/01-corn.mp4",
+    "poster": "/social/feeds/dark-and-romantic/01-corn.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "02-wine-pour",
+    "kind": "image",
+    "src": "/social/feeds/dark-and-romantic/02-wine-pour.jpg",
+    "poster": "/social/feeds/dark-and-romantic/02-wine-pour.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "03-steak",
+    "kind": "image",
+    "src": "/social/feeds/dark-and-romantic/03-steak.jpg",
+    "poster": "/social/feeds/dark-and-romantic/03-steak.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "04-mushrooms",
+    "kind": "image",
+    "src": "/social/feeds/dark-and-romantic/04-mushrooms.jpg",
+    "poster": "/social/feeds/dark-and-romantic/04-mushrooms.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "05-slow-fire",
+    "kind": "image",
+    "src": "/social/feeds/dark-and-romantic/05-slow-fire.jpg",
+    "poster": "/social/feeds/dark-and-romantic/05-slow-fire.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "06-table",
+    "kind": "image",
+    "src": "/social/feeds/dark-and-romantic/06-table.jpg",
+    "poster": "/social/feeds/dark-and-romantic/06-table.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "07-sushi-torch",
+    "kind": "video",
+    "src": "/social/feeds/dark-and-romantic/07-sushi-torch.mp4",
+    "poster": "/social/feeds/dark-and-romantic/07-sushi-torch.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "08-ribs",
+    "kind": "image",
+    "src": "/social/feeds/dark-and-romantic/08-ribs.jpg",
+    "poster": "/social/feeds/dark-and-romantic/08-ribs.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "09-chef",
+    "kind": "image",
+    "src": "/social/feeds/dark-and-romantic/09-chef.jpg",
+    "poster": "/social/feeds/dark-and-romantic/09-chef.jpg",
+    "w": 1080,
+    "h": 1350
+   }
+  ],
+  "earthy-and-naturalistic": [
+   {
+    "id": "01-from-scratch",
+    "kind": "video",
+    "src": "/social/feeds/earthy-and-naturalistic/01-from-scratch.mp4",
+    "poster": "/social/feeds/earthy-and-naturalistic/01-from-scratch.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "02-strawberries",
+    "kind": "image",
+    "src": "/social/feeds/earthy-and-naturalistic/02-strawberries.jpg",
+    "poster": "/social/feeds/earthy-and-naturalistic/02-strawberries.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "03-coffee-sip",
+    "kind": "image",
+    "src": "/social/feeds/earthy-and-naturalistic/03-coffee-sip.jpg",
+    "poster": "/social/feeds/earthy-and-naturalistic/03-coffee-sip.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "04-coffee-crema",
+    "kind": "image",
+    "src": "/social/feeds/earthy-and-naturalistic/04-coffee-crema.jpg",
+    "poster": "/social/feeds/earthy-and-naturalistic/04-coffee-crema.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "05-yogurt-stop-motion",
+    "kind": "video",
+    "src": "/social/feeds/earthy-and-naturalistic/05-yogurt-stop-motion.mp4",
+    "poster": "/social/feeds/earthy-and-naturalistic/05-yogurt-stop-motion.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "06-matcha",
+    "kind": "image",
+    "src": "/social/feeds/earthy-and-naturalistic/06-matcha.jpg",
+    "poster": "/social/feeds/earthy-and-naturalistic/06-matcha.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "07-overhead",
+    "kind": "image",
+    "src": "/social/feeds/earthy-and-naturalistic/07-overhead.jpg",
+    "poster": "/social/feeds/earthy-and-naturalistic/07-overhead.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "08-coffee-headline",
+    "kind": "video",
+    "src": "/social/feeds/earthy-and-naturalistic/08-coffee-headline.mp4",
+    "poster": "/social/feeds/earthy-and-naturalistic/08-coffee-headline.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "09-pancakes-caption",
+    "kind": "video",
+    "src": "/social/feeds/earthy-and-naturalistic/09-pancakes-caption.mp4",
+    "poster": "/social/feeds/earthy-and-naturalistic/09-pancakes-caption.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   }
+  ]
+ },
+ "tiers": {
+  "bronze": [
+   {
+    "id": "backseat",
+    "kind": "image",
+    "src": "/social/tiers/bronze/backseat.jpg",
+    "poster": "/social/tiers/bronze/backseat.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "05-gift-set",
+    "kind": "image",
+    "src": "/social/tiers/bronze/05-gift-set.jpg",
+    "poster": "/social/tiers/bronze/05-gift-set.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "coffee-or-matcha",
+    "kind": "image",
+    "src": "/social/tiers/bronze/coffee-or-matcha.jpg",
+    "poster": "/social/tiers/bronze/coffee-or-matcha.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "02-grandma-texts",
+    "kind": "image",
+    "src": "/social/tiers/bronze/02-grandma-texts.jpg",
+    "poster": "/social/tiers/bronze/02-grandma-texts.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "03-al-dente",
+    "kind": "image",
+    "src": "/social/tiers/bronze/03-al-dente.jpg",
+    "poster": "/social/tiers/bronze/03-al-dente.jpg",
+    "w": 1080,
+    "h": 1350
+   }
+  ],
+  "silver": [
+   {
+    "id": "01-poolside",
+    "kind": "video",
+    "src": "/social/tiers/silver/01-poolside.mp4",
+    "poster": "/social/tiers/silver/01-poolside.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "shift-promo-phone-2",
+    "kind": "video",
+    "src": "/social/tiers/silver/shift-promo-phone-2.mp4",
+    "poster": "/social/tiers/silver/shift-promo-phone-2.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   },
+   {
+    "id": "01-whats-oot",
+    "kind": "carousel",
+    "slides": [
+     {
+      "src": "/social/tiers/silver/01-whats-oot/1.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/tiers/silver/01-whats-oot/2.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/tiers/silver/01-whats-oot/3.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/tiers/silver/01-whats-oot/4.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/tiers/silver/01-whats-oot/5.jpg",
+      "w": 1080,
+      "h": 1350
+     }
+    ],
+    "poster": "/social/tiers/silver/01-whats-oot/1.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "stay-cool",
+    "kind": "video",
+    "src": "/social/tiers/silver/stay-cool.mp4",
+    "poster": "/social/tiers/silver/stay-cool.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "09-garden",
+    "kind": "video",
+    "src": "/social/tiers/silver/09-garden.mp4",
+    "poster": "/social/tiers/silver/09-garden.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "needs-an-acura",
+    "kind": "carousel",
+    "slides": [
+     {
+      "src": "/social/tiers/silver/needs-an-acura/1.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/tiers/silver/needs-an-acura/2.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/tiers/silver/needs-an-acura/3.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/tiers/silver/needs-an-acura/4.jpg",
+      "w": 1080,
+      "h": 1350
+     }
+    ],
+    "poster": "/social/tiers/silver/needs-an-acura/1.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "recipe-reel",
+    "kind": "video",
+    "src": "/social/tiers/silver/recipe-reel.mp4",
+    "poster": "/social/tiers/silver/recipe-reel.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   }
+  ],
+  "gold": [
+   {
+    "id": "brandos-spin-to-win",
+    "kind": "video",
+    "src": "/social/tiers/gold/brandos-spin-to-win.mp4",
+    "poster": "/social/tiers/gold/brandos-spin-to-win.jpg",
+    "w": 720,
+    "h": 1078,
+    "sound": true
+   },
+   {
+    "id": "flash-art",
+    "kind": "video",
+    "src": "/social/tiers/gold/flash-art.mp4",
+    "poster": "/social/tiers/gold/flash-art.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   },
+   {
+    "id": "lombardi-no",
+    "kind": "video",
+    "src": "/social/tiers/gold/lombardi-no.mp4",
+    "poster": "/social/tiers/gold/lombardi-no.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   },
+   {
+    "id": "mb-feature",
+    "kind": "video",
+    "src": "/social/tiers/gold/mb-feature.mp4",
+    "poster": "/social/tiers/gold/mb-feature.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   },
+   {
+    "id": "oyster-point-long-day",
+    "kind": "video",
+    "src": "/social/tiers/gold/oyster-point-long-day.mp4",
+    "poster": "/social/tiers/gold/oyster-point-long-day.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   }
+  ]
+ }
+}

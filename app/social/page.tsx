@@ -1,0 +1,176 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+
+import { brand } from "@/content/brand";
+import { site } from "@/content/site";
+import { addOns, feeds, included, packages, social, terms, tiers } from "@/content/social";
+import { loadCaptions } from "@/lib/captions";
+import { feedPosts, tierPosts } from "@/lib/socialMedia";
+import PostGrid from "./components/PostGrid";
+import { feedStyle } from "./fonts";
+
+export const metadata: Metadata = {
+  title: `${social.name} — Social media management`,
+  description: social.bio,
+};
+
+const tierColor = { bronze: "#b0744a", silver: "#8e959c", gold: "#c39b2a" };
+
+export default async function Social() {
+  const looks = await Promise.all(
+    feeds.map(async (feed) => {
+      const captions = await loadCaptions(feed.key);
+      return {
+        ...feed,
+        posts: feedPosts[feed.key].map((p) => ({ ...p, caption: captions[p.id] })),
+      };
+    })
+  );
+  const postCount = looks.reduce((n, l) => n + l.posts.length, 0);
+
+  return (
+    <main className="mx-auto max-w-[80rem] px-4 py-10 sm:px-8 sm:py-16">
+      <nav className="eyebrow flex justify-between">
+        <Link href="/" className="link-draw">
+          Studio L
+        </Link>
+        <Link href="/photography" className="link-draw">
+          Photography
+        </Link>
+      </nav>
+
+      {/* Profile header, Instagram style. */}
+      <header className="mt-10 flex flex-col items-center gap-6 text-center sm:mt-14 sm:flex-row sm:justify-center sm:gap-12 sm:text-left">
+        <Image src={brand.mark} alt="" priority className="h-28 w-28 rounded-full sm:h-36 sm:w-36" />
+        <div>
+          <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-7xl">{social.name}</h1>
+          <p className="mt-1 text-lg opacity-80">@{social.handle}</p>
+          <dl className="mt-4 flex justify-center gap-8 sm:justify-start">
+            {[
+              [feeds.length, "looks"],
+              [postCount, "posts"],
+              [tiers.length, "tiers"],
+            ].map(([n, label]) => (
+              <div key={label} className="flex items-baseline gap-1.5">
+                <dt className="sr-only">{label}</dt>
+                <dd className="text-xl font-bold">{n}</dd>
+                <span className="opacity-80">{label}</span>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-3 text-lg">{social.bio}</p>
+        </div>
+      </header>
+
+      <div className="eyebrow mt-10 flex justify-center gap-8 border-y-2 border-red py-3 sm:mt-14">
+        <a href="#looks" className="link-draw">Looks</a>
+        <a href="#posts" className="link-draw">Post types</a>
+        <a href="#packages" className="link-draw">Packages</a>
+      </div>
+
+      {/* The four test feeds. */}
+      <section id="looks" className="scroll-mt-6 pt-14 sm:pt-20">
+        <div className="grid gap-14 md:grid-cols-2 md:gap-x-10 md:gap-y-16">
+          {looks.map((look) => {
+            const style = feedStyle[look.key];
+            return (
+              <div key={look.key}>
+                <h2 className={`mb-4 text-center text-4xl sm:text-5xl ${style.font}`} style={{ color: style.color }}>
+                  {look.label}
+                </h2>
+                <PostGrid posts={look.posts} title={look.label} titleClass={style.font} />
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Bronze, silver, gold, with examples. */}
+      <section id="posts" className="scroll-mt-6 pt-20 sm:pt-28">
+        <h2 className="text-center font-[family-name:var(--font-display)] text-5xl sm:text-6xl">Post types</h2>
+        <div className="mt-10 space-y-14">
+          {tiers.map((tier) => (
+            <div key={tier.key}>
+              <div className="mb-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <h3 className="flex items-center gap-2.5 text-3xl font-bold" style={{ color: tierColor[tier.key] }}>
+                  <span className="h-4 w-4 rounded-full" style={{ background: tierColor[tier.key] }} />
+                  {tier.name}
+                </h3>
+                <p className="text-lg">{tier.what}</p>
+              </div>
+              <PostGrid posts={tierPosts[tier.key]} title={tier.name} layout="row" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* What each package gets you, and the price. */}
+      <section id="packages" className="scroll-mt-6 pt-20 sm:pt-28">
+        <h2 className="text-center font-[family-name:var(--font-display)] text-5xl sm:text-6xl">Packages</h2>
+
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {packages.map((pkg) => (
+            <div key={pkg.name} className="flex flex-col border-2 border-red p-6">
+              <h3 className="font-[family-name:var(--font-display)] text-4xl">{pkg.name}</h3>
+              <p className="mt-3">
+                <span className="text-4xl font-bold">${pkg.price}</span>
+                <span className="opacity-80"> /month</span>
+              </p>
+              <p className="eyebrow mt-6 opacity-70">Every week</p>
+              <ul className="mt-2 space-y-1.5 text-lg">
+                {pkg.perWeek.map((item) => {
+                  const tier = tiers.find((t) => item.endsWith(t.name))!;
+                  return (
+                    <li key={item} className="flex items-center gap-2.5">
+                      <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: tierColor[tier.key] }} />
+                      {item} {Number(item[0]) > 1 ? "posts" : "post"}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div className="bg-red p-6 text-cream">
+            <p className="eyebrow">Every package includes</p>
+            <ul className="mt-3 space-y-1.5 text-lg">
+              {included.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="border-2 border-red p-6">
+            <p className="eyebrow">Add-ons</p>
+            <ul className="mt-3 space-y-1.5 text-lg">
+              {addOns.map((a) => (
+                <li key={a.name} className="flex justify-between gap-4">
+                  <span>
+                    {a.name}
+                    {a.note && <span className="ml-2 text-sm italic opacity-70">{a.note}</span>}
+                  </span>
+                  <span className="font-bold">{a.price}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <p className="mt-6 text-center text-sm tracking-wide opacity-70">{terms.join("  ·  ")}</p>
+      </section>
+
+      <footer className="mt-20 flex flex-col items-center gap-4 border-t border-red-line pt-12 text-center sm:mt-28">
+        {site.email && (
+          <a href={`mailto:${site.email}`} className="link-draw text-lg">
+            {site.email}
+          </a>
+        )}
+        <p className="mt-2 text-xs tracking-[0.2em] uppercase opacity-50">
+          {new Date().getFullYear()} {social.name}
+        </p>
+      </footer>
+    </main>
+  );
+}

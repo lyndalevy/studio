@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 
 import type { Photo } from "@/lib/sources";
-import { Sparkle } from "./Marks";
 
 /**
  * Contact-sheet grid with a lightbox. Lays out in CSS columns so portrait and
@@ -43,27 +42,25 @@ export default function Gallery({ photos }: { photos: Photo[] }) {
 
   return (
     <>
-      <div className="columns-2 gap-3 sm:gap-4 md:columns-3 [&>*]:mb-3 sm:[&>*]:mb-4">
+      {/* Masonry columns, so portrait and landscape shots sit together
+          without either being cropped. */}
+      <div className="columns-2 gap-2 sm:gap-3 md:columns-3 lg:columns-4 [&>*]:mb-2 sm:[&>*]:mb-3">
         {photos.map((photo, i) => (
           <button
             key={photo.id}
             type="button"
             onClick={() => setOpenIndex(i)}
             aria-label={`Open photo ${i + 1} of ${photos.length}`}
-            className="frame group relative block w-full cursor-zoom-in border border-red-line transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1"
+            className="frame block w-full cursor-zoom-in transition-opacity duration-300 hover:opacity-85"
           >
             <Image
               src={photo.thumb}
               alt={photo.alt}
               width={photo.width ?? 1200}
               height={photo.height ?? 800}
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 380px"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               className="h-auto w-full"
             />
-            {/* Sparkle peeks in on hover — the playful bit. */}
-            <span className="pointer-events-none absolute right-2 top-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <Sparkle className="h-5 w-5 text-cream drop-shadow" />
-            </span>
           </button>
         ))}
       </div>

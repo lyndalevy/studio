@@ -12,3 +12,19 @@ runConfig:
 
   # Image optimisation and the Lightroom proxy do real work on first hit.
   timeoutSeconds: 60
+# ── Instagram ────────────────────────────────────────────────
+# Uncomment once the secret exists, otherwise the deploy fails looking
+# for it. Create it first with:
+#
+#   firebase apphosting:secrets:set INSTAGRAM_ACCESS_TOKEN
+#
+# It prompts for the value, stores it in Cloud Secret Manager, and never
+# puts it in this repo. BUILD matters as well as RUNTIME, because the page
+# is prerendered at build time.
+#
+# env:
+#   - variable: INSTAGRAM_ACCESS_TOKEN
+#     secret: INSTAGRAM_ACCESS_TOKEN
+#     availability:
+#       - BUILD
+#       - RUNTIME

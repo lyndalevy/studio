@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 
-import type { GallerySource } from "@/content/galleries";
+import type { PhotoSource } from "@/content/photos";
 import { imageSize } from "./imageSize";
 import { fetchShare, proxied } from "./lightroom";
 
@@ -338,7 +338,7 @@ function shuffle<T>(items: T[]): T[] {
 }
 
 export async function loadGallery(
-  source: GallerySource,
+  source: PhotoSource,
   alt = "Photograph by Studio L",
   { randomize = true }: { randomize?: boolean } = {}
 ): Promise<GalleryResult> {

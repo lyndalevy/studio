@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
       // Adobe Lightroom shares
       { protocol: "https", hostname: "lightroom.adobe.com" },
       { protocol: "https", hostname: "*.adobe.io" },
+      // Instagram media CDN
+      { protocol: "https", hostname: "*.cdninstagram.com" },
+      { protocol: "https", hostname: "*.fbcdn.net" },
       // Adobe Portfolio pages and their image CDN
       { protocol: "https", hostname: "cdn.myportfolio.com" },
       { protocol: "https", hostname: "*.myportfolio.com" },

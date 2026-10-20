@@ -1,25 +1,17 @@
 import Link from "next/link";
 
-import { FilmReel } from "./components/Marks";
-
 export default function NotFound() {
   return (
-    <div className="tile-pattern flex min-h-[70vh] items-center justify-center px-5 py-24 text-center">
-      <div>
-        <FilmReel className="mx-auto h-24 w-auto text-red" />
-        <h1 className="headline mt-8">Nothing on this roll</h1>
-        <p className="lede mx-auto mt-5 max-w-md">
-          That page doesn&rsquo;t exist. Probably my fault, possibly a typo.
-        </p>
-        <div className="mt-9 flex flex-wrap justify-center gap-3">
-          <Link href="/" className="btn btn-solid">
-            Back home
-          </Link>
-          <Link href="/portfolio" className="btn btn-ghost">
-            See the work
-          </Link>
-        </div>
-      </div>
-    </div>
+    <main className="flex min-h-screen flex-col items-center justify-center px-5 text-center">
+      <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-7xl">
+        Nothing here
+      </h1>
+      <p className="mt-5 max-w-sm text-lg leading-relaxed">
+        That page doesn&rsquo;t exist. Probably a typo, possibly my fault.
+      </p>
+      <Link href="/" className="link-draw mt-8 text-lg">
+        Back to the photos
+      </Link>
+    </main>
   );
 }
