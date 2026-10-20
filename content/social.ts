@@ -50,7 +50,7 @@ export const included = [
   "Social media management tool",
   "Editing and AI tools",
   "Posting and scheduling",
-  "1 shoot a month",
+  "1 30-minute shoot a month",
 ];
 
 export const addOns = [
@@ -58,7 +58,8 @@ export const addOns = [
   { name: "+1 Bronze a week", price: "$100/mo" },
   { name: "+1 Silver a week", price: "$125/mo" },
   { name: "+1 Gold a week", price: "$150/mo" },
-  { name: "Extra shoot", price: "$100" },
+  { name: "Extend a shoot by 30 minutes", price: "$100" },
+  { name: "Extra 30-minute shoot", price: "$100" },
   { name: "Extra revision", price: "$10" },
 ];
 
