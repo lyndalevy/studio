@@ -66,7 +66,7 @@ export default async function Social() {
       <div className="eyebrow mt-10 flex justify-center gap-8 border-y-2 border-red py-3 sm:mt-14">
         <a href="#packages" className="link-draw">Packages</a>
         <a href="#posts" className="link-draw">Post types</a>
-        <a href="#looks" className="link-draw">Looks</a>
+        <a href="#samples" className="link-draw">Samples</a>
       </div>
 
       {/* What each package gets you, and the price. */}
@@ -145,8 +145,9 @@ export default async function Social() {
       </section>
 
       {/* The four test feeds. */}
-      <section id="looks" className="scroll-mt-6 pt-20 sm:pt-28">
-        <div className="grid gap-14 md:grid-cols-2 md:gap-x-10 md:gap-y-16">
+      <section id="samples" className="scroll-mt-6 pt-20 sm:pt-28">
+        <h2 className="text-center font-[family-name:var(--font-display)] text-5xl sm:text-6xl">Samples</h2>
+        <div className="mt-10 grid gap-14 md:grid-cols-2 md:gap-x-10 md:gap-y-16">
           {looks.map((look) => {
             const style = feedStyle[look.key];
             return (
