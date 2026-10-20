@@ -45,7 +45,7 @@ export default async function Social() {
         <Image src={brand.mark} alt="" priority className="h-28 w-28 rounded-full sm:h-36 sm:w-36" />
         <div>
           <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-7xl">{social.name}</h1>
-          <p className="mt-1 text-lg opacity-80">@{social.handle}</p>
+          <p className="mt-1 text-lg opacity-80">{social.byline}</p>
           <dl className="mt-4 flex justify-center gap-8 sm:justify-start">
             {[
               [feeds.length, "looks"],

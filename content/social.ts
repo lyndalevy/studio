@@ -11,6 +11,8 @@ export const social = {
   name: "Studio L Social",
   /** The profile handle shown on the page and on every post. */
   handle: "studiol.social",
+  /** The small line right under the name. */
+  byline: "a Studio L project",
   /** The line under the name, like an Instagram bio. */
   bio: "Social media, handled.",
 };
