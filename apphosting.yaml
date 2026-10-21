@@ -32,11 +32,22 @@ runConfig:
 # ── Dashboard ────────────────────────────────────────────────
 # The /dashboard password. Set or change it with:
 #   firebase apphosting:secrets:set DASHBOARD_PASSWORD
-# The Dropbox secrets (DROPBOX_APP_KEY, DROPBOX_APP_SECRET,
-# DROPBOX_REFRESH_TOKEN) go here too once scripts/connect-dashboard.mjs
-# has been run.
+# Dropbox access for the dashboard comes from scripts/connect-dashboard.mjs,
+# which stores these three. Run it again to reconnect Dropbox.
 env:
   - variable: DASHBOARD_PASSWORD
     secret: DASHBOARD_PASSWORD
+    availability:
+      - RUNTIME
+  - variable: DROPBOX_APP_KEY
+    secret: DROPBOX_APP_KEY
+    availability:
+      - RUNTIME
+  - variable: DROPBOX_APP_SECRET
+    secret: DROPBOX_APP_SECRET
+    availability:
+      - RUNTIME
+  - variable: DROPBOX_REFRESH_TOKEN
+    secret: DROPBOX_REFRESH_TOKEN
     availability:
       - RUNTIME
