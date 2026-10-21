@@ -8,7 +8,7 @@ import { stripeInvoices, type StripeInvoice } from "./stripe";
  *
  *   <CLIENT>/client.json            package, add-ons, cycle start, billing
  *   <CLIENT>/CYCLE 1 - 10:19:26/... one folder per 2-week cycle (or SET), dated in its name
- *   W2 10:26 SILVER living-room.mp4 each post named by week and its Monday
+ *   10:26 SILVER living-room.mp4    each post named by its week's Monday and tier
  *   <CLIENT>/SET 1 .../captions.txt a post marked "(SCHEDULED)" or "(POSTED)" is scheduled
  *
  * A post's tier comes from what it is: a photo is Bronze, a carousel of 4+
@@ -36,7 +36,7 @@ export type Deliverable = {
   name: string;
   kind: "photo" | "carousel" | "video";
   tier: TierKey;
-  /** The Monday of the post's week (from "W2 10:26 ..." in its name), else the set's date. */
+  /** The Monday of the post's week (from "10:26 ..." at the start of its name), else the set's date. */
   week: string | null;
   /** Scheduled in LinkMe or already posted: either way, nothing left to do. */
   scheduled: boolean;
@@ -113,9 +113,9 @@ const mondayOf = (d: string) => {
 const shortDay = (d: string) =>
   new Date(toTime(d)).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
-/** "W2 10:26 SILVER ..." → the date of that Monday, in the year of the folder it's in. */
+/** "10:26 SILVER ..." (or the older "W2 10:26 ...") → that Monday, in the year of the folder it's in. */
 function weekDate(name: string, folderDate: string | null): string | null {
-  const m = name.match(/^W\d+\s+(\d{1,2})[:/](\d{1,2})\b/i);
+  const m = name.match(/^(?:W\d+\s+)?(\d{1,2})[:/](\d{1,2})\b/i);
   if (!m || !folderDate) return folderDate;
   let year = Number(folderDate.slice(0, 4));
   if (Number(m[1]) < Number(folderDate.slice(5, 7))) year++; // a cycle running into January
