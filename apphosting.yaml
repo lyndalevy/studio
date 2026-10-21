@@ -28,3 +28,15 @@ runConfig:
 #     availability:
 #       - BUILD
 #       - RUNTIME
+
+# ── Dashboard ────────────────────────────────────────────────
+# The /dashboard password. Set or change it with:
+#   firebase apphosting:secrets:set DASHBOARD_PASSWORD
+# The Dropbox secrets (DROPBOX_APP_KEY, DROPBOX_APP_SECRET,
+# DROPBOX_REFRESH_TOKEN) go here too once scripts/connect-dashboard.mjs
+# has been run.
+env:
+  - variable: DASHBOARD_PASSWORD
+    secret: DASHBOARD_PASSWORD
+    availability:
+      - RUNTIME
