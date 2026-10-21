@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { brand } from "@/content/brand";
 import { site } from "@/content/site";
-import { addOns, feeds, included, packages, social, terms, tiers } from "@/content/social";
+import { addOns, baseFee, feeds, included, packages, social, terms, tiers } from "@/content/social";
 import { loadCaptions } from "@/lib/captions";
 import { feedPosts, tierPosts } from "@/lib/socialMedia";
 import PostGrid from "./components/PostGrid";
@@ -81,6 +81,9 @@ export default async function Social() {
                 <span className="text-4xl font-bold">${pkg.price}</span>
                 <span className="opacity-80"> /month</span>
               </p>
+              <p className="mt-2 text-sm leading-snug opacity-80">
+                Includes the ${baseFee} base: management, tools and your shoot
+              </p>
               <p className="eyebrow mt-6 opacity-70">Every week</p>
               <ul className="mt-2 space-y-1.5 text-lg">
                 {pkg.perWeek.map((item) => {
@@ -99,7 +102,7 @@ export default async function Social() {
 
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div className="bg-red p-6 text-cream">
-            <p className="eyebrow">Every package includes</p>
+            <p className="eyebrow">Every package includes · ${baseFee}/month base</p>
             <ul className="mt-3 space-y-1.5 text-lg">
               {included.map((item) => (
                 <li key={item}>{item}</li>

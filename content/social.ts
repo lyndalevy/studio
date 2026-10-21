@@ -41,6 +41,9 @@ export const tiers: { key: TierKey; name: string; what: string }[] = [
   { key: "gold", name: "Gold", what: "In-person reels, filmed on location" },
 ];
 
+/** The monthly base fee, already inside every package price. */
+export const baseFee = 150;
+
 /** Prices are per month and already include the $150 base fee. */
 export const packages = [
   { name: "Steady", price: 250, perWeek: ["1 Bronze"] },
