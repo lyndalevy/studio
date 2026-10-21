@@ -35,9 +35,14 @@ export default async function Social() {
         <Link href="/" className="link-draw">
           Studio L
         </Link>
-        <Link href="/photography" className="link-draw">
-          Photography
-        </Link>
+        <span className="flex gap-6">
+          <Link href="/photography" className="link-draw">
+            Photography
+          </Link>
+          <Link href="/dashboard" className="link-draw">
+            Dashboard
+          </Link>
+        </span>
       </nav>
 
       {/* Profile header, Instagram style. */}
