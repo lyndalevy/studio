@@ -81,9 +81,7 @@ export default async function Social() {
                 <span className="text-4xl font-bold">${pkg.price}</span>
                 <span className="opacity-80"> /month</span>
               </p>
-              <p className="mt-2 text-sm leading-snug opacity-80">
-                Includes the ${baseFee} base: management, tools and your shoot
-              </p>
+              <p className="mt-2 text-sm leading-snug opacity-80">Includes ${baseFee} base</p>
               <p className="eyebrow mt-6 opacity-70">Every week</p>
               <ul className="mt-2 space-y-1.5 text-lg">
                 {pkg.perWeek.map((item) => {

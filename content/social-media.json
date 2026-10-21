@@ -649,15 +649,6 @@
     "h": 1350
    },
    {
-    "id": "stay-cool",
-    "kind": "video",
-    "src": "/social/tiers/silver/stay-cool.mp4",
-    "poster": "/social/tiers/silver/stay-cool.jpg",
-    "w": 720,
-    "h": 900,
-    "sound": false
-   },
-   {
     "id": "09-garden",
     "kind": "video",
     "src": "/social/tiers/silver/09-garden.mp4",
