@@ -389,6 +389,167 @@
     "h": 900,
     "sound": false
    }
+  ],
+  "fun-and-playful": [
+   {
+    "id": "01-gen-z-girlie",
+    "kind": "video",
+    "src": "/social/feeds/fun-and-playful/01-gen-z-girlie.mp4",
+    "poster": "/social/feeds/fun-and-playful/01-gen-z-girlie.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   },
+   {
+    "id": "02-whats-oot",
+    "kind": "carousel",
+    "slides": [
+     {
+      "src": "/social/feeds/fun-and-playful/02-whats-oot/1.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/02-whats-oot/2.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/02-whats-oot/3.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/02-whats-oot/4.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/02-whats-oot/5.jpg",
+      "w": 1080,
+      "h": 1350
+     }
+    ],
+    "poster": "/social/feeds/fun-and-playful/02-whats-oot/1.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "03-grandma-texts",
+    "kind": "image",
+    "src": "/social/feeds/fun-and-playful/03-grandma-texts.jpg",
+    "poster": "/social/feeds/fun-and-playful/03-grandma-texts.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "04-one-jar",
+    "kind": "video",
+    "src": "/social/feeds/fun-and-playful/04-one-jar.mp4",
+    "poster": "/social/feeds/fun-and-playful/04-one-jar.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   },
+   {
+    "id": "05-gift-set",
+    "kind": "image",
+    "src": "/social/feeds/fun-and-playful/05-gift-set.jpg",
+    "poster": "/social/feeds/fun-and-playful/05-gift-set.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "06-team-oot-or-dat",
+    "kind": "carousel",
+    "slides": [
+     {
+      "src": "/social/feeds/fun-and-playful/06-team-oot-or-dat/1.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/06-team-oot-or-dat/2.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/06-team-oot-or-dat/3.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/06-team-oot-or-dat/4.jpg",
+      "w": 1080,
+      "h": 1350
+     }
+    ],
+    "poster": "/social/feeds/fun-and-playful/06-team-oot-or-dat/1.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "07-a-little-bit",
+    "kind": "video",
+    "src": "/social/feeds/fun-and-playful/07-a-little-bit.mp4",
+    "poster": "/social/feeds/fun-and-playful/07-a-little-bit.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   },
+   {
+    "id": "08-ways-to-oot",
+    "kind": "carousel",
+    "slides": [
+     {
+      "src": "/social/feeds/fun-and-playful/08-ways-to-oot/1.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/08-ways-to-oot/2.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/08-ways-to-oot/3.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/08-ways-to-oot/4.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/08-ways-to-oot/5.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/08-ways-to-oot/6.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/fun-and-playful/08-ways-to-oot/7.jpg",
+      "w": 1080,
+      "h": 1350
+     }
+    ],
+    "poster": "/social/feeds/fun-and-playful/08-ways-to-oot/1.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "09-reacting",
+    "kind": "video",
+    "src": "/social/feeds/fun-and-playful/09-reacting.mp4",
+    "poster": "/social/feeds/fun-and-playful/09-reacting.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   }
   ]
  },
  "tiers": {

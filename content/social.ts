@@ -21,7 +21,8 @@ export type FeedKey =
   | "bold-and-bright"
   | "light-and-airy"
   | "dark-and-romantic"
-  | "earthy-and-naturalistic";
+  | "earthy-and-naturalistic"
+  | "fun-and-playful";
 
 /** The four looks, in the order they appear. */
 export const feeds: { key: FeedKey; label: string }[] = [
@@ -29,6 +30,7 @@ export const feeds: { key: FeedKey; label: string }[] = [
   { key: "light-and-airy", label: "Light & Airy" },
   { key: "dark-and-romantic", label: "Dark & Romantic" },
   { key: "earthy-and-naturalistic", label: "Earthy & Naturalistic" },
+  { key: "fun-and-playful", label: "Fun & Playful" },
 ];
 
 export type TierKey = "bronze" | "silver" | "gold";

@@ -148,10 +148,12 @@ export default async function Social() {
       <section id="samples" className="scroll-mt-6 pt-20 sm:pt-28">
         <h2 className="text-center font-[family-name:var(--font-display)] text-5xl sm:text-6xl">Samples</h2>
         <div className="mt-10 grid gap-14 md:grid-cols-2 md:gap-x-10 md:gap-y-16">
-          {looks.map((look) => {
+          {looks.map((look, i) => {
             const style = feedStyle[look.key];
+            // An odd one out at the end gets its own row, centred.
+            const alone = i === looks.length - 1 && looks.length % 2 === 1;
             return (
-              <div key={look.key}>
+              <div key={look.key} className={alone ? "md:col-span-2 md:mx-auto md:w-[calc(50%-1.25rem)]" : ""}>
                 <h2 className={`mb-4 text-center text-4xl sm:text-5xl ${style.font}`} style={{ color: style.color }}>
                   {look.label}
                 </h2>

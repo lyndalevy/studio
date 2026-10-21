@@ -78,7 +78,12 @@ function PostCard({ post, location }: { post: Post; location: string }) {
         </div>
       </header>
 
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-neutral-100">
+      {/* Reels show whole, at 9:16, so nothing burned into them is cropped. */}
+      <div
+        className={`relative w-full overflow-hidden bg-neutral-100 ${
+          post.kind === "video" && post.h / post.w > 1.5 ? "aspect-[9/16]" : "aspect-[4/5]"
+        }`}
+      >
         {post.kind === "carousel" && post.slides ? (
           <Carousel slides={post.slides} onIndex={setIndex} />
         ) : post.kind === "video" && post.src ? (
