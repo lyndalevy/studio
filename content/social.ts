@@ -54,6 +54,7 @@ export const packages = [
 
 /** What the $150 base fee covers, in every package. */
 export const included = [
+  "Instagram and Facebook",
   "Social media management tool",
   "Editing and AI tools",
   "Posting and scheduling",
@@ -65,6 +66,7 @@ export const addOns = [
   { name: "+1 Bronze a week", price: "$100/mo" },
   { name: "+1 Silver a week", price: "$125/mo" },
   { name: "+1 Gold a week", price: "$150/mo" },
+  { name: "Extra platform", price: "$25/mo", note: "Each, beyond Instagram and Facebook" },
   { name: "Extend a shoot by 30 minutes", price: "$100" },
   { name: "Extra 30-minute shoot", price: "$100" },
   { name: "Extra revision", price: "$10" },
