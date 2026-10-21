@@ -1,4 +1,4 @@
-import { readdir, readFile, stat } from "node:fs/promises";
+import { readdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 /**
@@ -16,6 +16,8 @@ export interface Source {
   list(dir: string, recursive?: boolean): Promise<Entry[]>;
   /** A small text file (client.json, captions.txt), or null if it isn't there. */
   read(file: string): Promise<string | null>;
+  /** Save a small text file, replacing what's there. */
+  write(file: string, text: string): Promise<void>;
 }
 
 const ROOT = process.env.DROPBOX_ROOT ?? "/STUDIO L SOCIAL";
@@ -102,6 +104,21 @@ const dropbox: Source = {
     if (!res.ok) throw new Error(`Couldn't read ${file} from Dropbox (${res.status}): ${await reason(res)}`);
     return res.text();
   },
+
+  async write(file, text) {
+    const token = await accessToken();
+    const res = await fetch("https://content.dropboxapi.com/2/files/upload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/octet-stream",
+        "Dropbox-API-Arg": headerJson({ path: `${ROOT}/${file}`, mode: "overwrite", mute: true }),
+      },
+      body: text,
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`Couldn't save ${file} to Dropbox (${res.status}): ${await reason(res)}`);
+  },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -130,6 +147,9 @@ function local(root: string): Source {
       } catch {
         return null;
       }
+    },
+    async write(file, text) {
+      await writeFile(path.join(root, file), text, "utf8");
     },
   };
 }

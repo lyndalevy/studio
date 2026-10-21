@@ -7,7 +7,7 @@ import { source, type Entry, type Source } from "./source";
  *
  *   <CLIENT>/client.json            package, add-ons, start month, payments
  *   <CLIENT>/SET 1 - 10:20:26/...   one folder per set, dated in its name
- *   <CLIENT>/SET 1 .../captions.txt a post marked "(POSTED)" counts as posted
+ *   <CLIENT>/SET 1 .../captions.txt a post marked "(SCHEDULED)" or "(POSTED)" is scheduled
  *
  * A post's tier comes from what it is: a photo is Bronze, a carousel of 4+
  * slides or an .mp4 is Silver, a filmed .mov reel is Gold. client.json can
@@ -31,7 +31,8 @@ export type Deliverable = {
   name: string;
   kind: "photo" | "carousel" | "video";
   tier: TierKey;
-  posted: boolean;
+  /** Scheduled in LinkMe or already posted: either way, nothing left to do. */
+  scheduled: boolean;
 };
 
 export type MonthPlan = {
@@ -40,7 +41,7 @@ export type MonthPlan = {
   weeks: number;
   needed: Record<TierKey, number>;
   made: Record<TierKey, number>;
-  posted: number;
+  scheduled: number;
 };
 
 export type Invoice = {
@@ -136,13 +137,20 @@ const priceOf = (name: string) => {
 
 // ── deliverables ─────────────────────────────────────────────
 
+/** "(SCHEDULED)" or "(POSTED)" after a post's name in captions.txt. */
+const MARK = /\((scheduled|posted)\)/i;
+
+/** Is this captions.txt line the heading for a post? (lower-cased line, file name, stem) */
+const headingFor = (line: string, name: string, stem: string) =>
+  line.startsWith(name.toLowerCase()) || line.startsWith(stem);
+
 function deliverables(folder: string, set: string, entries: Entry[], captions: string, info: ClientFile): Deliverable[] {
   const prefix = `${folder}/${set}/`;
   const inSet = entries.filter((e) => e.path.startsWith(prefix));
   const children = inSet.filter((e) => !e.path.slice(prefix.length).includes("/"));
-  const postedLines = captions
+  const markedLines = captions
     .split("\n")
-    .filter((l) => /\(posted\)/i.test(l))
+    .filter((l) => MARK.test(l))
     .map((l) => l.trim().toLowerCase());
 
   const items: Deliverable[] = [];
@@ -166,8 +174,8 @@ function deliverables(folder: string, set: string, entries: Entry[], captions: s
 
     tier = info.tiers?.[`${set}/${name}`] ?? tier;
     const stem = name.replace(/\.[^.]+$/, "").toLowerCase();
-    const posted = postedLines.some((l) => l.startsWith(name.toLowerCase()) || l.startsWith(stem));
-    items.push({ set, name, kind, tier, posted });
+    const scheduled = markedLines.some((l) => headingFor(l, name, stem));
+    items.push({ set, name, kind, tier, scheduled });
   }
   return items.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 }
@@ -221,15 +229,15 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
     const weeks = mondays(month);
     const needed = zero();
     const made = zero();
-    let posted = 0;
+    let scheduled = 0;
     for (const t of TIERS) needed[t] = perWeek[t] * weeks;
     for (const s of sets.filter((x) => x.date?.startsWith(month))) {
       for (const it of s.items) {
         made[it.tier]++;
-        if (it.posted) posted++;
+        if (it.scheduled) scheduled++;
       }
     }
-    return { month, label: monthLabel(month), weeks, needed, made, posted };
+    return { month, label: monthLabel(month), weeks, needed, made, scheduled };
   };
 
   // Payments: an invoice on the 1st of every month from the start, due 7 days later.
@@ -292,4 +300,29 @@ export async function loadClients(): Promise<{ clients: ClientStatus[]; error?: 
   } catch (err) {
     return { clients: [], error: (err as Error).message };
   }
+}
+
+/**
+ * Mark a post scheduled, or clear it, by editing the heading line in its set's
+ * captions.txt. A post with no heading yet gets one added at the end.
+ */
+export async function setScheduled(folder: string, set: string, name: string, on: boolean): Promise<void> {
+  const src = source();
+  if (!src) throw new Error("Dropbox isn't connected yet.");
+  const safe = (p: string) => p.length > 0 && !p.includes("/") && !p.includes("..");
+  if (!safe(folder) || !safe(set) || !safe(name) || !/^set\b/i.test(set)) throw new Error("That isn't a post.");
+  if ((await src.read(`${folder}/client.json`)) === null) throw new Error("That isn't a client folder.");
+
+  const file = `${folder}/${set}/captions.txt`;
+  const lines = ((await src.read(file)) ?? "").split("\n");
+  const stem = name.replace(/\.[^.]+$/, "").toLowerCase();
+  const i = lines.findIndex((l) => headingFor(l.trim().toLowerCase(), name, stem));
+  if (i === -1) {
+    if (!on) return;
+    lines.push("", `${name}  (SCHEDULED)`);
+  } else {
+    const bare = lines[i].replace(/\s*\((scheduled|posted)\)/gi, "").trimEnd();
+    lines[i] = on ? `${bare}  (SCHEDULED)` : bare;
+  }
+  await src.write(file, lines.join("\n"));
 }

@@ -6,6 +6,7 @@ import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
 import { loadClients, today, type ClientStatus, type Invoice, type MonthPlan } from "@/lib/dashboard/clients";
 import { logout } from "./actions";
 import LoginForm from "./LoginForm";
+import PostPill from "./PostPill";
 
 export const metadata: Metadata = {
   title: "Dashboard — Studio L",
@@ -85,7 +86,7 @@ export default async function Dashboard() {
 }
 
 function ClientCard({ c }: { c: ClientStatus }) {
-  const posted = c.sets.flatMap((s) => s.items).filter((i) => i.posted).length;
+  const scheduled = c.sets.flatMap((s) => s.items).filter((i) => i.scheduled).length;
   const made = c.sets.flatMap((s) => s.items).length;
 
   return (
@@ -110,7 +111,7 @@ function ClientCard({ c }: { c: ClientStatus }) {
         <p className="text-sm opacity-80">
           {TIERS.filter((t) => c.perWeek[t]).map((t) => `${c.perWeek[t]} ${tierName[t]}`).join(" + ") || "No posts"} a week
           {c.info.add_ons?.length ? ` · add-ons: ${c.info.add_ons.join(", ")}` : ""}
-          {` · ${made} made, ${posted} posted`}
+          {` · ${made} made, ${scheduled} scheduled`}
         </p>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -130,17 +131,16 @@ function ClientCard({ c }: { c: ClientStatus }) {
                 </p>
                 <ul className="mt-1 flex flex-wrap gap-1.5">
                   {s.items.map((it) => (
-                    <li
+                    <PostPill
                       key={it.name}
-                      title={`${tierName[it.tier]} ${it.kind}${it.posted ? ", posted" : ", made, not posted"}`}
-                      className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs ${
-                        it.posted ? "bg-red text-cream" : "border border-red"
-                      }`}
-                    >
-                      <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: tierColor[it.tier] }} />
-                      {it.name.replace(/\.[^.]+$/, "")}
-                      {it.posted && " ✓"}
-                    </li>
+                      folder={c.folder}
+                      set={s.name}
+                      name={it.name}
+                      label={it.name.replace(/\.[^.]+$/, "")}
+                      title={`${tierName[it.tier]} ${it.kind}${it.scheduled ? ", scheduled" : ", made"}`}
+                      color={tierColor[it.tier]}
+                      scheduled={it.scheduled}
+                    />
                   ))}
                 </ul>
               </div>
@@ -158,7 +158,7 @@ function ClientCard({ c }: { c: ClientStatus }) {
                 {tierName[t]}
               </span>
             ))}
-            <span>filled = posted</span>
+            <span>filled = scheduled · click a post to mark it</span>
           </p>
         </div>
 
@@ -241,7 +241,7 @@ function Month({ plan, title, todo = false }: { plan: MonthPlan; title: string; 
             : "All made ✓"}
         </p>
       )}
-      {!todo && <p className="mt-3 text-sm opacity-70">{plan.posted} posted</p>}
+      {!todo && <p className="mt-3 text-sm opacity-70">{plan.scheduled} scheduled</p>}
     </div>
   );
 }
