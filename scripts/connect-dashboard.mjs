@@ -9,6 +9,9 @@
 // password or reconnect Dropbox.
 
 import { spawnSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { createInterface } from "node:readline";
 
 const ask = (question, hidden = false) =>
@@ -28,12 +31,21 @@ const ask = (question, hidden = false) =>
     });
   });
 
+// Firebase reads the value from a private temporary file that's deleted straight after.
 const setSecret = (name, value) => {
-  const r = spawnSync("firebase", ["apphosting:secrets:set", name, "--data-file", "-", "--force"], {
-    input: value,
-    stdio: ["pipe", "ignore", "inherit"],
-  });
-  if (r.status !== 0) throw new Error(`Couldn't save ${name}. Is the Firebase CLI signed in? (firebase login)`);
+  const dir = mkdtempSync(path.join(tmpdir(), "studio-l-"));
+  const file = path.join(dir, "value");
+  try {
+    writeFileSync(file, value, { mode: 0o600 });
+    const r = spawnSync("firebase", ["apphosting:secrets:set", name, "--data-file", file, "--force"], {
+      stdio: ["ignore", "ignore", "inherit"],
+    });
+    if (r.status !== 0) throw new Error(`Couldn't save ${name}. Is the Firebase CLI signed in? (firebase login)`);
+    spawnSync("firebase", ["apphosting:secrets:grantaccess", name, "--backend", "studio-l"], { stdio: "ignore" });
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+    rmSync("firebase-debug.log", { force: true });
+  }
   console.log(`  ✓ ${name} saved`);
 };
 
@@ -64,7 +76,8 @@ if (!refresh_token) {
 
 let password = "";
 for (;;) {
-  password = await ask("\nChoose a dashboard password (8+ characters): ", true);
+  password = await ask("\nNew dashboard password (8+ characters, or just Enter to keep the current one): ", true);
+  if (!password) break;
   const again = await ask("Type it again: ", true);
   if (password.length < 8) console.log("That's too short.");
   else if (password !== again) console.log("Those didn't match.");
@@ -75,5 +88,5 @@ console.log("\nSaving to Firebase…");
 setSecret("DROPBOX_APP_KEY", key);
 setSecret("DROPBOX_APP_SECRET", secret);
 setSecret("DROPBOX_REFRESH_TOKEN", refresh_token);
-setSecret("DASHBOARD_PASSWORD", password);
+if (password) setSecret("DASHBOARD_PASSWORD", password);
 console.log("\nDone. Tell Claude it's set up, and the site will be redeployed with the dashboard switched on.\n");
