@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import type { TierKey } from "@/content/social";
 import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
-import { loadClients, today, type ClientStatus, type Invoice, type MonthPlan } from "@/lib/dashboard/clients";
+import { loadClients, today, type ClientStatus, type CyclePlan, type Invoice } from "@/lib/dashboard/clients";
 import { logout } from "./actions";
 import LoginForm from "./LoginForm";
 import PostPill from "./PostPill";
@@ -23,9 +23,13 @@ const tierName: Record<TierKey, string> = { bronze: "Bronze", silver: "Silver", 
 const statusStyle: Record<Invoice["status"], string> = {
   paid: "bg-red text-cream",
   overdue: "bg-[#1c1714] text-cream",
-  due: "border-2 border-red",
+  sent: "border-2 border-red",
+  "not sent": "border-2 border-dashed border-red",
   upcoming: "border border-red-line opacity-70",
 };
+
+/** Finder shows ":" in a name as "/", so show it that way here too. */
+const finder = (name: string) => name.replace(/:/g, "/");
 
 const fmtDay = (d: string) =>
   new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
@@ -115,8 +119,8 @@ function ClientCard({ c }: { c: ClientStatus }) {
         </p>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Month plan={c.thisMonth} title="This month" />
-          <Month plan={c.nextMonth} title="Next month" todo />
+          <Cycle plan={c.thisCycle} title="This cycle" />
+          <Cycle plan={c.nextCycle} title="Next cycle" todo />
         </div>
 
         <div>
@@ -126,8 +130,7 @@ function ClientCard({ c }: { c: ClientStatus }) {
             {c.sets.map((s) => (
               <div key={s.name}>
                 <p className="text-sm font-bold">
-                  {s.name}
-                  {s.date && <span className="font-normal opacity-70"> · {fmtDay(s.date)}</span>}
+                  {finder(s.name)}
                 </p>
                 <ul className="mt-1 flex flex-wrap gap-1.5">
                   {s.items.map((it) => (
@@ -136,7 +139,7 @@ function ClientCard({ c }: { c: ClientStatus }) {
                       folder={c.folder}
                       set={s.name}
                       name={it.name}
-                      label={it.name.replace(/\.[^.]+$/, "")}
+                      label={finder(it.name.replace(/\.[^.]+$/, ""))}
                       title={`${tierName[it.tier]} ${it.kind}${it.scheduled ? ", scheduled" : ", made"}`}
                       color={tierColor[it.tier]}
                       scheduled={it.scheduled}
@@ -165,21 +168,29 @@ function ClientCard({ c }: { c: ClientStatus }) {
         <div>
           <p className="eyebrow mb-2">Payments</p>
           {c.invoices.length === 0 ? (
-            <p className="text-sm opacity-70">Set a package and start month to see the schedule.</p>
+            <p className="text-sm opacity-70">The schedule starts once the first invoice is sent.</p>
           ) : (
             <ul className="space-y-1.5">
               {c.invoices.map((inv) => (
                 <li key={inv.month} className="flex flex-wrap items-center justify-between gap-2 text-sm">
                   <span>
                     <span className="font-bold">{inv.label}</span>
+                    {inv.number &&
+                      (inv.url ? (
+                        <a href={inv.url} target="_blank" rel="noopener noreferrer" className="link-draw ml-1.5">
+                          {inv.number}
+                        </a>
+                      ) : (
+                        <span className="ml-1.5">{inv.number}</span>
+                      ))}
                     <span className="opacity-70">
                       {" "}
-                      · sent {fmtDay(inv.sent)}, due {fmtDay(inv.due)}
+                      · {inv.status === "upcoming" || inv.status === "not sent" ? "sends" : "sent"} {fmtDay(inv.sent)}, due {fmtDay(inv.due)}
                     </span>
                   </span>
                   <span className="flex items-center gap-2">
                     <span className="font-bold">${inv.amount}</span>
-                    <span className={`eyebrow rounded-full px-2.5 py-0.5 ${statusStyle[inv.status]}`}>{inv.status}</span>
+                    <InvoiceStatus inv={inv} />
                   </span>
                 </li>
               ))}
@@ -206,13 +217,34 @@ function ClientCard({ c }: { c: ClientStatus }) {
   );
 }
 
-function Month({ plan, title, todo = false }: { plan: MonthPlan; title: string; todo?: boolean }) {
+/** The invoice's status pill. In the week before it's due to go out, it counts down as a reminder. */
+function InvoiceStatus({ inv }: { inv: Invoice }) {
+  const days = Math.round((Date.parse(`${inv.sent}T00:00:00Z`) - Date.parse(`${today()}T00:00:00Z`)) / 86_400_000);
+  if (inv.status === "upcoming" && days >= 0 && days <= 7) {
+    return (
+      <span className="eyebrow rounded-full border-2 border-red bg-cream-deep px-2.5 py-0.5">
+        {days === 0 ? "Today" : `In ${days} day${days === 1 ? "" : "s"}`}
+      </span>
+    );
+  }
+  return <span className={`eyebrow rounded-full px-2.5 py-0.5 ${statusStyle[inv.status]}`}>{inv.status}</span>;
+}
+
+function Cycle({ plan, title, todo = false }: { plan: CyclePlan | null; title: string; todo?: boolean }) {
+  if (!plan) {
+    return (
+      <div className="border border-red-line p-4">
+        <p className="eyebrow">{title}</p>
+        <p className="mt-2 text-sm opacity-70">Add a dated CYCLE folder to start the cycles.</p>
+      </div>
+    );
+  }
   const left = TIERS.filter((t) => plan.needed[t] > plan.made[t]);
   return (
     <div className="border border-red-line p-4">
       <p className="eyebrow">{title}</p>
       <p className="font-bold">
-        {plan.label} <span className="font-normal opacity-70">· {plan.weeks} weeks</span>
+        Cycle {plan.number} <span className="font-normal opacity-70">· {plan.label}</span>
       </p>
       <ul className="mt-3 space-y-2">
         {TIERS.filter((t) => plan.needed[t] || plan.made[t]).map((t) => {
