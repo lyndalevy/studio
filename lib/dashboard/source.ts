@@ -39,10 +39,21 @@ async function accessToken(): Promise<string> {
     }),
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(`Dropbox sign-in failed (${res.status}). Reconnect Dropbox.`);
+  if (!res.ok) throw new Error(`Dropbox sign-in failed (${res.status}): ${await reason(res)} Reconnect Dropbox.`);
   const json = (await res.json()) as { access_token: string; expires_in: number };
   cachedToken = { value: json.access_token, expires: Date.now() + json.expires_in * 1000 };
   return json.access_token;
+}
+
+/** Dropbox's own explanation of a failed call (an error summary, never a token). */
+async function reason(res: Response): Promise<string> {
+  const text = await res.text();
+  try {
+    const j = JSON.parse(text) as { error_summary?: string; error_description?: string; error?: unknown };
+    return (j.error_summary ?? j.error_description ?? JSON.stringify(j.error) ?? "").slice(0, 300);
+  } catch {
+    return text.slice(0, 300);
+  }
 }
 
 /** Dropbox wants its JSON argument header in plain ASCII, so escape everything else. */
@@ -63,7 +74,7 @@ const dropbox: Source = {
         body: JSON.stringify(body),
         cache: "no-store",
       });
-      if (!res.ok) throw new Error(`Couldn't list ${base} in Dropbox (${res.status}).`);
+      if (!res.ok) throw new Error(`Couldn't list ${base} in Dropbox (${res.status}): ${await reason(res)}`);
       const page = (await res.json()) as {
         entries: { ".tag": string; path_display: string }[];
         has_more: boolean;
@@ -88,7 +99,7 @@ const dropbox: Source = {
       cache: "no-store",
     });
     if (res.status === 409) return null; // not found
-    if (!res.ok) throw new Error(`Couldn't read ${file} from Dropbox (${res.status}).`);
+    if (!res.ok) throw new Error(`Couldn't read ${file} from Dropbox (${res.status}): ${await reason(res)}`);
     return res.text();
   },
 };
