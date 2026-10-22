@@ -159,7 +159,6 @@ export default async function Social() {
         <div className="mt-10 grid gap-14 md:grid-cols-2 md:gap-x-10 md:gap-y-16">
           {looks.map((look, i) => {
             const style = feedStyle[look.key];
-            const pkg = packages.find((p) => p.name === look.plan)!;
             // An odd one out at the end gets its own row, centred.
             const alone = i === looks.length - 1 && looks.length % 2 === 1;
             return (
@@ -170,10 +169,7 @@ export default async function Social() {
                 <h2 className={`text-center text-4xl sm:text-5xl ${style.font}`} style={{ color: style.color }}>
                   {look.label}
                 </h2>
-                <p className="mt-2 text-center text-lg font-bold">{pkg.name} package</p>
-                <p className="mb-5 text-center opacity-80">
-                  {pkg.perWeek.join(" + ")} a week · ${pkg.price}/month
-                </p>
+                <p className="mt-2 mb-5 text-center text-lg font-bold">{look.plan} package</p>
                 <PostGrid posts={look.posts} title={look.label} titleClass={style.font} />
               </div>
             );

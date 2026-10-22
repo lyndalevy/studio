@@ -18,7 +18,7 @@ import mark from "@/app/assets/mark-circle.png";
 export const brand = {
   /** Full "Studio L Photography" lockup. */
   logoWide,
-  /** "Studio L Social" lockup (a see-through copy of logo-wide-social.png), the social page title. */
+  /** "Studio L Social" lockup (a see-through copy of logo-wide-social.png in the site red), the social page title. */
   logoSocial,
   /** Short "Studio L" lockup, for narrow screens. */
   logoCompact,
