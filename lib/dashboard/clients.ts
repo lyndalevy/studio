@@ -26,6 +26,8 @@ export type ClientFile = {
   stripe_customer?: string;
   paid?: string[];
   notes?: string;
+  /** Profile links by platform name, e.g. {"Instagram": "https://www.instagram.com/..."}. */
+  socials?: Record<string, string>;
   tiers?: Record<string, TierKey>;
   /** Monday the first cycle starts, YYYY-MM-DD. Defaults to the Monday of the first set. */
   cycle_start?: string;

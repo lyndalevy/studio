@@ -31,6 +31,14 @@ const statusStyle: Record<Invoice["status"], string> = {
 /** Finder shows ":" in a name as "/", so show it that way here too. */
 const finder = (name: string) => name.replace(/:/g, "/");
 
+/** Studio tools, linked at the top of the dashboard. */
+const TOOLS = [
+  { name: "LinkMe home", href: "https://app.link.com/home" },
+  { name: "LinkMe posts", href: "https://link.me/posts/all" },
+  { name: "Stripe invoices", href: "https://dashboard.stripe.com/acct_1USifd7M7uqalbo6/invoices" },
+  { name: "Dropbox API", href: "https://www.dropbox.com/developers/console/apps/nqh0vilp6wm6lys/settings" },
+];
+
 const fmtDay = (d: string) =>
   new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
@@ -75,6 +83,21 @@ export default async function Dashboard() {
         </p>
       </header>
 
+      <ul className="mt-6 flex flex-wrap justify-center gap-2">
+        {TOOLS.map((t) => (
+          <li key={t.href}>
+            <a
+              href={t.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="eyebrow inline-block rounded-full border-2 border-red px-3 py-1 hover:bg-red hover:text-cream"
+            >
+              {t.name} ↗
+            </a>
+          </li>
+        ))}
+      </ul>
+
       {error && <p className="mx-auto mt-10 max-w-xl border-2 border-red p-5 text-center">{error}</p>}
       {!error && !clients.length && (
         <p className="mt-10 text-center">No clients yet. Add a client.json to a client&rsquo;s folder in Dropbox.</p>
@@ -101,6 +124,15 @@ function ClientCard({ c }: { c: ClientStatus }) {
           {c.info.package ?? "No package"}
           {c.monthly !== null && <span className="font-bold"> · ${c.monthly}/mo</span>}
         </p>
+        {c.info.socials && Object.keys(c.info.socials).length > 0 && (
+          <p className="flex w-full flex-wrap gap-x-4 gap-y-1 text-sm">
+            {Object.entries(c.info.socials).map(([name, href]) => (
+              <a key={href} href={href} target="_blank" rel="noopener noreferrer" className="link-draw">
+                {name} ↗
+              </a>
+            ))}
+          </p>
+        )}
       </div>
 
       <div className="space-y-6 p-5">
