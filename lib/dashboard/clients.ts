@@ -86,6 +86,8 @@ const IMAGE = /\.(jpe?g|png|webp|heic)$/i;
 const VIDEO = /\.(mp4|mov|m4v)$/i;
 const NOT_A_POST = /(cover|grid-preview|safe-check)/i;
 const WORK_FOLDERS = new Set(["raw", "ai", "work", "checks", "spare"]);
+/** Where finished cycles go, inside each client's folder. */
+const SHIPPED = "SHIPPED";
 
 // ── dates ────────────────────────────────────────────────────
 
@@ -233,10 +235,26 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
   const unknown = (info.add_ons ?? []).filter((a) => priceOf(a) === null);
   if (unknown.length) problems.push(`Unknown add-on: ${unknown.join(", ")}.`);
 
-  const entries = await src.list(folder);
-  const setNames = entries
-    .filter((e) => e.kind === "folder" && /^(set|cycle)\b/i.test(e.path.slice(folder.length + 1)) && !e.path.slice(folder.length + 1).includes("/"))
-    .map((e) => e.path.slice(folder.length + 1));
+  let entries = await src.list(folder);
+  const topFolders = () =>
+    entries
+      .filter((e) => e.kind === "folder" && /^(set|cycle)\b/i.test(e.path.slice(folder.length + 1)) && !e.path.slice(folder.length + 1).includes("/"))
+      .map((e) => e.path.slice(folder.length + 1));
+
+  // A cycle folder whose two weeks are over moves into SHIPPED/, so only live cycles stay in view.
+  const ended = topFolders().filter((name) => {
+    const date = /^cycle\b/i.test(name) ? setDate(name) : null;
+    return date !== null && toTime(mondayOf(date)) + 13 * DAY < toTime(today());
+  });
+  for (const name of ended) {
+    try {
+      await src.move(`${folder}/${name}`, `${folder}/${SHIPPED}/${name}`);
+    } catch (err) {
+      problems.push(`Couldn't move "${name}" into ${SHIPPED}: ${(err as Error).message}`);
+    }
+  }
+  if (ended.length) entries = await src.list(folder);
+  const setNames = topFolders();
 
   const sets = await Promise.all(
     setNames.map(async (name) => {

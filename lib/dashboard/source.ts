@@ -1,4 +1,4 @@
-import { readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rename, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 /**
@@ -18,6 +18,8 @@ export interface Source {
   read(file: string): Promise<string | null>;
   /** Save a small text file, replacing what's there. */
   write(file: string, text: string): Promise<void>;
+  /** Move a file or folder, making the folders it goes into. */
+  move(from: string, to: string): Promise<void>;
 }
 
 const ROOT = process.env.DROPBOX_ROOT ?? "/STUDIO L SOCIAL";
@@ -119,6 +121,17 @@ const dropbox: Source = {
     });
     if (!res.ok) throw new Error(`Couldn't save ${file} to Dropbox (${res.status}): ${await reason(res)}`);
   },
+
+  async move(from, to) {
+    const token = await accessToken();
+    const res = await fetch("https://api.dropboxapi.com/2/files/move_v2", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from_path: `${ROOT}/${from}`, to_path: `${ROOT}/${to}`, autorename: true }),
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`Couldn't move ${from} in Dropbox (${res.status}): ${await reason(res)}`);
+  },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -150,6 +163,10 @@ function local(root: string): Source {
     },
     async write(file, text) {
       await writeFile(path.join(root, file), text, "utf8");
+    },
+    async move(from, to) {
+      await mkdir(path.dirname(path.join(root, to)), { recursive: true });
+      await rename(path.join(root, from), path.join(root, to));
     },
   };
 }
