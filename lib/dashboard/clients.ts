@@ -40,7 +40,7 @@ export type Deliverable = {
   tier: TierKey;
   /** The Monday of the post's week (from "10:26 ..." at the start of its name), else the set's date. */
   week: string | null;
-  /** Scheduled in LinkMe or already posted: either way, nothing left to do. */
+  /** Scheduled in Linkme or already posted: either way, nothing left to do. */
   scheduled: boolean;
 };
 

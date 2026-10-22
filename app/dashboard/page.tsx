@@ -33,8 +33,8 @@ const finder = (name: string) => name.replace(/:/g, "/");
 
 /** Studio tools, linked at the top of the dashboard. */
 const TOOLS = [
-  { name: "LinkMe agency", href: "https://link.me/agency/28249" },
-  { name: "LinkMe posts", href: "https://link.me/posts/all" },
+  { name: "Linkme agency", href: "https://link.me/agency/28249" },
+  { name: "Linkme posts", href: "https://link.me/posts/all" },
   { name: "Stripe invoices", href: "https://dashboard.stripe.com/acct_1USifd7M7uqalbo6/invoices" },
   { name: "Dropbox API", href: "https://www.dropbox.com/developers/console/apps/nqh0vilp6wm6lys/settings" },
 ];

@@ -62,7 +62,7 @@ export const included = [
 ];
 
 export const addOns = [
-  { name: "LinkMe link", price: "$50/mo", note: "Highly recommended" },
+  { name: "Linkme link", price: "$50/mo", note: "Highly recommended" },
   { name: "+1 Bronze a week", price: "$100/mo" },
   { name: "+1 Silver a week", price: "$125/mo" },
   { name: "+1 Gold a week", price: "$150/mo" },
