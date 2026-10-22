@@ -22,15 +22,17 @@ export type FeedKey =
   | "light-and-airy"
   | "dark-and-romantic"
   | "earthy-and-naturalistic"
-  | "fun-and-playful";
+  | "fun-and-playful"
+  | "sculptural-and-sunlit";
 
-/** The four looks, in the order they appear. */
+/** The looks, in the order they appear. */
 export const feeds: { key: FeedKey; label: string }[] = [
   { key: "bold-and-bright", label: "Bold & Bright" },
   { key: "fun-and-playful", label: "Playful & People-Centered" },
   { key: "light-and-airy", label: "Light & Airy" },
   { key: "dark-and-romantic", label: "Dark & Romantic" },
   { key: "earthy-and-naturalistic", label: "Earthy & Naturalistic" },
+  { key: "sculptural-and-sunlit", label: "Sculptural & Sunlit" },
 ];
 
 export type TierKey = "bronze" | "silver" | "gold";

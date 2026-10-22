@@ -390,6 +390,83 @@
     "sound": false
    }
   ],
+  "sculptural-and-sunlit": [
+   {
+    "id": "01-tennis-necklace",
+    "kind": "video",
+    "src": "/social/feeds/sculptural-and-sunlit/01-tennis-necklace.mp4",
+    "poster": "/social/feeds/sculptural-and-sunlit/01-tennis-necklace.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": false
+   },
+   {
+    "id": "02-pear-lariat",
+    "kind": "image",
+    "src": "/social/feeds/sculptural-and-sunlit/02-pear-lariat.jpg",
+    "poster": "/social/feeds/sculptural-and-sunlit/02-pear-lariat.jpg",
+    "w": 1080,
+    "h": 1341
+   },
+   {
+    "id": "03-baguette-halo",
+    "kind": "image",
+    "src": "/social/feeds/sculptural-and-sunlit/03-baguette-halo.jpg",
+    "poster": "/social/feeds/sculptural-and-sunlit/03-baguette-halo.jpg",
+    "w": 1080,
+    "h": 1341
+   },
+   {
+    "id": "04-butterfly-and-flower",
+    "kind": "image",
+    "src": "/social/feeds/sculptural-and-sunlit/04-butterfly-and-flower.jpg",
+    "poster": "/social/feeds/sculptural-and-sunlit/04-butterfly-and-flower.jpg",
+    "w": 1080,
+    "h": 1341
+   },
+   {
+    "id": "05-link-ring",
+    "kind": "video",
+    "src": "/social/feeds/sculptural-and-sunlit/05-link-ring.mp4",
+    "poster": "/social/feeds/sculptural-and-sunlit/05-link-ring.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": false
+   },
+   {
+    "id": "06-baguette-worn",
+    "kind": "image",
+    "src": "/social/feeds/sculptural-and-sunlit/06-baguette-worn.jpg",
+    "poster": "/social/feeds/sculptural-and-sunlit/06-baguette-worn.jpg",
+    "w": 1080,
+    "h": 1341
+   },
+   {
+    "id": "07-wreath-pendant",
+    "kind": "image",
+    "src": "/social/feeds/sculptural-and-sunlit/07-wreath-pendant.jpg",
+    "poster": "/social/feeds/sculptural-and-sunlit/07-wreath-pendant.jpg",
+    "w": 1080,
+    "h": 1341
+   },
+   {
+    "id": "08-wreath-worn",
+    "kind": "video",
+    "src": "/social/feeds/sculptural-and-sunlit/08-wreath-worn.mp4",
+    "poster": "/social/feeds/sculptural-and-sunlit/08-wreath-worn.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": false
+   },
+   {
+    "id": "09-yellow-diamond-bracelet",
+    "kind": "image",
+    "src": "/social/feeds/sculptural-and-sunlit/09-yellow-diamond-bracelet.jpg",
+    "poster": "/social/feeds/sculptural-and-sunlit/09-yellow-diamond-bracelet.jpg",
+    "w": 1080,
+    "h": 1341
+   }
+  ],
   "fun-and-playful": [
    {
     "id": "01-gen-z-girlie",

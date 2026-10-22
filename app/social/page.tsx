@@ -150,7 +150,7 @@ export default async function Social() {
         </div>
       </section>
 
-      {/* The four test feeds. */}
+      {/* The sample feeds. */}
       <section id="samples" className="scroll-mt-6 pt-20 sm:pt-28">
         <h2 className="text-center font-[family-name:var(--font-display)] text-5xl sm:text-6xl">Samples</h2>
         <div className="mt-10 grid gap-14 md:grid-cols-2 md:gap-x-10 md:gap-y-16">

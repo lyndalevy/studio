@@ -37,6 +37,7 @@ const TOOLS = [
   { name: "Linkme posts", href: "https://link.me/posts/all" },
   { name: "Stripe invoices", href: "https://dashboard.stripe.com/acct_1USifd7M7uqalbo6/invoices" },
   { name: "Dropbox API", href: "https://www.dropbox.com/developers/console/apps/nqh0vilp6wm6lys/settings" },
+  { name: "Google AI billing", href: "https://aistudio.google.com/billing?billing=01F2EC-86587D-68AD0F" },
 ];
 
 const fmtDay = (d: string) =>
@@ -64,11 +65,16 @@ export default async function Dashboard() {
         <Link href="/" className="link-draw">
           Studio L
         </Link>
-        <form action={logout}>
-          <button type="submit" className="eyebrow link-draw">
-            Sign out
-          </button>
-        </form>
+        <span className="flex items-center gap-5">
+          <Link href="/social" className="link-draw">
+            Social
+          </Link>
+          <form action={logout}>
+            <button type="submit" className="eyebrow link-draw">
+              Sign out
+            </button>
+          </form>
+        </span>
       </nav>
 
       <header className="mt-8 text-center">
