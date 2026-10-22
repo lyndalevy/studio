@@ -2,6 +2,7 @@
 
 import { useOptimistic, useState, useTransition } from "react";
 
+import { Sparkle } from "../components/Marks";
 import { toggleScheduled } from "./actions";
 
 /** One post on the dashboard. Click to mark it scheduled; click again to clear it. */
@@ -43,7 +44,7 @@ export default function PostPill({
           on ? "bg-red text-cream" : "border border-red hover:bg-cream-deep"
         } ${pending ? "opacity-60" : ""}`}
       >
-        <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: color }} />
+        <Sparkle className="h-3 w-3 shrink-0" style={{ color }} />
         {label}
         {on && " ✓"}
       </button>

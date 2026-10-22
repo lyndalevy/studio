@@ -6,6 +6,7 @@ import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
 import { loadBudget, type Budget } from "@/lib/dashboard/budget";
 import { loadClients, today, type ClientStatus, type CyclePlan, type Invoice } from "@/lib/dashboard/clients";
 import { logout } from "./actions";
+import { Sparkle } from "../components/Marks";
 import LoginForm from "./LoginForm";
 import PostPill from "./PostPill";
 
@@ -40,6 +41,10 @@ const TOOLS = [
   { name: "Dropbox API", href: "https://www.dropbox.com/developers/console/apps/nqh0vilp6wm6lys/settings" },
   { name: "Google AI billing", href: "https://aistudio.google.com/billing?billing=01F2EC-86587D-68AD0F" },
 ];
+
+/** A post's week is over once the Sunday after its Monday has passed. */
+const weekOver = (week: string | null) =>
+  week !== null && Date.parse(`${week}T00:00:00Z`) + 6 * 86_400_000 < Date.parse(`${today()}T00:00:00Z`);
 
 const fmtDay = (d: string) =>
   new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
@@ -126,6 +131,10 @@ export default async function Dashboard() {
 function ClientCard({ c }: { c: ClientStatus }) {
   const scheduled = c.sets.flatMap((s) => s.items).filter((i) => i.scheduled).length;
   const made = c.sets.flatMap((s) => s.items).length;
+  // Deliverables only shows posts whose week hasn't ended yet.
+  const showing = c.sets
+    .map((s) => ({ ...s, items: s.items.filter((it) => !weekOver(it.week)) }))
+    .filter((s) => s.items.length);
 
   return (
     <section className="flex flex-col border-2 border-red bg-cream">
@@ -169,8 +178,11 @@ function ClientCard({ c }: { c: ClientStatus }) {
         <div>
           <p className="eyebrow mb-2">Deliverables</p>
           {c.sets.length === 0 && <p className="text-sm opacity-70">No sets yet.</p>}
+          {c.sets.length > 0 && showing.length === 0 && (
+            <p className="text-sm opacity-70">Every post&rsquo;s week is over. Add the next cycle.</p>
+          )}
           <div className="space-y-3">
-            {c.sets.map((s) => (
+            {showing.map((s) => (
               <div key={s.name}>
                 <p className="text-sm font-bold">
                   {finder(s.name)}
@@ -200,11 +212,11 @@ function ClientCard({ c }: { c: ClientStatus }) {
           <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs opacity-70">
             {TIERS.map((t) => (
               <span key={t} className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ background: tierColor[t] }} />
+                <Sparkle className="h-3 w-3" style={{ color: tierColor[t] }} />
                 {tierName[t]}
               </span>
             ))}
-            <span>filled = scheduled · click a post to mark it</span>
+            <span>filled = scheduled · click a post to mark it · past weeks are hidden</span>
           </p>
         </div>
 
