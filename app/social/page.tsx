@@ -7,6 +7,7 @@ import { site } from "@/content/site";
 import { addOns, baseFee, feeds, included, packages, social, terms, tiers } from "@/content/social";
 import { loadCaptions } from "@/lib/captions";
 import { feedPosts, tierPosts } from "@/lib/socialMedia";
+import { Sparkle } from "../components/Marks";
 import PostGrid from "./components/PostGrid";
 import { feedStyle } from "./fonts";
 
@@ -93,7 +94,7 @@ export default async function Social() {
                   const tier = tiers.find((t) => item.endsWith(t.name))!;
                   return (
                     <li key={item} className="flex items-center gap-2.5">
-                      <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: tierColor[tier.key] }} />
+                      <Sparkle className="h-4 w-4 shrink-0" style={{ color: tierColor[tier.key] }} />
                       {item} {Number(item[0]) > 1 ? "posts" : "post"}
                     </li>
                   );
@@ -139,7 +140,7 @@ export default async function Social() {
             <div key={tier.key}>
               <div className="mb-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
                 <h3 className="flex items-center gap-2.5 text-3xl font-bold" style={{ color: tierColor[tier.key] }}>
-                  <span className="h-4 w-4 rounded-full" style={{ background: tierColor[tier.key] }} />
+                  <Sparkle className="h-5 w-5" />
                   {tier.name}
                 </h3>
                 <p className="text-lg">{tier.what}</p>
@@ -156,13 +157,21 @@ export default async function Social() {
         <div className="mt-10 grid gap-14 md:grid-cols-2 md:gap-x-10 md:gap-y-16">
           {looks.map((look, i) => {
             const style = feedStyle[look.key];
+            const pkg = packages.find((p) => p.name === look.plan)!;
             // An odd one out at the end gets its own row, centred.
             const alone = i === looks.length - 1 && looks.length % 2 === 1;
             return (
-              <div key={look.key} className={alone ? "md:col-span-2 md:mx-auto md:w-[calc(50%-1.25rem)]" : ""}>
-                <h2 className={`mb-4 text-center text-4xl sm:text-5xl ${style.font}`} style={{ color: style.color }}>
+              <div
+                key={look.key}
+                className={`bg-white p-4 sm:p-6 ${alone ? "md:col-span-2 md:mx-auto md:w-[calc(50%-1.25rem)]" : ""}`}
+              >
+                <h2 className={`text-center text-4xl sm:text-5xl ${style.font}`} style={{ color: style.color }}>
                   {look.label}
                 </h2>
+                <p className="mt-2 text-center text-lg font-bold">{pkg.name} package</p>
+                <p className="mb-5 text-center opacity-80">
+                  {pkg.perWeek.join(" + ")} a week · ${pkg.price}/month
+                </p>
                 <PostGrid posts={look.posts} title={look.label} titleClass={style.font} />
               </div>
             );

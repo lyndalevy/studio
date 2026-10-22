@@ -163,12 +163,11 @@
   "dark-and-romantic": [
    {
     "id": "01-corn",
-    "kind": "video",
-    "src": "/social/feeds/dark-and-romantic/01-corn.mp4",
+    "kind": "image",
+    "src": "/social/feeds/dark-and-romantic/01-corn.jpg",
     "poster": "/social/feeds/dark-and-romantic/01-corn.jpg",
-    "w": 720,
-    "h": 900,
-    "sound": false
+    "w": 1080,
+    "h": 1350
    },
    {
     "id": "02-wine-pour",
@@ -212,12 +211,11 @@
    },
    {
     "id": "07-sushi-torch",
-    "kind": "video",
-    "src": "/social/feeds/dark-and-romantic/07-sushi-torch.mp4",
+    "kind": "image",
+    "src": "/social/feeds/dark-and-romantic/07-sushi-torch.jpg",
     "poster": "/social/feeds/dark-and-romantic/07-sushi-torch.jpg",
-    "w": 720,
-    "h": 900,
-    "sound": false
+    "w": 1080,
+    "h": 1350
    },
    {
     "id": "08-ribs",
