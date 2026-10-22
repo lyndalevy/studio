@@ -325,6 +325,15 @@ function BudgetCard({ b }: { b: Budget }) {
           </p>
         </div>
       </div>
+
+      <div className="flex flex-wrap justify-center gap-x-12 gap-y-2 border-t-2 border-red px-5 py-4 text-center text-lg">
+        <p>
+          Yearly salary before taxes <span className="font-bold">{money(b.profit * 12)}</span>
+        </p>
+        <p>
+          After taxes <span className="font-bold">{money(b.pay * 12)}</span>
+        </p>
+      </div>
     </section>
   );
 }
