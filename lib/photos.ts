@@ -61,7 +61,7 @@ async function freshPhotos(): Promise<Photo[]> {
 }
 
 /**
- * The photos, shuffled once and shared for 5 minutes, so the home page peek
- * shows the same first photos as the Photography page.
+ * The photos, cached for 5 minutes. The shuffle is seeded by the date, so the
+ * home page peek shows the same first photos as the Photography page.
  */
 export const loadPhotos = unstable_cache(freshPhotos, ["photos"], { revalidate: 300 });

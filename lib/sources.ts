@@ -324,14 +324,25 @@ async function fromAdobePortfolio(pageUrl: string, alt: string): Promise<Gallery
 // ─────────────────────────────────────────────────────────────
 
 /**
- * Fisher–Yates. Runs on the server only, so the browser receives one fixed
- * order and there's no risk of a hydration mismatch. The order re-rolls
- * whenever the page revalidates.
+ * Fisher–Yates, seeded by today's date (and the album), so every page that
+ * shows these photos gets the same order and it changes once a day. Runs on
+ * the server only, so there's no risk of a hydration mismatch.
  */
-function shuffle<T>(items: T[]): T[] {
+function shuffle<T>(items: T[], salt: string): T[] {
+  let seed = 0;
+  for (const ch of new Date().toISOString().slice(0, 10) + salt) {
+    seed = (Math.imul(seed, 31) + ch.charCodeAt(0)) | 0;
+  }
+  // mulberry32
+  const random = () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
   const out = [...items];
   for (let i = out.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(random() * (i + 1));
     [out[i], out[j]] = [out[j], out[i]];
   }
   return out;
@@ -356,5 +367,5 @@ export async function loadGallery(
   })();
 
   if (!randomize || result.photos.length < 2) return result;
-  return { ...result, photos: shuffle(result.photos) };
+  return { ...result, photos: shuffle(result.photos, alt) };
 }
