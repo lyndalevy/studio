@@ -641,20 +641,20 @@
     "h": 1350
    },
    {
-    "id": "05-gift-set",
+    "id": "03-steak",
     "kind": "image",
-    "src": "/social/tiers/bronze/05-gift-set.jpg",
-    "poster": "/social/tiers/bronze/05-gift-set.jpg",
+    "src": "/social/tiers/bronze/03-steak.jpg",
+    "poster": "/social/tiers/bronze/03-steak.jpg",
     "w": 1080,
     "h": 1350
    },
    {
-    "id": "coffee-or-matcha",
+    "id": "nested-square-pendant-butter",
     "kind": "image",
-    "src": "/social/tiers/bronze/coffee-or-matcha.jpg",
-    "poster": "/social/tiers/bronze/coffee-or-matcha.jpg",
+    "src": "/social/tiers/bronze/nested-square-pendant-butter.jpg",
+    "poster": "/social/tiers/bronze/nested-square-pendant-butter.jpg",
     "w": 1080,
-    "h": 1350
+    "h": 1341
    },
    {
     "id": "02-grandma-texts",
@@ -675,13 +675,13 @@
   ],
   "silver": [
    {
-    "id": "01-poolside",
+    "id": "tennis-choker-model",
     "kind": "video",
-    "src": "/social/tiers/silver/01-poolside.mp4",
-    "poster": "/social/tiers/silver/01-poolside.jpg",
+    "src": "/social/tiers/silver/tennis-choker-model.mp4",
+    "poster": "/social/tiers/silver/tennis-choker-model.jpg",
     "w": 720,
-    "h": 900,
-    "sound": false
+    "h": 1280,
+    "sound": true
    },
    {
     "id": "shift-promo-phone-2",
