@@ -19,7 +19,7 @@ export const social = {
 
 export type FeedKey =
   | "bold-and-bright"
-  | "light-and-airy"
+  | "luxury-and-architectural"
   | "dark-and-romantic"
   | "earthy-and-naturalistic"
   | "fun-and-playful"
@@ -29,7 +29,7 @@ export type FeedKey =
 export const feeds: { key: FeedKey; label: string }[] = [
   { key: "bold-and-bright", label: "Bold & Bright" },
   { key: "fun-and-playful", label: "Playful & People-Centered" },
-  { key: "light-and-airy", label: "Light & Airy" },
+  { key: "luxury-and-architectural", label: "Luxury & Architectural" },
   { key: "dark-and-romantic", label: "Dark & Romantic" },
   { key: "earthy-and-naturalistic", label: "Earthy & Naturalistic" },
   { key: "sculptural-and-sunlit", label: "Sculptural & Sunlit" },

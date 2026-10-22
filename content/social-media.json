@@ -160,82 +160,6 @@
     "h": 1350
    }
   ],
-  "light-and-airy": [
-   {
-    "id": "01-pasta-making",
-    "kind": "video",
-    "src": "/social/feeds/light-and-airy/01-pasta-making.mp4",
-    "poster": "/social/feeds/light-and-airy/01-pasta-making.jpg",
-    "w": 720,
-    "h": 900,
-    "sound": false
-   },
-   {
-    "id": "02-wine-pour",
-    "kind": "image",
-    "src": "/social/feeds/light-and-airy/02-wine-pour.jpg",
-    "poster": "/social/feeds/light-and-airy/02-wine-pour.jpg",
-    "w": 1080,
-    "h": 1350
-   },
-   {
-    "id": "03-al-dente",
-    "kind": "image",
-    "src": "/social/feeds/light-and-airy/03-al-dente.jpg",
-    "poster": "/social/feeds/light-and-airy/03-al-dente.jpg",
-    "w": 1080,
-    "h": 1350
-   },
-   {
-    "id": "04-parmigiano",
-    "kind": "image",
-    "src": "/social/feeds/light-and-airy/04-parmigiano.jpg",
-    "poster": "/social/feeds/light-and-airy/04-parmigiano.jpg",
-    "w": 1080,
-    "h": 1350
-   },
-   {
-    "id": "05-tomato",
-    "kind": "image",
-    "src": "/social/feeds/light-and-airy/05-tomato.jpg",
-    "poster": "/social/feeds/light-and-airy/05-tomato.jpg",
-    "w": 1080,
-    "h": 1350
-   },
-   {
-    "id": "06-cheese-bread",
-    "kind": "image",
-    "src": "/social/feeds/light-and-airy/06-cheese-bread.jpg",
-    "poster": "/social/feeds/light-and-airy/06-cheese-bread.jpg",
-    "w": 1080,
-    "h": 1350
-   },
-   {
-    "id": "07-basilico",
-    "kind": "image",
-    "src": "/social/feeds/light-and-airy/07-basilico.jpg",
-    "poster": "/social/feeds/light-and-airy/07-basilico.jpg",
-    "w": 1080,
-    "h": 1350
-   },
-   {
-    "id": "08-parmesan-snow",
-    "kind": "video",
-    "src": "/social/feeds/light-and-airy/08-parmesan-snow.mp4",
-    "poster": "/social/feeds/light-and-airy/08-parmesan-snow.jpg",
-    "w": 720,
-    "h": 900,
-    "sound": false
-   },
-   {
-    "id": "09-long-lunch",
-    "kind": "image",
-    "src": "/social/feeds/light-and-airy/09-long-lunch.jpg",
-    "poster": "/social/feeds/light-and-airy/09-long-lunch.jpg",
-    "w": 1080,
-    "h": 1350
-   }
-  ],
   "dark-and-romantic": [
    {
     "id": "01-corn",
@@ -626,6 +550,85 @@
     "w": 720,
     "h": 1280,
     "sound": true
+   }
+  ],
+  "luxury-and-architectural": [
+   {
+    "id": "01-poolside",
+    "kind": "video",
+    "src": "/social/feeds/luxury-and-architectural/01-poolside.mp4",
+    "poster": "/social/feeds/luxury-and-architectural/01-poolside.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "02-exterior",
+    "kind": "image",
+    "src": "/social/feeds/luxury-and-architectural/02-exterior.jpg",
+    "poster": "/social/feeds/luxury-and-architectural/02-exterior.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "03-kitchen",
+    "kind": "video",
+    "src": "/social/feeds/luxury-and-architectural/03-kitchen.mp4",
+    "poster": "/social/feeds/luxury-and-architectural/03-kitchen.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "04-great-room",
+    "kind": "image",
+    "src": "/social/feeds/luxury-and-architectural/04-great-room.jpg",
+    "poster": "/social/feeds/luxury-and-architectural/04-great-room.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "05-foyer",
+    "kind": "video",
+    "src": "/social/feeds/luxury-and-architectural/05-foyer.mp4",
+    "poster": "/social/feeds/luxury-and-architectural/05-foyer.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "06-dining-room",
+    "kind": "image",
+    "src": "/social/feeds/luxury-and-architectural/06-dining-room.jpg",
+    "poster": "/social/feeds/luxury-and-architectural/06-dining-room.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "07-deck",
+    "kind": "video",
+    "src": "/social/feeds/luxury-and-architectural/07-deck.mp4",
+    "poster": "/social/feeds/luxury-and-architectural/07-deck.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "08-sunroom",
+    "kind": "image",
+    "src": "/social/feeds/luxury-and-architectural/08-sunroom.jpg",
+    "poster": "/social/feeds/luxury-and-architectural/08-sunroom.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "09-garden",
+    "kind": "video",
+    "src": "/social/feeds/luxury-and-architectural/09-garden.mp4",
+    "poster": "/social/feeds/luxury-and-architectural/09-garden.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
    }
   ]
  },
