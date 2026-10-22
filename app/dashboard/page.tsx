@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import type { TierKey } from "@/content/social";
 import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
+import { loadBudget, type Budget } from "@/lib/dashboard/budget";
 import { loadClients, today, type ClientStatus, type CyclePlan, type Invoice } from "@/lib/dashboard/clients";
 import { logout } from "./actions";
 import LoginForm from "./LoginForm";
@@ -58,6 +59,7 @@ export default async function Dashboard() {
   }
 
   const { clients, error } = await loadClients();
+  const { budget, error: budgetError } = await loadBudget(clients);
 
   return (
     <main className="mx-auto max-w-[90rem] px-4 py-10 sm:px-8 sm:py-14">
@@ -114,6 +116,9 @@ export default async function Dashboard() {
           <ClientCard key={c.folder} c={c} />
         ))}
       </div>
+
+      {budget && <BudgetCard b={budget} />}
+      {budgetError && <p className="mx-auto mt-10 max-w-xl border-2 border-red p-5 text-center">{budgetError}</p>}
     </main>
   );
 }
@@ -250,6 +255,75 @@ function ClientCard({ c }: { c: ClientStatus }) {
         </div>
 
         {c.info.notes && <p className="border-t border-red-line pt-4 text-sm italic">{c.info.notes}</p>}
+      </div>
+    </section>
+  );
+}
+
+const money = (n: number) =>
+  n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: n % 1 ? 2 : 0 });
+
+/** A month of money in and out, and what's left to pay yourself. Numbers come from budget.json in Dropbox. */
+function BudgetCard({ b }: { b: Budget }) {
+  const row = (label: string, amount: number, note?: string, strong = false) => (
+    <li key={label} className={`flex justify-between gap-4 ${strong ? "font-bold" : ""}`}>
+      <span>
+        {label}
+        {note && <span className="ml-2 text-sm italic opacity-70">{note}</span>}
+      </span>
+      <span className="shrink-0">{money(amount)}</span>
+    </li>
+  );
+
+  return (
+    <section className="mt-10 border-2 border-red bg-cream">
+      <div className="flex flex-wrap items-baseline justify-between gap-3 bg-red px-5 py-4 text-cream">
+        <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">Budget</h2>
+        <p className="text-lg">
+          Pay yourself <span className="font-bold">{money(b.pay)}/mo</span>
+        </p>
+      </div>
+
+      <div className="grid gap-6 p-5 md:grid-cols-3">
+        <div>
+          <p className="eyebrow mb-2">Coming in each month</p>
+          <ul className="space-y-1.5">
+            {b.income.map((i) => row(i.client, i.amount))}
+            {row("Total", b.revenue, undefined, true)}
+          </ul>
+        </div>
+
+        <div>
+          <p className="eyebrow mb-2">Going out each month</p>
+          <ul className="space-y-1.5">
+            {b.file.costs.map((c) => row(c.name, c.monthly, c.note))}
+            {row(
+              "Stripe fees",
+              b.stripeFees,
+              `${b.file.stripe.percent}% + ${money(b.file.stripe.fixed)} per payment`
+            )}
+            {row("Total", b.costs + b.stripeFees, undefined, true)}
+          </ul>
+        </div>
+
+        <div>
+          <p className="eyebrow mb-2">What&rsquo;s left</p>
+          <ul className="space-y-1.5">
+            {row("Profit", b.profit)}
+            {row(`Set aside for taxes`, b.taxes, `${b.file.tax_percent}% of profit`)}
+            {row("Pay yourself", b.pay, undefined, true)}
+          </ul>
+          <p className="mt-4 text-sm">
+            Bank: <span className="font-bold">{money(b.file.bank_balance)}</span>, keeping at least{" "}
+            {money(b.file.keep_in_bank)}.{" "}
+            {b.spare >= 0
+              ? `${money(b.spare)} above that now.`
+              : `${money(-b.spare)} short of that now, so top it up before paying yourself.`}
+          </p>
+          <p className="mt-2 text-xs opacity-70">
+            Pay yourself after the month&rsquo;s invoices are paid, so the bills never dip the account below the minimum.
+          </p>
+        </div>
       </div>
     </section>
   );
