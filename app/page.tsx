@@ -1,14 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { visibleAlbums } from "@/content/photos";
 import { site } from "@/content/site";
 import { social } from "@/content/social";
 import { feedPosts, tierPosts } from "@/lib/socialMedia";
-import { loadGallery } from "@/lib/sources";
+import { loadPhotos } from "@/lib/photos";
 import Wordmark from "./components/Wordmark";
 
-// Pick fresh photos from Lightroom every 5 minutes.
+// Follow the Photography page's photos, which refresh every 5 minutes.
 export const revalidate = 300;
 
 /** A peek at the social side: a few favourite posts, by feed (or tier) and id. */
@@ -21,19 +20,10 @@ const peek = [
   tierPosts.gold.find((p) => p.id === "oyster-point-long-day"),
 ].filter((p) => p !== undefined);
 
-/** A peek at the photography side: one photo from each of the first six albums. */
-async function photoPeek() {
-  const albums = await Promise.all(
-    visibleAlbums()
-      .slice(0, peek.length)
-      .map((album) => loadGallery(album.source, album.name))
-  );
-  return albums.flatMap((a) => a.photos.slice(0, 1));
-}
-
 /** The front door: photography on one side, social on the other. */
 export default async function Home() {
-  const photos = await photoPeek();
+  // The first six photos on the Photography page.
+  const photos = (await loadPhotos()).slice(0, 6);
 
   return (
     <main className="flex min-h-screen flex-col">
