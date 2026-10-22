@@ -50,7 +50,9 @@ export default async function Social() {
       <header className="mt-10 flex flex-col items-center gap-6 text-center sm:mt-14 sm:flex-row sm:justify-center sm:gap-12 sm:text-left">
         <Image src={brand.mark} alt="" priority className="h-28 w-28 rounded-full sm:h-36 sm:w-36" />
         <div>
-          <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-7xl">{social.name}</h1>
+          <h1>
+            <Image src={brand.logoSocial} alt={social.name} priority className="mx-auto h-auto w-[min(26rem,100%)] sm:mx-0" />
+          </h1>
           <p className="mt-1 text-lg opacity-80">{social.byline}</p>
           <dl className="mt-4 flex justify-center gap-8 sm:justify-start">
             {[
