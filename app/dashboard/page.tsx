@@ -326,13 +326,22 @@ function BudgetCard({ b }: { b: Budget }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-x-12 gap-y-2 border-t-2 border-red px-5 py-4 text-center text-lg">
-        <p>
-          Yearly salary before taxes <span className="font-bold">{money(b.profit * 12)}</span>
-        </p>
-        <p>
-          After taxes <span className="font-bold">{money(b.pay * 12)}</span>
-        </p>
+      <div className="border-t-2 border-red p-5">
+        <p className="eyebrow mb-3 text-center">Each year</p>
+        <dl className="grid grid-cols-2 gap-4 text-center sm:grid-cols-3 lg:grid-cols-5">
+          {[
+            ["Coming in", b.revenue * 12],
+            ["Going out", (b.costs + b.stripeFees) * 12],
+            ["Salary before taxes", b.profit * 12],
+            ["Estimated taxes", b.taxes * 12],
+            ["Salary after taxes", b.pay * 12],
+          ].map(([label, amount]) => (
+            <div key={label}>
+              <dt className="text-sm opacity-80">{label}</dt>
+              <dd className="text-xl font-bold">{money(amount as number)}</dd>
+            </div>
+          ))}
+        </dl>
       </div>
     </section>
   );
