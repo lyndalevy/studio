@@ -39,9 +39,11 @@ export async function addIdea(_: string | null, form: FormData): Promise<string 
   const text = String(form.get("text") ?? "").trim().slice(0, 500);
   if (!text) return "Write the idea first.";
   const forWhich: Idea["for"] = form.get("for") === "Photography" ? "Photography" : "Social";
+  const link = String(form.get("link") ?? "").trim();
+  if (link && !/^https?:\/\//i.test(link)) return "The link should start with https://";
   try {
     await updateIdeas((ideas) => [
-      { id: crypto.randomUUID(), text, for: forWhich, status: "to film", added: today() },
+      { id: crypto.randomUUID(), text, for: forWhich, status: "to film", added: today(), ...(link ? { link } : {}) },
       ...ideas,
     ]);
   } catch (err) {

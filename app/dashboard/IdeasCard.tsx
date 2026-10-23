@@ -36,6 +36,12 @@ export default function IdeasCard({ ideas }: { ideas: Idea[] }) {
             placeholder="A reel, a behind-the-scenes, a trend to try…"
             className="flex-1 border-2 border-red bg-cream px-3 py-2 outline-none"
           />
+          <input
+            name="link"
+            type="url"
+            placeholder="Link (optional)"
+            className="border-2 border-red bg-cream px-3 py-2 outline-none sm:w-56"
+          />
           <select name="for" className="border-2 border-red bg-cream px-3 py-2">
             <option>Social</option>
             <option>Photography</option>
@@ -60,6 +66,11 @@ export default function IdeasCard({ ideas }: { ideas: Idea[] }) {
                     <li key={i.id} className="flex items-start justify-between gap-3 text-sm">
                       <span>
                         {i.text}
+                        {i.link && (
+                          <a href={i.link} target="_blank" rel="noopener noreferrer" className="link-draw ml-1.5 text-xs">
+                            Open ↗
+                          </a>
+                        )}
                         <span className="ml-1.5 text-xs opacity-60">{i.for}</span>
                       </span>
                       <span className="flex shrink-0 gap-1.5">
@@ -88,7 +99,10 @@ export default function IdeasCard({ ideas }: { ideas: Idea[] }) {
             );
           })}
         </div>
-        <p className="text-xs opacity-70">Saved in STUDIO L/ideas.json in Dropbox. Put the clips you film in STUDIO L/FOOTAGE.</p>
+        <p className="text-xs opacity-70">
+          Saved in STUDIO L/ideas.json in Dropbox. Links saved to ideas/business show up here on their own. Put the
+          clips you film in STUDIO L/FOOTAGE.
+        </p>
       </div>
     </section>
   );
