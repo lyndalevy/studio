@@ -5,7 +5,7 @@ import type { TierKey } from "@/content/social";
 import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
 import { loadBudget, type Budget } from "@/lib/dashboard/budget";
 import { loadIdeas, syncBusinessLinks } from "@/lib/dashboard/ideas";
-import { loadLibrary } from "@/lib/dashboard/library";
+import { loadLibrary, nameNewLinks, type SavedLink } from "@/lib/dashboard/library";
 import { loadClients, today, type ClientStatus, type CyclePlan, type Invoice } from "@/lib/dashboard/clients";
 import { logout } from "./actions";
 import { Sparkle } from "../components/Marks";
@@ -69,11 +69,12 @@ export default async function Dashboard() {
 
   const { clients, error } = await loadClients();
   const { budget, error: budgetError } = await loadBudget(clients);
-  // Links saved in ideas/business become ideas before the list is read.
+  // New links saved from the phone get names first; business links then become ideas.
+  await nameNewLinks();
   const syncError = await syncBusinessLinks(today());
   const { ideas, error: loadError } = await loadIdeas();
   const ideasError = loadError ?? syncError;
-  const { links } = await loadLibrary();
+  const { links, error: libraryError } = await loadLibrary(clients);
 
   return (
     <main className="mx-auto max-w-[90rem] px-4 py-10 sm:px-8 sm:py-14">
@@ -127,13 +128,14 @@ export default async function Dashboard() {
 
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
         {clients.map((c) => (
-          <ClientCard key={c.folder} c={c} />
+          <ClientCard key={c.folder} c={c} links={links} />
         ))}
       </div>
 
       <IdeasCard ideas={ideas} />
       {ideasError && <p className="mx-auto mt-4 max-w-xl border-2 border-red p-5 text-center">{ideasError}</p>}
-      <LibraryCard links={links} />
+      <LibraryCard links={links} clients={clients.map((c) => c.nickname)} />
+      {libraryError && <p className="mx-auto mt-4 max-w-xl border-2 border-red p-5 text-center">{libraryError}</p>}
 
       {budget && <BudgetCard b={budget} />}
       {budgetError && <p className="mx-auto mt-10 max-w-xl border-2 border-red p-5 text-center">{budgetError}</p>}
@@ -141,7 +143,11 @@ export default async function Dashboard() {
   );
 }
 
-function ClientCard({ c }: { c: ClientStatus }) {
+function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
+  // Post ideas queued for this client, soonest cycle first.
+  const queued = links
+    .flatMap((l) => l.assigned.filter((a) => a.client === c.nickname).map((a) => ({ ...a, link: l })))
+    .sort((a, b) => a.cycle - b.cycle || a.at.localeCompare(b.at));
   const scheduled = c.sets.flatMap((s) => s.items).filter((i) => i.scheduled).length;
   const made = c.sets.flatMap((s) => s.items).length;
   // Deliverables only shows posts whose week hasn't ended yet.
@@ -187,6 +193,23 @@ function ClientCard({ c }: { c: ClientStatus }) {
           <Cycle plan={c.thisCycle} title="This cycle" />
           <Cycle plan={c.nextCycle} title="Next cycle" todo />
         </div>
+
+        {queued.length > 0 && (
+          <div>
+            <p className="eyebrow mb-2">Post ideas queued</p>
+            <ul className="space-y-1 text-sm">
+              {queued.map((q) => (
+                <li key={q.link.path} className="flex items-center gap-2">
+                  <span className="w-16 shrink-0 font-bold">Cycle {q.cycle}</span>
+                  <Sparkle className="h-3 w-3 shrink-0" style={{ color: tierColor[q.link.shelf as TierKey] }} />
+                  <a href={q.link.url} target="_blank" rel="noopener noreferrer" className="link-draw">
+                    {q.link.name} ↗
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div>
           <p className="eyebrow mb-2">Deliverables</p>

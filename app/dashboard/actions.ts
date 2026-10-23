@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { isSignedIn, signIn, signOut } from "@/lib/dashboard/auth";
-import { setScheduled, today } from "@/lib/dashboard/clients";
-import { deleteLink, moveLink, type Shelf } from "@/lib/dashboard/library";
+import { loadClients, setScheduled, today } from "@/lib/dashboard/clients";
+import { assignLink, deleteLink, renameLink } from "@/lib/dashboard/library";
 import { loadIdeas, removeBusinessLink, STATUSES, updateIdeas, type IdeaStatus } from "@/lib/dashboard/ideas";
 
 export async function login(_: string | null, form: FormData): Promise<string | null> {
@@ -73,12 +73,17 @@ export async function changeIdea(id: string, to: IdeaStatus | "delete"): Promise
   return null;
 }
 
-/** Put a saved post idea on another shelf (bronze, silver, gold, unsorted or business), or delete it. */
-export async function sortLink(path: string, to: Shelf | "delete"): Promise<string | null> {
+/** Assign a post idea to a client (or take it off), rename it, or delete it. */
+export async function changeLink(
+  path: string,
+  url: string,
+  action: { assign: string } | { rename: string } | { delete: true }
+): Promise<string | null> {
   if (!(await isSignedIn())) return "Signed out. Reload and sign in again.";
   try {
-    if (to === "delete") await deleteLink(path);
-    else await moveLink(path, to);
+    if ("assign" in action) await assignLink(path, url, action.assign, (await loadClients()).clients);
+    else if ("rename" in action) await renameLink(path, action.rename);
+    else await deleteLink(path, url);
   } catch (err) {
     return (err as Error).message;
   }

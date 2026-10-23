@@ -31,6 +31,8 @@ export type ClientFile = {
   tiers?: Record<string, TierKey>;
   /** Monday the first cycle starts, YYYY-MM-DD. Defaults to the Monday of the first set. */
   cycle_start?: string;
+  /** Short label for the post idea library, e.g. "MCB". Defaults to the client's initials. */
+  nickname?: string;
 };
 
 export type Deliverable = {
@@ -68,6 +70,12 @@ export type Invoice = {
 export type ClientStatus = {
   folder: string;
   info: ClientFile;
+  /** Short label used in the post idea library ("MCB", "RDF"). */
+  nickname: string;
+  /** The cycle running now (1 = the first), 0 if cycles haven't started. */
+  current: number;
+  /** Every cycle from 1 to well past now, with what each needs and what's made (SHIPPED cycles included). */
+  cycles: CyclePlan[];
   monthly: number | null;
   perWeek: Record<TierKey, number>;
   sets: { name: string; date: string | null; items: Deliverable[] }[];
@@ -277,7 +285,18 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
   // Cycles: two weeks each, counted from cycle_start (or the Monday of the first dated set).
   const firstSet = sets.find((x) => x.date)?.date ?? null;
   const anchor = /^\d{4}-\d{2}-\d{2}$/.test(info.cycle_start ?? "") ? mondayOf(info.cycle_start!) : firstSet && mondayOf(firstSet);
-  const allItems = sets.flatMap((x) => x.items);
+  // Posts in finished cycles (moved to SHIPPED/) still count toward their cycle.
+  const shippedNames = entries
+    .filter((e) => e.kind === "folder" && new RegExp(`^${SHIPPED}/cycle\\b`, "i").test(e.path.slice(folder.length + 1)))
+    .map((e) => e.path.slice(folder.length + 1))
+    .filter((n) => n.split("/").length === 2);
+  const shipped = await Promise.all(
+    shippedNames.map(async (name) => {
+      const captions = (await src.read(`${folder}/${name}/captions.txt`)) ?? "";
+      return deliverables(folder, name, setDate(name), entries, captions, info);
+    })
+  );
+  const allItems = [...sets.flatMap((x) => x.items), ...shipped.flat()];
   const plan = (n: number): CyclePlan | null => {
     if (!anchor || n < 1) return null;
     const start = fromTime(toTime(anchor) + (n - 1) * 14 * DAY);
@@ -352,9 +371,21 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
   if (!first && monthly !== null) problems.push("No invoice sent yet. The payment schedule starts from the first one.");
   if (drafts.length) problems.push(`${drafts.length} unsent draft invoice${drafts.length > 1 ? "s" : ""} in Stripe.`);
 
+  const nickname =
+    (info.nickname ?? "").trim().toUpperCase() ||
+    info.client
+      .split(/\s+/)
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 3)
+      .toUpperCase();
+
   return {
     folder,
     info,
+    nickname,
+    current,
+    cycles: current ? Array.from({ length: current + 26 }, (_, i) => plan(i + 1)!) : [],
     monthly,
     perWeek,
     sets,
