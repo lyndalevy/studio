@@ -1,7 +1,7 @@
 import type { ClientStatus } from "./clients";
 import { source } from "./source";
 
-/** budget.json, in the top of the studio Dropbox folder. */
+/** STUDIO L/budget.json in the studio Dropbox folder. */
 export type BudgetFile = {
   /** What's in the business checking account now. */
   bank_balance: number;
@@ -33,8 +33,8 @@ const round = (n: number) => Math.round(n * 100) / 100;
 export async function loadBudget(clients: ClientStatus[]): Promise<{ budget: Budget | null; error?: string }> {
   const src = source();
   if (!src) return { budget: null };
-  const raw = await src.read("budget.json");
-  if (raw === null) return { budget: null, error: "Add a budget.json to the studio folder in Dropbox to see the budget." };
+  const raw = await src.read("STUDIO L/budget.json");
+  if (raw === null) return { budget: null, error: "Add a budget.json to the STUDIO L folder in Dropbox to see the budget." };
 
   let file: BudgetFile;
   try {

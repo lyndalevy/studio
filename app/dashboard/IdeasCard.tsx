@@ -88,7 +88,7 @@ export default function IdeasCard({ ideas }: { ideas: Idea[] }) {
             );
           })}
         </div>
-        <p className="text-xs opacity-70">Saved in ideas.json in the studio Dropbox folder.</p>
+        <p className="text-xs opacity-70">Saved in STUDIO L/ideas.json in Dropbox. Put the clips you film in STUDIO L/FOOTAGE.</p>
       </div>
     </section>
   );

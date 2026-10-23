@@ -281,7 +281,7 @@ function ClientCard({ c }: { c: ClientStatus }) {
 const money = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: n % 1 ? 2 : 0 });
 
-/** A month of money in and out, and what's left to pay yourself. Numbers come from budget.json in Dropbox. */
+/** A month of money in and out, and what's left to pay yourself. Numbers come from STUDIO L/budget.json in Dropbox. */
 function BudgetCard({ b }: { b: Budget }) {
   const row = (label: string, amount: number, note?: string, strong = false) => (
     <li key={label} className={`flex justify-between gap-4 ${strong ? "font-bold" : ""}`}>

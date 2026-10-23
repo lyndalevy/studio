@@ -1,6 +1,6 @@
 import { source } from "./source";
 
-/** ideas.json, in the top of the studio Dropbox folder: things to film for Lynda's own accounts. */
+/** STUDIO L/ideas.json in the studio Dropbox folder: things to film for Lynda's own accounts. */
 export type IdeaStatus = "to film" | "filmed" | "posted";
 export type Idea = {
   id: string;
@@ -13,7 +13,7 @@ export type Idea = {
 };
 
 export const STATUSES: IdeaStatus[] = ["to film", "filmed", "posted"];
-const FILE = "ideas.json";
+const FILE = "STUDIO L/ideas.json";
 
 export async function loadIdeas(): Promise<{ ideas: Idea[]; error?: string }> {
   const src = source();
