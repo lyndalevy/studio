@@ -1,4 +1,4 @@
-import { mkdir, readdir, readFile, rename, stat, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 /**
@@ -20,6 +20,8 @@ export interface Source {
   write(file: string, text: string): Promise<void>;
   /** Move a file or folder, making the folders it goes into. */
   move(from: string, to: string): Promise<void>;
+  /** Delete a file (Dropbox keeps it in Deleted files for 30 days). */
+  remove(file: string): Promise<void>;
 }
 
 const ROOT = process.env.DROPBOX_ROOT ?? "/STUDIO L SOCIAL";
@@ -132,6 +134,18 @@ const dropbox: Source = {
     });
     if (!res.ok) throw new Error(`Couldn't move ${from} in Dropbox (${res.status}): ${await reason(res)}`);
   },
+
+  async remove(file) {
+    const token = await accessToken();
+    const res = await fetch("https://api.dropboxapi.com/2/files/delete_v2", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ path: `${ROOT}/${file}` }),
+      cache: "no-store",
+    });
+    if (res.status === 409) return; // already gone
+    if (!res.ok) throw new Error(`Couldn't delete ${file} in Dropbox (${res.status}): ${await reason(res)}`);
+  },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -167,6 +181,9 @@ function local(root: string): Source {
     async move(from, to) {
       await mkdir(path.dirname(path.join(root, to)), { recursive: true });
       await rename(path.join(root, from), path.join(root, to));
+    },
+    async remove(file) {
+      await rm(path.join(root, file), { force: true });
     },
   };
 }

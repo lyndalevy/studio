@@ -24,7 +24,6 @@ export default function IdeasCard({ ideas }: { ideas: Idea[] }) {
     <section className="mt-10 border-2 border-red bg-cream">
       <div className="flex flex-wrap items-baseline justify-between gap-3 bg-red px-5 py-4 text-cream">
         <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">Ideas to film</h2>
-        <p className="text-lg">For Studio L Social and Studio L Photography</p>
       </div>
 
       <div className="space-y-6 p-5">
@@ -42,10 +41,6 @@ export default function IdeasCard({ ideas }: { ideas: Idea[] }) {
             placeholder="Link (optional)"
             className="border-2 border-red bg-cream px-3 py-2 outline-none sm:w-56"
           />
-          <select name="for" className="border-2 border-red bg-cream px-3 py-2">
-            <option>Social</option>
-            <option>Photography</option>
-          </select>
           <button type="submit" disabled={adding} className="btn btn-ghost justify-center disabled:opacity-50">
             {adding ? "Adding…" : "Add idea"}
           </button>
@@ -71,7 +66,6 @@ export default function IdeasCard({ ideas }: { ideas: Idea[] }) {
                             Open ↗
                           </a>
                         )}
-                        <span className="ml-1.5 text-xs opacity-60">{i.for}</span>
                       </span>
                       <span className="flex shrink-0 gap-1.5">
                         <button

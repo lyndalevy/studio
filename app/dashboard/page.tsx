@@ -5,10 +5,12 @@ import type { TierKey } from "@/content/social";
 import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
 import { loadBudget, type Budget } from "@/lib/dashboard/budget";
 import { loadIdeas, syncBusinessLinks } from "@/lib/dashboard/ideas";
+import { loadLibrary } from "@/lib/dashboard/library";
 import { loadClients, today, type ClientStatus, type CyclePlan, type Invoice } from "@/lib/dashboard/clients";
 import { logout } from "./actions";
 import { Sparkle } from "../components/Marks";
 import IdeasCard from "./IdeasCard";
+import LibraryCard from "./LibraryCard";
 import LoginForm from "./LoginForm";
 import PostPill from "./PostPill";
 
@@ -71,6 +73,7 @@ export default async function Dashboard() {
   const syncError = await syncBusinessLinks(today());
   const { ideas, error: loadError } = await loadIdeas();
   const ideasError = loadError ?? syncError;
+  const { links } = await loadLibrary();
 
   return (
     <main className="mx-auto max-w-[90rem] px-4 py-10 sm:px-8 sm:py-14">
@@ -130,6 +133,7 @@ export default async function Dashboard() {
 
       <IdeasCard ideas={ideas} />
       {ideasError && <p className="mx-auto mt-4 max-w-xl border-2 border-red p-5 text-center">{ideasError}</p>}
+      <LibraryCard links={links} />
 
       {budget && <BudgetCard b={budget} />}
       {budgetError && <p className="mx-auto mt-10 max-w-xl border-2 border-red p-5 text-center">{budgetError}</p>}
