@@ -4,9 +4,11 @@ import Link from "next/link";
 import type { TierKey } from "@/content/social";
 import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
 import { loadBudget, type Budget } from "@/lib/dashboard/budget";
+import { loadIdeas } from "@/lib/dashboard/ideas";
 import { loadClients, today, type ClientStatus, type CyclePlan, type Invoice } from "@/lib/dashboard/clients";
 import { logout } from "./actions";
 import { Sparkle } from "../components/Marks";
+import IdeasCard from "./IdeasCard";
 import LoginForm from "./LoginForm";
 import PostPill from "./PostPill";
 
@@ -65,6 +67,7 @@ export default async function Dashboard() {
 
   const { clients, error } = await loadClients();
   const { budget, error: budgetError } = await loadBudget(clients);
+  const { ideas, error: ideasError } = await loadIdeas();
 
   return (
     <main className="mx-auto max-w-[90rem] px-4 py-10 sm:px-8 sm:py-14">
@@ -121,6 +124,9 @@ export default async function Dashboard() {
           <ClientCard key={c.folder} c={c} />
         ))}
       </div>
+
+      <IdeasCard ideas={ideas} />
+      {ideasError && <p className="mx-auto mt-4 max-w-xl border-2 border-red p-5 text-center">{ideasError}</p>}
 
       {budget && <BudgetCard b={budget} />}
       {budgetError && <p className="mx-auto mt-10 max-w-xl border-2 border-red p-5 text-center">{budgetError}</p>}
