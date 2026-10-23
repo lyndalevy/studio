@@ -46,9 +46,9 @@ async function listShelf(shelf: Shelf): Promise<{ path: string; name: string; ur
   } catch {
     return []; // that folder isn't there yet
   }
+  const read = await Promise.all(files.map(async (path) => ({ path, text: (await src.read(path)) ?? "" })));
   const out = [];
-  for (const path of files) {
-    const text = (await src.read(path)) ?? "";
+  for (const { path, text } of read) {
     const url = text.match(/^URL=(\S+)/m)?.[1] ?? text.match(/<string>(https?:[^<]+)<\/string>/)?.[1];
     if (url) out.push({ path, name: path.split("/").pop()!.replace(LINK, ""), url: url.trim() });
   }

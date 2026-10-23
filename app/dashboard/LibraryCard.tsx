@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 
 import type { SavedLink, Shelf } from "@/lib/dashboard/library";
 import { changeLink } from "./actions";
@@ -15,16 +15,36 @@ const COLUMNS: { shelf: Shelf; title: string; color: string }[] = [
  * The post idea library: links saved to ideas/bronze, silver and gold in Dropbox. Tap a client's nickname
  * to queue the idea into that client's next cycle with room; tap again to take it off.
  */
-export default function LibraryCard({ links, clients }: { links: SavedLink[]; clients: string[] }) {
+export default function LibraryCard({ links: saved, clients }: { links: SavedLink[]; clients: string[] }) {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
-  const [pending, start] = useTransition();
-  const act = (l: SavedLink, action: Parameters<typeof changeLink>[2]) =>
+  const [, start] = useTransition();
+  // Show a tap right away; the server fills in the cycle (shown as "…" until then).
+  const [links, show] = useOptimistic(saved, (now: SavedLink[], step: { path: string; action: Parameters<typeof changeLink>[2] }) =>
+    now.flatMap((l) => {
+      if (l.path !== step.path) return [l];
+      const a = step.action;
+      if ("delete" in a) return [];
+      if ("rename" in a) return [{ ...l, name: a.rename }];
+      const on = l.assigned.some((x) => x.client === a.assign);
+      return [
+        {
+          ...l,
+          assigned: on
+            ? l.assigned.filter((x) => x.client !== a.assign)
+            : [...l.assigned, { client: a.assign, cycle: 0, at: new Date().toISOString() }],
+        },
+      ];
+    })
+  );
+  const act = (l: SavedLink, action: Parameters<typeof changeLink>[2]) => {
+    setEditing(null);
     start(async () => {
+      show({ path: l.path, action });
       setError(await changeLink(l.path, l.url, action));
-      setEditing(null);
     });
+  };
 
   return (
     <section className="mt-10 border-2 border-red bg-cream">
@@ -34,7 +54,7 @@ export default function LibraryCard({ links, clients }: { links: SavedLink[]; cl
       </div>
       <div className="space-y-4 p-5">
         {error && <p className="text-sm">{error}</p>}
-        <div className={`grid gap-4 md:grid-cols-3 ${pending ? "opacity-60" : ""}`}>
+        <div className="grid gap-4 md:grid-cols-3">
           {COLUMNS.map(({ shelf, title, color }) => {
             const list = links.filter((l) => l.shelf === shelf);
             return (
@@ -110,7 +130,7 @@ export default function LibraryCard({ links, clients }: { links: SavedLink[]; cl
                               }`}
                             >
                               {nick}
-                              {a && ` · C${a.cycle}`}
+                              {a && (a.cycle ? ` · C${a.cycle}` : " · …")}
                             </button>
                           );
                         })}

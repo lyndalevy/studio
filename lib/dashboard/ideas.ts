@@ -58,9 +58,9 @@ async function businessFiles(): Promise<string[]> {
 
 async function readLinks(files: string[]): Promise<{ path: string; name: string; url: string }[]> {
   const src = source()!;
+  const read = await Promise.all(files.map(async (path) => ({ path, text: (await src.read(path)) ?? "" })));
   const out: { path: string; name: string; url: string }[] = [];
-  for (const path of files) {
-    const text = (await src.read(path)) ?? "";
+  for (const { path, text } of read) {
     const url = text.match(/^URL=(\S+)/m)?.[1] ?? text.match(/<string>(https?:[^<]+)<\/string>/)?.[1];
     if (url) out.push({ path, name: path.split("/").pop()!.replace(/\.(url|webloc)$/i, ""), url: url.trim() });
   }

@@ -188,9 +188,39 @@ function local(root: string): Source {
   };
 }
 
+// Saved Instagram links (.url files) never change once saved, so each is downloaded once per server.
+const LINK_FILE = /\.(url|webloc)$/i;
+const linkCache = new Map<string, string>();
+
+function withLinkCache(src: Source): Source {
+  return {
+    ...src,
+    async read(file) {
+      if (!LINK_FILE.test(file)) return src.read(file);
+      const hit = linkCache.get(file);
+      if (hit !== undefined) return hit;
+      const text = await src.read(file);
+      if (text !== null) linkCache.set(file, text);
+      return text;
+    },
+    async move(from, to) {
+      await src.move(from, to);
+      const text = linkCache.get(from);
+      linkCache.delete(from);
+      if (text !== undefined && LINK_FILE.test(to)) linkCache.set(to, text);
+    },
+    async remove(file) {
+      await src.remove(file);
+      linkCache.delete(file);
+    },
+  };
+}
+
+const cachedDropbox = withLinkCache(dropbox);
+
 /** The configured source, or null when the dashboard hasn't been connected yet. */
 export function source(): Source | null {
-  if (process.env.DASHBOARD_LOCAL_ROOT) return local(process.env.DASHBOARD_LOCAL_ROOT);
-  if (process.env.DROPBOX_REFRESH_TOKEN && process.env.DROPBOX_APP_KEY && process.env.DROPBOX_APP_SECRET) return dropbox;
+  if (process.env.DASHBOARD_LOCAL_ROOT) return withLinkCache(local(process.env.DASHBOARD_LOCAL_ROOT));
+  if (process.env.DROPBOX_REFRESH_TOKEN && process.env.DROPBOX_APP_KEY && process.env.DROPBOX_APP_SECRET) return cachedDropbox;
   return null;
 }

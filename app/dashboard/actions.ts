@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { isSignedIn, signIn, signOut } from "@/lib/dashboard/auth";
-import { loadClients, setScheduled, today } from "@/lib/dashboard/clients";
+import { recentClients, setScheduled, today } from "@/lib/dashboard/clients";
 import { assignLink, deleteLink, renameLink } from "@/lib/dashboard/library";
 import { loadIdeas, removeBusinessLink, STATUSES, updateIdeas, type IdeaStatus } from "@/lib/dashboard/ideas";
 
@@ -81,7 +81,7 @@ export async function changeLink(
 ): Promise<string | null> {
   if (!(await isSignedIn())) return "Signed out. Reload and sign in again.";
   try {
-    if ("assign" in action) await assignLink(path, url, action.assign, (await loadClients()).clients);
+    if ("assign" in action) await assignLink(path, url, action.assign, (await recentClients()).clients);
     else if ("rename" in action) await renameLink(path, action.rename);
     else await deleteLink(path, url);
   } catch (err) {

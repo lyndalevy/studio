@@ -398,8 +398,25 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
   };
 }
 
+let recent: { at: number; result: { clients: ClientStatus[]; error?: string } } | null = null;
+
+/**
+ * The clients as the dashboard last loaded them (if within a few minutes), for quick button taps
+ * like assigning a post idea, so they don't re-read every client folder.
+ */
+export async function recentClients(): Promise<{ clients: ClientStatus[]; error?: string }> {
+  if (recent && Date.now() - recent.at < 5 * 60_000) return recent.result;
+  return loadClients();
+}
+
 /** Every client: each top-level folder in the studio Dropbox that has a client.json. */
 export async function loadClients(): Promise<{ clients: ClientStatus[]; error?: string }> {
+  const result = await readClients();
+  if (!result.error) recent = { at: Date.now(), result };
+  return result;
+}
+
+async function readClients(): Promise<{ clients: ClientStatus[]; error?: string }> {
   const src = source();
   if (!src) return { clients: [], error: "Dropbox isn't connected yet." };
   try {
