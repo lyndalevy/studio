@@ -131,10 +131,13 @@ export default async function Dashboard() {
         ))}
       </div>
 
+      <LibraryCard
+        links={links}
+        clients={clients.map((c) => ({ nickname: c.nickname, tiers: TIERS.filter((t) => c.perWeek[t] > 0) }))}
+      />
+      {libraryError && <p className="mx-auto mt-4 max-w-xl border-2 border-red p-5 text-center">{libraryError}</p>}
       <IdeasCard ideas={ideas} />
       {ideasError && <p className="mx-auto mt-4 max-w-xl border-2 border-red p-5 text-center">{ideasError}</p>}
-      <LibraryCard links={links} clients={clients.map((c) => c.nickname)} />
-      {libraryError && <p className="mx-auto mt-4 max-w-xl border-2 border-red p-5 text-center">{libraryError}</p>}
 
       {budget && <BudgetCard b={budget} />}
       {budgetError && <p className="mx-auto mt-10 max-w-xl border-2 border-red p-5 text-center">{budgetError}</p>}

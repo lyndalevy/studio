@@ -2,6 +2,7 @@
 
 import { useOptimistic, useState, useTransition } from "react";
 
+import type { TierKey } from "@/content/social";
 import type { SavedLink, Shelf } from "@/lib/dashboard/library";
 import { changeLink } from "./actions";
 
@@ -15,7 +16,14 @@ const COLUMNS: { shelf: Shelf; title: string; color: string }[] = [
  * The post idea library: links saved to ideas/bronze, silver and gold in Dropbox. Tap a client's nickname
  * to queue the idea into that client's next cycle with room; tap again to take it off.
  */
-export default function LibraryCard({ links: saved, clients }: { links: SavedLink[]; clients: string[] }) {
+export default function LibraryCard({
+  links: saved,
+  clients,
+}: {
+  links: SavedLink[];
+  /** Each client's nickname and the tiers its package includes (a client only shows in those columns). */
+  clients: { nickname: string; tiers: TierKey[] }[];
+}) {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
@@ -112,7 +120,9 @@ export default function LibraryCard({ links: saved, clients }: { links: SavedLin
                         </span>
                       )}
                       <span className="mt-1.5 flex flex-wrap gap-1">
-                        {clients.map((nick) => {
+                        {clients
+                          .filter((c) => c.tiers.includes(shelf as TierKey))
+                          .map(({ nickname: nick }) => {
                           const a = l.assigned.find((x) => x.client === nick);
                           const no = l.declined.includes(nick);
                           return (
