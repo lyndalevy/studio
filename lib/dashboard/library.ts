@@ -9,12 +9,20 @@ import { source } from "./source";
  *
  * A tier link can be assigned to one or more clients (by nickname). Each assignment takes the first cycle
  * that still has room for that tier, after the posts already made and the ideas assigned before it, and
- * keeps that cycle. Once every assignment's cycle has all its posts of that tier made, the link deletes
- * itself. A link with nothing assigned is never touched.
+ * keeps that cycle; once that cycle has all its posts of that tier made, the assignment is done (the link
+ * stays). Tapping a client again marks the idea as not for that client (grayed out); once more clears it.
  */
 export type Shelf = "bronze" | "silver" | "gold" | "business";
-export type Assignment = { client: string; cycle: number; at: string };
-export type SavedLink = { shelf: Shelf; name: string; url: string; path: string; assigned: Assignment[] };
+export type Assignment = { client: string; cycle: number; at: string; done?: boolean };
+export type SavedLink = {
+  shelf: Shelf;
+  name: string;
+  url: string;
+  path: string;
+  assigned: Assignment[];
+  /** Clients this idea isn't for (grayed out). */
+  declined: string[];
+};
 
 export const SHELVES: Shelf[] = ["bronze", "silver", "gold"];
 const ROOT = "ideas";
@@ -24,7 +32,7 @@ const LINK = /\.(url|webloc)$/i;
 /** A link without its tracking query, so the same reel shared twice still matches. */
 export const linkKey = (u: string) => u.replace(/\?.*$/, "").replace(/\/$/, "");
 
-type Meta = Record<string, { assigned: Assignment[] }>;
+type Meta = Record<string, { assigned: Assignment[]; declined?: string[] }>;
 
 async function readMeta(): Promise<Meta> {
   const raw = await source()!.read(META);
@@ -143,61 +151,48 @@ function openCycle(c: ClientStatus, tier: TierKey, taken: Assignment[], tiers: M
 }
 
 /**
- * The library, kept up to date: links whose assignments are all made are deleted, and an assignment
- * whose cycle ended before it was made moves on to the next cycle with room.
+ * The library, with each assignment marked done once its cycle has all its posts of that tier made. An
+ * assignment whose cycle ended before it was made moves on to the next cycle with room. Links are never
+ * deleted here, and a link with nothing assigned is never touched.
  */
 export async function loadLibrary(clients: ClientStatus[]): Promise<{ links: SavedLink[]; error?: string }> {
   const src = source();
   if (!src) return { links: [] };
   const meta = await readMeta();
-  const found = (await Promise.all(SHELVES.map(async (shelf) => (await listShelf(shelf)).map((l) => ({ ...l, shelf })))))
+  const links: SavedLink[] = (
+    await Promise.all(SHELVES.map(async (shelf) => (await listShelf(shelf)).map((l) => ({ ...l, shelf }))))
+  )
     .flat()
-    .map((l) => ({ ...l, assigned: meta[linkKey(l.url)]?.assigned ?? [] }));
+    .map((l) => ({
+      ...l,
+      assigned: (meta[linkKey(l.url)]?.assigned ?? []).map((a) => ({ ...a })),
+      declined: meta[linkKey(l.url)]?.declined ?? [],
+    }));
 
-  let changed = false;
   const byNick = new Map(clients.map((c) => [c.nickname, c]));
   const tiers = new Map<Assignment, TierKey>();
-  for (const l of found) {
-    const t = tierOfShelf(l.shelf);
-    if (t) for (const a of l.assigned) tiers.set(a, t);
-  }
-  const all = found.flatMap((l) => l.assigned);
+  for (const l of links) for (const a of l.assigned) tiers.set(a, tierOfShelf(l.shelf)!);
+  const all = links.flatMap((l) => l.assigned);
 
-  const links: SavedLink[] = [];
-  for (const l of found) {
-    const tier = tierOfShelf(l.shelf);
-    // nothing assigned (or no tier yet): never touched
-    if (!tier || !l.assigned.length) {
-      links.push(l);
-      continue;
-    }
+  let changed = false;
+  for (const l of links) {
+    const tier = tierOfShelf(l.shelf)!;
     for (const a of l.assigned) {
       const c = byNick.get(a.client);
-      if (!c || cycleDone(c, a.cycle, tier)) continue;
+      if (!c) continue;
+      if (cycleDone(c, a.cycle, tier)) {
+        a.done = true;
+        continue;
+      }
       if (a.cycle < c.current) {
         const n = openCycle(c, tier, all.filter((x) => x !== a), tiers);
         if (n && n !== a.cycle) {
           a.cycle = n;
+          meta[linkKey(l.url)].assigned = l.assigned.map((x) => ({ client: x.client, cycle: x.cycle, at: x.at }));
           changed = true;
         }
       }
     }
-    const done = l.assigned.every((a) => {
-      const c = byNick.get(a.client);
-      return c ? cycleDone(c, a.cycle, tier) : false;
-    });
-    if (done) {
-      try {
-        await src.remove(l.path);
-        delete meta[linkKey(l.url)];
-        changed = true;
-        continue;
-      } catch {
-        // keep it showing; try again next time
-      }
-    }
-    meta[linkKey(l.url)] = { assigned: l.assigned };
-    links.push(l);
   }
   if (changed) {
     try {
@@ -210,7 +205,10 @@ export async function loadLibrary(clients: ClientStatus[]): Promise<{ links: Sav
   return { links };
 }
 
-/** Assign a tier link to a client (it joins the end of that client's queue), or take it off. */
+/**
+ * Tap a client on a tier link: blank → queued (joins the end of that client's queue) → not for this client
+ * (grayed out) → blank.
+ */
 export async function assignLink(path: string, url: string, nickname: string, clients: ClientStatus[]): Promise<void> {
   checkPath(path);
   const tier = tierOfShelf(path.split("/")[1] as Shelf);
@@ -219,9 +217,13 @@ export async function assignLink(path: string, url: string, nickname: string, cl
   if (!c) throw new Error(`No client called ${nickname}.`);
   const meta = await readMeta();
   const key = linkKey(url);
-  const mine = meta[key]?.assigned ?? [];
-  if (mine.some((a) => a.client === nickname)) {
-    meta[key] = { assigned: mine.filter((a) => a.client !== nickname) };
+  const entry = { assigned: meta[key]?.assigned ?? [], declined: meta[key]?.declined ?? [] };
+
+  if (entry.assigned.some((a) => a.client === nickname)) {
+    entry.assigned = entry.assigned.filter((a) => a.client !== nickname);
+    entry.declined = [...entry.declined, nickname];
+  } else if (entry.declined.includes(nickname)) {
+    entry.declined = entry.declined.filter((n) => n !== nickname);
   } else {
     if (!c.perWeek[tier]) throw new Error(`${nickname}'s package has no ${tier[0].toUpperCase() + tier.slice(1)} posts.`);
     // every other assignment, with its tier, so this one goes after them
@@ -237,8 +239,10 @@ export async function assignLink(path: string, url: string, nickname: string, cl
     }
     const n = openCycle(c, tier, taken, tiers);
     if (!n) throw new Error(`${nickname} has no room for another ${tier} post in the next year of cycles.`);
-    meta[key] = { assigned: [...mine, { client: nickname, cycle: n, at: new Date().toISOString() }] };
+    entry.assigned = [...entry.assigned, { client: nickname, cycle: n, at: new Date().toISOString() }];
   }
+  if (entry.assigned.length || entry.declined.length) meta[key] = entry;
+  else delete meta[key];
   await writeMeta(meta);
 }
 

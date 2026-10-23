@@ -27,15 +27,11 @@ export default function LibraryCard({ links: saved, clients }: { links: SavedLin
       const a = step.action;
       if ("delete" in a) return [];
       if ("rename" in a) return [{ ...l, name: a.rename }];
-      const on = l.assigned.some((x) => x.client === a.assign);
-      return [
-        {
-          ...l,
-          assigned: on
-            ? l.assigned.filter((x) => x.client !== a.assign)
-            : [...l.assigned, { client: a.assign, cycle: 0, at: new Date().toISOString() }],
-        },
-      ];
+      // blank → queued → grayed out → blank
+      if (l.assigned.some((x) => x.client === a.assign))
+        return [{ ...l, assigned: l.assigned.filter((x) => x.client !== a.assign), declined: [...l.declined, a.assign] }];
+      if (l.declined.includes(a.assign)) return [{ ...l, declined: l.declined.filter((n) => n !== a.assign) }];
+      return [{ ...l, assigned: [...l.assigned, { client: a.assign, cycle: 0, at: new Date().toISOString() }] }];
     })
   );
   const act = (l: SavedLink, action: Parameters<typeof changeLink>[2]) => {
@@ -118,19 +114,31 @@ export default function LibraryCard({ links: saved, clients }: { links: SavedLin
                       <span className="mt-1.5 flex flex-wrap gap-1">
                         {clients.map((nick) => {
                           const a = l.assigned.find((x) => x.client === nick);
+                          const no = l.declined.includes(nick);
                           return (
                             <button
                               key={nick}
                               type="button"
                               aria-pressed={!!a}
                               onClick={() => act(l, { assign: nick })}
-                              title={a ? `${nick}: cycle ${a.cycle}. Tap to take it off.` : `Queue for ${nick}'s next cycle with room`}
+                              title={
+                                a
+                                  ? `${nick}: cycle ${a.cycle}${a.done ? ", made" : ""}. Tap to mark it not for ${nick}.`
+                                  : no
+                                    ? `Not for ${nick}. Tap to clear.`
+                                    : `Queue for ${nick}'s next cycle with room`
+                              }
                               className={`eyebrow rounded-full px-2 py-0.5 ${
-                                a ? "bg-red text-cream" : "border border-red hover:bg-cream-deep"
+                                a
+                                  ? "bg-red text-cream"
+                                  : no
+                                    ? "border border-[#c9bfb8] bg-[#e6ddd6] text-[#9b8f87] line-through"
+                                    : "border border-red hover:bg-cream-deep"
                               }`}
                             >
                               {nick}
                               {a && (a.cycle ? ` · C${a.cycle}` : " · …")}
+                              {a?.done && " ✓"}
                             </button>
                           );
                         })}
@@ -144,8 +152,8 @@ export default function LibraryCard({ links: saved, clients }: { links: SavedLin
         </div>
         <p className="text-xs opacity-70">
           Save Instagram links to ideas/bronze, silver or gold in Dropbox from your phone (Share → Dropbox); new ones
-          are named from their captions. Tap a client to queue the idea into their next cycle with room for that tier.
-          Once every client&rsquo;s cycle has all its posts of that tier made, the idea deletes itself.
+          are named from their captions. Tap a client once to queue the idea into their next cycle with room (✓ once
+          that cycle&rsquo;s posts are made), twice to gray it out as not for them, and again to clear it.
         </p>
       </div>
     </section>

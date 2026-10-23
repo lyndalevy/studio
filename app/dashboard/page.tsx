@@ -145,7 +145,7 @@ export default async function Dashboard() {
 function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
   // Post ideas queued for this client, soonest cycle first.
   const queued = links
-    .flatMap((l) => l.assigned.filter((a) => a.client === c.nickname).map((a) => ({ ...a, link: l })))
+    .flatMap((l) => l.assigned.filter((a) => a.client === c.nickname && !a.done).map((a) => ({ ...a, link: l })))
     .sort((a, b) => a.cycle - b.cycle || a.at.localeCompare(b.at));
   const scheduled = c.sets.flatMap((s) => s.items).filter((i) => i.scheduled).length;
   const made = c.sets.flatMap((s) => s.items).length;
