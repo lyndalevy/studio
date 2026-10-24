@@ -61,10 +61,27 @@ export default function IdeasCard({ ideas }: { ideas: Idea[] }) {
                     <li key={i.id} className="flex items-start justify-between gap-3 text-sm">
                       <span>
                         {i.text}
-                        {i.link && (
-                          <a href={i.link} target="_blank" rel="noopener noreferrer" className="link-draw ml-1.5 text-xs">
-                            Open ↗
+                        {i.link?.startsWith("photo:") ? (
+                          <a
+                            href={`/dashboard/idea-image?size=large&ref=${encodeURIComponent(i.link.slice(6))}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-1 block w-fit"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element -- a signed-in preview, not a site image */}
+                            <img
+                              src={`/dashboard/idea-image?ref=${encodeURIComponent(i.link.slice(6))}`}
+                              alt=""
+                              loading="lazy"
+                              className="h-16 w-16 border border-red-line object-cover"
+                            />
                           </a>
+                        ) : (
+                          i.link && (
+                            <a href={i.link} target="_blank" rel="noopener noreferrer" className="link-draw ml-1.5 text-xs">
+                              Open ↗
+                            </a>
+                          )
                         )}
                       </span>
                       <span className="flex shrink-0 gap-1.5">

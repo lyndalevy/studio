@@ -9,7 +9,8 @@ import path from "node:path";
  * Dropbox folder on disk and it reads the files directly instead.
  */
 
-export type Entry = { path: string; kind: "file" | "folder" };
+/** id: Dropbox's permanent file id (stays the same when a file is renamed or moved). */
+export type Entry = { path: string; kind: "file" | "folder"; id?: string };
 
 export interface Source {
   /** Files and folders under `dir` (every level, or just the top one), with paths relative to the studio root. */
@@ -22,6 +23,8 @@ export interface Source {
   move(from: string, to: string): Promise<void>;
   /** Delete a file (Dropbox keeps it in Deleted files for 30 days). */
   remove(file: string): Promise<void>;
+  /** A JPEG preview of a photo (by path or Dropbox id), "small" for lists or "large" to look at. */
+  thumbnail(ref: string, size: "small" | "large"): Promise<{ type: string; body: ArrayBuffer } | null>;
 }
 
 const ROOT = process.env.DROPBOX_ROOT ?? "/STUDIO L SOCIAL";
@@ -82,14 +85,14 @@ const dropbox: Source = {
       });
       if (!res.ok) throw new Error(`Couldn't list ${base} in Dropbox (${res.status}): ${await reason(res)}`);
       const page = (await res.json()) as {
-        entries: { ".tag": string; path_display: string }[];
+        entries: { ".tag": string; path_display: string; id?: string }[];
         has_more: boolean;
         cursor: string;
       };
       for (const e of page.entries) {
         if (e[".tag"] === "deleted") continue;
         const rel = e.path_display.slice(ROOT.length + 1);
-        out.push({ path: rel, kind: e[".tag"] === "folder" ? "folder" : "file" });
+        out.push({ path: rel, kind: e[".tag"] === "folder" ? "folder" : "file", id: e.id });
       }
       if (!page.has_more) return out;
       url = "https://api.dropboxapi.com/2/files/list_folder/continue";
@@ -146,6 +149,26 @@ const dropbox: Source = {
     if (res.status === 409) return; // already gone
     if (!res.ok) throw new Error(`Couldn't delete ${file} in Dropbox (${res.status}): ${await reason(res)}`);
   },
+
+  async thumbnail(ref, size) {
+    const token = await accessToken();
+    // Dropbox makes the preview, so iPhone HEIC photos show in every browser too
+    const res = await fetch("https://content.dropboxapi.com/2/files/get_thumbnail_v2", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Dropbox-API-Arg": headerJson({
+          resource: { ".tag": "path", path: ref.startsWith("id:") ? ref : `${ROOT}/${ref}` },
+          format: "jpeg",
+          size: size === "small" ? "w256h256" : "w1024h768",
+          mode: "fitone_bestfit",
+        }),
+      },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return { type: "image/jpeg", body: await res.arrayBuffer() };
+  },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -184,6 +207,16 @@ function local(root: string): Source {
     },
     async remove(file) {
       await rm(path.join(root, file), { force: true });
+    },
+    async thumbnail(ref) {
+      try {
+        const buf = await readFile(path.join(root, ref));
+        const ext = ref.split(".").pop()!.toLowerCase();
+        const type = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : ext === "gif" ? "image/gif" : "image/jpeg";
+        return { type, body: buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer };
+      } catch {
+        return null;
+      }
     },
   };
 }

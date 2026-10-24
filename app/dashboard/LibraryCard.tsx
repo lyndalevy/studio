@@ -4,6 +4,7 @@ import { useOptimistic, useState, useTransition } from "react";
 
 import type { TierKey } from "@/content/social";
 import type { SavedLink, Shelf } from "@/lib/dashboard/library";
+import { isPhoto, photoRef } from "@/lib/dashboard/photo";
 import { changeLink } from "./actions";
 
 const COLUMNS: { shelf: Shelf; title: string; color: string }[] = [
@@ -91,9 +92,30 @@ export default function LibraryCard({
                         </form>
                       ) : (
                         <span className="flex items-start justify-between gap-2">
-                          <a href={l.url} target="_blank" rel="noopener noreferrer" className="link-draw">
-                            {l.name} ↗
-                          </a>
+                          {isPhoto(l.url) ? (
+                            <a
+                              href={`/dashboard/idea-image?size=large&ref=${encodeURIComponent(photoRef(l.url))}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-start gap-2"
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element -- a signed-in preview, not a site image */}
+                              <img
+                                src={`/dashboard/idea-image?ref=${encodeURIComponent(photoRef(l.url))}`}
+                                alt=""
+                                loading="lazy"
+                                className="h-16 w-16 shrink-0 border border-red-line object-cover"
+                              />
+                              <span className="link-draw">
+                                {l.name}
+                                {l.needsName && <span className="ml-1 text-xs italic opacity-70">(name me ✎)</span>}
+                              </span>
+                            </a>
+                          ) : (
+                            <a href={l.url} target="_blank" rel="noopener noreferrer" className="link-draw">
+                              {l.name} ↗
+                            </a>
+                          )}
                           <span className="flex shrink-0 gap-1">
                             <button
                               type="button"
@@ -161,8 +183,8 @@ export default function LibraryCard({
           })}
         </div>
         <p className="text-xs opacity-70">
-          Save Instagram links to ideas/bronze, silver or gold in Dropbox from your phone (Share → Dropbox); new ones
-          are named from their captions. Tap a client once to queue the idea into their next cycle with room (✓ once
+          Save Instagram links or photos to ideas/bronze, silver or gold in Dropbox from your phone (Share → Dropbox);
+          new links are named from their captions, and photos still called IMG_… need a name (✎). Tap a client once to queue the idea into their next cycle with room (✓ once
           that cycle&rsquo;s posts are made), twice to gray it out as not for them, and again to clear it.
         </p>
       </div>

@@ -1,9 +1,10 @@
 import type { TierKey } from "@/content/social";
 import type { ClientStatus } from "./clients";
+import { isPhoto } from "./photo";
 import { source } from "./source";
 
 /**
- * The post idea library in Dropbox: Instagram links (.url files) saved from the phone into ideas/,
+ * The post idea library in Dropbox: Instagram links (.url files) and photos saved from the phone into ideas/,
  * sorted by tier in ideas/bronze, ideas/silver and ideas/gold. ideas/business is Lynda's own and shows in
  * "Ideas to film" instead.
  *
@@ -17,7 +18,10 @@ export type Assignment = { client: string; cycle: number; at: string; done?: boo
 export type SavedLink = {
   shelf: Shelf;
   name: string;
+  /** The reel's link, or "photo:<Dropbox id>" for a photo. */
   url: string;
+  /** A photo still named like "IMG_1234" (it has no caption to name it from). */
+  needsName?: boolean;
   path: string;
   assigned: Assignment[];
   /** Clients this idea isn't for (grayed out). */
@@ -29,6 +33,9 @@ const ROOT = "ideas";
 const META = "ideas/library.json";
 const folderOf = (shelf: Shelf) => `${ROOT}/${shelf}`;
 const LINK = /\.(url|webloc)$/i;
+const PHOTO = /\.(jpe?g|png|heic|heif|webp|gif)$/i;
+const IDEA_FILE = /\.(url|webloc|jpe?g|png|heic|heif|webp|gif)$/i;
+const cameraName = (name: string) => /^(IMG|DSC|DSCN|PXL|MVIMG|Photo|image|Screenshot)[\s_-]?[\d\s_-]+/i.test(name) || /^[0-9A-F-]{20,}$/i.test(name);
 /** A link without its tracking query, so the same reel shared twice still matches. */
 export const linkKey = (u: string) => u.replace(/\?.*$/, "").replace(/\/$/, "");
 
@@ -44,23 +51,31 @@ async function readMeta(): Promise<Meta> {
 }
 const writeMeta = (meta: Meta) => source()!.write(META, JSON.stringify({ links: meta }, null, 2) + "\n");
 
-async function listShelf(shelf: Shelf): Promise<{ path: string; name: string; url: string }[]> {
+async function listShelf(shelf: Shelf): Promise<{ path: string; name: string; url: string; needsName?: boolean }[]> {
   const src = source()!;
-  let files: string[];
+  let files: { path: string; id?: string }[];
   try {
-    files = (await src.list(folderOf(shelf), false))
-      .filter((e) => e.kind === "file" && LINK.test(e.path) && !e.path.split("/").pop()!.startsWith("._"))
-      .map((e) => e.path);
+    files = (await src.list(folderOf(shelf), false)).filter(
+      (e) => e.kind === "file" && IDEA_FILE.test(e.path) && !e.path.split("/").pop()!.startsWith("._")
+    );
   } catch {
     return []; // that folder isn't there yet
   }
-  const read = await Promise.all(files.map(async (path) => ({ path, text: (await src.read(path)) ?? "" })));
-  const out = [];
+  const photos = files
+    .filter((f) => PHOTO.test(f.path))
+    .map((f) => {
+      const name = f.path.split("/").pop()!.replace(PHOTO, "");
+      return { path: f.path, name, url: `photo:${f.id ?? f.path}`, needsName: cameraName(name) };
+    });
+  const read = await Promise.all(
+    files.filter((f) => LINK.test(f.path)).map(async (f) => ({ path: f.path, text: (await src.read(f.path)) ?? "" }))
+  );
+  const links = [];
   for (const { path, text } of read) {
     const url = text.match(/^URL=(\S+)/m)?.[1] ?? text.match(/<string>(https?:[^<]+)<\/string>/)?.[1];
-    if (url) out.push({ path, name: path.split("/").pop()!.replace(LINK, ""), url: url.trim() });
+    if (url) links.push({ path, name: path.split("/").pop()!.replace(LINK, ""), url: url.trim() });
   }
-  return out;
+  return [...links, ...photos];
 }
 
 // ── naming ───────────────────────────────────────────────────
@@ -116,7 +131,7 @@ export async function nameNewLinks(): Promise<void> {
   if (!src) return;
   for (const shelf of [...SHELVES, "business" as Shelf]) {
     for (const l of await listShelf(shelf)) {
-      if (!unnamed(l.name, l.url)) continue;
+      if (isPhoto(l.url) || !unnamed(l.name, l.url)) continue;
       const name = await nameFromInstagram(l.url);
       if (!name) continue;
       const ext = l.path.match(LINK)![0];
@@ -248,12 +263,12 @@ export async function assignLink(path: string, url: string, nickname: string, cl
 
 // ── moving, naming and deleting files ────────────────────────
 
-/** Only link files directly inside one of the ideas/ shelves can be changed. */
+/** Only link and photo files directly inside one of the ideas/ shelves can be changed. */
 function checkPath(path: string) {
   const parts = path.split("/");
   const ok =
     parts[0] === ROOT &&
-    LINK.test(path) &&
+    IDEA_FILE.test(path) &&
     !path.includes("..") &&
     parts.length === 3 &&
     [...SHELVES, "business"].includes(parts[1] as Shelf);
@@ -266,7 +281,7 @@ export async function renameLink(path: string, name: string): Promise<void> {
   const clean = safeName(name);
   if (!clean) throw new Error("Write a name first.");
   const dir = path.split("/").slice(0, -1).join("/");
-  await source()!.move(path, `${dir}/${clean}${path.match(LINK)![0]}`);
+  await source()!.move(path, `${dir}/${clean}${path.match(IDEA_FILE)![0]}`);
 }
 
 /** Delete a link file (Dropbox keeps it in Deleted files for 30 days). */

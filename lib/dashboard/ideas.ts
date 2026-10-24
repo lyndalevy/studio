@@ -8,15 +8,15 @@ export type Idea = {
   status: IdeaStatus;
   /** YYYY-MM-DD. */
   added: string;
-  /** A reel or post to look at, if there is one. */
+  /** A reel or post to look at, if there is one ("photo:<Dropbox id>" for a photo saved in ideas/business). */
   link?: string;
-  /** For ideas brought in from ideas/business: that link file's name, without ".url". */
+  /** For ideas brought in from ideas/business: that file's name, without its extension. */
   file?: string;
 };
 
 export const STATUSES: IdeaStatus[] = ["to film", "filmed", "posted"];
 const FILE = "STUDIO L/ideas.json";
-/** Links saved here (Instagram reels shared to Dropbox as .url files) show up as ideas on their own. */
+/** Links (Instagram reels shared to Dropbox as .url files) and photos saved here show up as ideas on their own. */
 const BUSINESS = "ideas/business";
 
 export async function loadIdeas(): Promise<{ ideas: Idea[]; error?: string }> {
@@ -44,25 +44,33 @@ export async function updateIdeas(change: (ideas: Idea[]) => Idea[]): Promise<vo
 /** A link without its tracking query, so the same reel shared twice still matches. */
 const key = (u: string) => u.replace(/\?.*$/, "").replace(/\/$/, "");
 
-async function businessFiles(): Promise<string[]> {
+const LINK = /\.(url|webloc)$/i;
+const PHOTO = /\.(jpe?g|png|heic|heif|webp|gif)$/i;
+
+async function businessFiles(): Promise<{ path: string; id?: string }[]> {
   const src = source();
   if (!src) return [];
   try {
-    return (await src.list(BUSINESS, false))
-      .filter((e) => e.kind === "file" && /\.(url|webloc)$/i.test(e.path) && !e.path.split("/").pop()!.startsWith("._"))
-      .map((e) => e.path);
+    return (await src.list(BUSINESS, false)).filter(
+      (e) => e.kind === "file" && (LINK.test(e.path) || PHOTO.test(e.path)) && !e.path.split("/").pop()!.startsWith("._")
+    );
   } catch {
     return []; // no ideas/business folder yet
   }
 }
 
-async function readLinks(files: string[]): Promise<{ path: string; name: string; url: string }[]> {
+/** Each link with the reel it points to; each photo as "photo:<Dropbox id>" (its id survives a rename). */
+async function readLinks(files: { path: string; id?: string }[]): Promise<{ path: string; name: string; url: string }[]> {
   const src = source()!;
-  const read = await Promise.all(files.map(async (path) => ({ path, text: (await src.read(path)) ?? "" })));
-  const out: { path: string; name: string; url: string }[] = [];
+  const out: { path: string; name: string; url: string }[] = files
+    .filter((f) => PHOTO.test(f.path))
+    .map((f) => ({ path: f.path, name: f.path.split("/").pop()!.replace(PHOTO, ""), url: `photo:${f.id ?? f.path}` }));
+  const read = await Promise.all(
+    files.filter((f) => LINK.test(f.path)).map(async (f) => ({ path: f.path, text: (await src.read(f.path)) ?? "" }))
+  );
   for (const { path, text } of read) {
     const url = text.match(/^URL=(\S+)/m)?.[1] ?? text.match(/<string>(https?:[^<]+)<\/string>/)?.[1];
-    if (url) out.push({ path, name: path.split("/").pop()!.replace(/\.(url|webloc)$/i, ""), url: url.trim() });
+    if (url) out.push({ path, name: path.split("/").pop()!.replace(LINK, ""), url: url.trim() });
   }
   return out;
 }
