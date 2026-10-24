@@ -22,6 +22,8 @@ export type SavedLink = {
   url: string;
   /** A photo still named like "IMG_1234" (it has no caption to name it from). */
   needsName?: boolean;
+  /** A fingerprint of a photo's contents, to spot the same photo saved twice. */
+  hash?: string;
   path: string;
   assigned: Assignment[];
   /** Clients this idea isn't for (grayed out). */
@@ -35,7 +37,10 @@ const folderOf = (shelf: Shelf) => `${ROOT}/${shelf}`;
 const LINK = /\.(url|webloc)$/i;
 const PHOTO = /\.(jpe?g|png|heic|heif|webp|gif)$/i;
 const IDEA_FILE = /\.(url|webloc|jpe?g|png|heic|heif|webp|gif)$/i;
-const cameraName = (name: string) => /^(IMG|DSC|DSCN|PXL|MVIMG|Photo|image|Screenshot)[\s_-]?[\d\s_-]+/i.test(name) || /^[0-9A-F-]{20,}$/i.test(name);
+const cameraName = (name: string) =>
+  /^(IMG|DSC|DSCN|PXL|MVIMG|Photo|image|Screenshot)[\s_-]?[\d\s_-]+/i.test(name) ||
+  /^temp_image/i.test(name) ||
+  /[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}/i.test(name);
 /** A link without its tracking query, so the same reel shared twice still matches. */
 export const linkKey = (u: string) => u.replace(/\?.*$/, "").replace(/\/$/, "");
 
@@ -51,9 +56,11 @@ async function readMeta(): Promise<Meta> {
 }
 const writeMeta = (meta: Meta) => source()!.write(META, JSON.stringify({ links: meta }, null, 2) + "\n");
 
-async function listShelf(shelf: Shelf): Promise<{ path: string; name: string; url: string; needsName?: boolean }[]> {
+async function listShelf(
+  shelf: Shelf
+): Promise<{ path: string; name: string; url: string; needsName?: boolean; hash?: string }[]> {
   const src = source()!;
-  let files: { path: string; id?: string }[];
+  let files: { path: string; id?: string; hash?: string }[];
   try {
     files = (await src.list(folderOf(shelf), false)).filter(
       (e) => e.kind === "file" && IDEA_FILE.test(e.path) && !e.path.split("/").pop()!.startsWith("._")
@@ -65,7 +72,7 @@ async function listShelf(shelf: Shelf): Promise<{ path: string; name: string; ur
     .filter((f) => PHOTO.test(f.path))
     .map((f) => {
       const name = f.path.split("/").pop()!.replace(PHOTO, "");
-      return { path: f.path, name, url: `photo:${f.id ?? f.path}`, needsName: cameraName(name) };
+      return { path: f.path, name, url: `photo:${f.id ?? f.path}`, needsName: cameraName(name), hash: f.hash };
     });
   const read = await Promise.all(
     files.filter((f) => LINK.test(f.path)).map(async (f) => ({ path: f.path, text: (await src.read(f.path)) ?? "" }))
@@ -184,12 +191,42 @@ export async function loadLibrary(clients: ClientStatus[]): Promise<{ links: Sav
       declined: meta[linkKey(l.url)]?.declined ?? [],
     }));
 
+  // The same reel or photo in two tiers: keep it in the highest tier, delete the lower copies, and keep
+  // any client choices made on them.
+  let changed = false;
+  const rank: Record<string, number> = { bronze: 1, silver: 2, gold: 3 };
+  const same = new Map<string, typeof links>();
+  for (const l of links) {
+    const id = isPhoto(l.url) ? `photo:${l.hash ?? l.path}` : `link:${linkKey(l.url)}`;
+    same.set(id, [...(same.get(id) ?? []), l]);
+  }
+  const gone = new Set<SavedLink>();
+  for (const group of same.values()) {
+    if (group.length < 2) continue;
+    group.sort((a, b) => rank[b.shelf] - rank[a.shelf]);
+    const [keep, ...rest] = group;
+    let merged = false;
+    for (const l of rest) {
+      try {
+        await src.remove(l.path);
+      } catch {
+        continue; // try again next time
+      }
+      gone.add(l);
+      for (const a of l.assigned) if (!keep.assigned.some((x) => x.client === a.client)) keep.assigned.push(a);
+      for (const n of l.declined) if (!keep.declined.includes(n) && !keep.assigned.some((x) => x.client === n)) keep.declined.push(n);
+      if (l.url !== keep.url) delete meta[linkKey(l.url)];
+      merged = changed = true;
+    }
+    if (merged) meta[linkKey(keep.url)] = { assigned: keep.assigned.map((x) => ({ client: x.client, cycle: x.cycle, at: x.at })), declined: keep.declined };
+  }
+  if (gone.size) links.splice(0, links.length, ...links.filter((l) => !gone.has(l)));
+
   const byNick = new Map(clients.map((c) => [c.nickname, c]));
   const tiers = new Map<Assignment, TierKey>();
   for (const l of links) for (const a of l.assigned) tiers.set(a, tierOfShelf(l.shelf)!);
   const all = links.flatMap((l) => l.assigned);
 
-  let changed = false;
   for (const l of links) {
     const tier = tierOfShelf(l.shelf)!;
     for (const a of l.assigned) {
