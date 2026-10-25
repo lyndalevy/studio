@@ -46,8 +46,12 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   const hi = gridEnd > soonEnd ? gridEnd : soonEnd;
   const { events, missing, file, error } = await loadCalendar(clients, budget, lo, hi);
 
-  // A window (making posts) shows on each of its days.
-  const onDay = (d: string) => events.filter((e) => e.date === d || (e.until && e.date <= d && d <= e.until));
+  // A window (making posts) shows once, on its first day, with its dates.
+  const onDay = (d: string) => events.filter((e) => e.date === d);
+  const range = (e: CalEvent) =>
+    e.until && e.until !== e.date
+      ? ` (${fmt(e.date, { month: "short", day: "numeric" })} – ${fmt(e.until, e.until.slice(5, 7) === e.date.slice(5, 7) ? { day: "numeric" } : { month: "short", day: "numeric" })})`
+      : "";
   // Coming up: the next 3 weeks, plus anything from the last month still not done (an unsent invoice, an unscheduled cycle).
   const late = (e: CalEvent) => (e.until ?? e.date) < now && e.kind !== "make" && e.kind !== "shoot" && e.kind !== "pay";
   const soon = events.filter(
@@ -172,7 +176,8 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
                       title={e.title}
                       className={`rounded px-1.5 py-0.5 text-[11px] leading-tight ${KINDS[e.kind].style} ${e.done ? "line-through opacity-50" : ""}`}
                     >
-                      {e.kind === "make" && e.date !== d ? `… ${e.title.replace(/^Make /, "")}` : e.title}
+                      {e.title}
+                      {range(e)}
                       {e.time && ` · ${e.time}`}
                     </li>
                   ))}
