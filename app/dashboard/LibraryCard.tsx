@@ -1,6 +1,6 @@
 "use client";
 
-import { useOptimistic, useState, useTransition } from "react";
+import { useEffect, useOptimistic, useState, useTransition } from "react";
 
 import type { TierKey } from "@/content/social";
 import type { SavedLink, Shelf } from "@/lib/dashboard/library";
@@ -29,6 +29,20 @@ export default function LibraryCard({
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [, start] = useTransition();
+  // Open or closed, remembered on this device.
+  const [open, setOpen] = useState(true);
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("post-ideas-open") === "0") setOpen(false);
+    } catch {}
+  }, []);
+  const toggle = () =>
+    setOpen((was) => {
+      try {
+        localStorage.setItem("post-ideas-open", was ? "0" : "1");
+      } catch {}
+      return !was;
+    });
   // Show a tap right away; the server fills in the cycle (shown as "…" until then).
   const [links, show] = useOptimistic(saved, (now: SavedLink[], step: { path: string; action: Parameters<typeof changeLink>[2] }) =>
     now.flatMap((l) => {
@@ -53,11 +67,24 @@ export default function LibraryCard({
 
   return (
     <section className="mt-10 border-2 border-red bg-cream">
-      <div className="flex flex-wrap items-baseline justify-between gap-3 bg-red px-5 py-4 text-cream">
+      <button
+        type="button"
+        onClick={toggle}
+        aria-expanded={open}
+        aria-controls="post-ideas-body"
+        className="flex w-full flex-wrap items-baseline justify-between gap-3 bg-red px-5 py-4 text-left text-cream"
+      >
         <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">Post ideas</h2>
-        <p className="text-lg">For any client, by tier</p>
-      </div>
-      <div className="space-y-4 p-5">
+        <span className="text-lg">
+          {open
+            ? "For any client, by tier"
+            : COLUMNS.map(({ shelf, title }) => `${links.filter((l) => l.shelf === shelf).length} ${title}`).join(" · ")}
+          <span aria-hidden className="ml-3 inline-block transition-transform" style={{ transform: open ? "rotate(180deg)" : "none" }}>
+            ▾
+          </span>
+        </span>
+      </button>
+      <div id="post-ideas-body" hidden={!open} className="space-y-4 p-5">
         {error && <p className="text-sm">{error}</p>}
         <div className="grid gap-4 md:grid-cols-3">
           {COLUMNS.map(({ shelf, title, color }) => {
