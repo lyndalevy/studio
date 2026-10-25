@@ -26,6 +26,10 @@ export type ClientFile = {
   sent?: Record<string, string>;
   /** Months paid (YYYY-MM). Set from the dashboard. */
   paid?: string[];
+  /** A month's invoice goes out on a different day than usual, e.g. {"2026-10": "2026-10-26"}. */
+  send_dates?: Record<string, string>;
+  /** false keeps the client off the dashboard calendar. */
+  calendar?: boolean;
   notes?: string;
   /** Profile links by platform name, e.g. {"Instagram": "https://www.instagram.com/..."}. */
   socials?: Record<string, string>;
@@ -328,7 +332,7 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
     };
     for (let m = first.slice(0, 7); m <= addMonths(now, 2); m = addMonths(m, 1)) {
       const went = info.sent?.[m];
-      const sent = went ?? onNth(m);
+      const sent = went ?? info.send_dates?.[m] ?? onNth(m);
       const extras = (info.extras ?? []).filter((x) => x.month === m);
       const lines = [`${info.package} $${pkg!.price}`, ...(info.add_ons ?? []).map((a) => `${a} $${priceOf(a)}`)];
       let amount = monthly;

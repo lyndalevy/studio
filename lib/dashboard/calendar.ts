@@ -138,6 +138,7 @@ export async function loadCalendar(
 ): Promise<{ events: CalEvent[]; missing: MissingShoot[]; file: CalendarFile; error?: string }> {
   const file = await loadCalendarFile();
   const events: CalEvent[] = [];
+  clients = clients.filter((c) => c.info.calendar !== false);
 
   for (const c of clients) {
     for (const p of c.cycles) {
