@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import { isSignedIn } from "@/lib/dashboard/auth";
 import { loadBudget } from "@/lib/dashboard/budget";
-import { addDays, feedKey, loadCalendar, MAKE_DAYS, SCHEDULE_LEAD, type CalEvent } from "@/lib/dashboard/calendar";
+import { addDays, feedKey, loadCalendar, MAKE_DAYS, type CalEvent } from "@/lib/dashboard/calendar";
 import { loadClients, today } from "@/lib/dashboard/clients";
 import DashboardNav from "../DashboardNav";
 import ShootsLinkForm from "./ShootsLinkForm";
@@ -25,18 +25,18 @@ const fmt = (d: string, o: Intl.DateTimeFormatOptions) =>
   new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { ...o, timeZone: "UTC" });
 
 /** A calendar of what to do when: make and schedule each cycle, send invoices, shoots, and paydays. */
-export default async function CalendarPage({ searchParams }: { searchParams: Promise<{ m?: string }> }) {
+export default async function CalendarPage({ searchParams }: { searchParams: Promise<{ from?: string }> }) {
   if (!(await isSignedIn())) redirect("/dashboard");
   const now = today();
-  const { m } = await searchParams;
-  const month = /^\d{4}-\d{2}$/.test(m ?? "") ? m! : now.slice(0, 7);
-  const first = `${month}-01`;
-  const gridStart = addDays(first, -new Date(`${first}T12:00:00Z`).getUTCDay());
-  const nextFirst = addDays(first, 32).slice(0, 7) + "-01";
-  const last = addDays(nextFirst, -1);
-  const gridEnd = addDays(last, 6 - new Date(`${last}T12:00:00Z`).getUTCDay());
-  const prevMonth = addDays(first, -1).slice(0, 7);
-  const nextMonth = nextFirst.slice(0, 7);
+  // Five weeks, starting with this week (or the week of ?from=), stepped 4 weeks at a time.
+  const { from } = await searchParams;
+  const sunday = (d: string) => addDays(d, -new Date(`${d}T12:00:00Z`).getUTCDay());
+  const thisWeek = sunday(now);
+  const gridStart = /^\d{4}-\d{2}-\d{2}$/.test(from ?? "") ? sunday(from!) : thisWeek;
+  const gridEnd = addDays(gridStart, 34);
+  const prevStart = addDays(gridStart, -28);
+  const nextStart = addDays(gridStart, 28);
+  const span = `${fmt(gridStart, { month: "short", day: "numeric" })} – ${fmt(gridEnd, { month: "short", day: "numeric", year: "numeric" })}`;
 
   const { clients } = await loadClients();
   const { budget } = await loadBudget(clients);
@@ -48,15 +48,9 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
 
   // A window (making posts) shows once, on its first day, with its dates.
   const onDay = (d: string) => events.filter((e) => e.date === d);
-  const range = (e: CalEvent) =>
-    e.until && e.until !== e.date
-      ? ` (${fmt(e.date, { month: "short", day: "numeric" })} – ${fmt(e.until, e.until.slice(5, 7) === e.date.slice(5, 7) ? { day: "numeric" } : { month: "short", day: "numeric" })})`
-      : "";
   // Coming up: the next 3 weeks, plus anything from the last month still not done (an unsent invoice, an unscheduled cycle).
-  const late = (e: CalEvent) => (e.until ?? e.date) < now && e.kind !== "make" && e.kind !== "shoot" && e.kind !== "pay";
-  const soon = events.filter(
-    (e) => !e.done && e.date <= soonEnd && ((e.until ?? e.date) >= now || (late(e) && e.date >= addDays(now, -31)))
-  );
+  const late = (e: CalEvent) => e.date < now && e.kind !== "make" && e.kind !== "shoot" && e.kind !== "pay";
+  const soon = events.filter((e) => !e.done && e.date <= soonEnd && (e.date >= now || (late(e) && e.date >= addDays(now, -31))));
   const days: string[] = [];
   for (let d = gridStart; d <= gridEnd; d = addDays(d, 1)) days.push(d);
 
@@ -74,14 +68,19 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
 
       <section className="mt-10 border-2 border-red bg-cream">
         <div className="flex items-center justify-between gap-3 bg-red px-5 py-4 text-cream">
-          <Link href={`/dashboard/calendar?m=${prevMonth}`} className="eyebrow link-draw" aria-label="Previous month">
-            ← {fmt(`${prevMonth}-15`, { month: "short" })}
+          <Link href={`/dashboard/calendar?from=${prevStart}`} className="eyebrow link-draw" aria-label="Earlier weeks">
+            ← Earlier
           </Link>
-          <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">
-            {fmt(`${month}-15`, { month: "long", year: "numeric" })}
+          <h2 className="text-center font-[family-name:var(--font-display)] text-2xl sm:text-4xl">
+            {span}
+            {gridStart !== thisWeek && (
+              <Link href="/dashboard/calendar" className="eyebrow link-draw ml-3 align-middle">
+                This week
+              </Link>
+            )}
           </h2>
-          <Link href={`/dashboard/calendar?m=${nextMonth}`} className="eyebrow link-draw" aria-label="Next month">
-            {fmt(`${nextMonth}-15`, { month: "short" })} →
+          <Link href={`/dashboard/calendar?from=${nextStart}`} className="eyebrow link-draw" aria-label="Later weeks">
+            Later →
           </Link>
         </div>
         <div className="overflow-x-auto p-2 sm:p-4">
@@ -94,11 +93,13 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
             {days.map((d) => (
               <div
                 key={d}
-                className={`min-h-28 border-b border-r border-red-line p-1.5 ${d.startsWith(month) ? "" : "opacity-40"} ${
+                className={`min-h-28 border-b border-r border-red-line p-1.5 ${d < now ? "opacity-40" : ""} ${
                   d === now ? "bg-cream-deep" : ""
                 }`}
               >
-                <p className={`text-xs ${d === now ? "font-bold text-red" : "opacity-70"}`}>{Number(d.slice(8))}</p>
+                <p className={`text-xs ${d === now ? "font-bold text-red" : "opacity-70"}`}>
+                  {d.slice(8) === "01" || d === gridStart ? fmt(d, { month: "short", day: "numeric" }) : Number(d.slice(8))}
+                </p>
                 <ul className="mt-1 space-y-1">
                   {onDay(d).map((e, i) => (
                     <li
@@ -107,7 +108,6 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
                       className={`rounded px-1.5 py-0.5 text-[11px] leading-tight ${KINDS[e.kind].style} ${e.done ? "line-through opacity-50" : ""}`}
                     >
                       {e.title}
-                      {range(e)}
                       {e.time && ` · ${e.time}`}
                     </li>
                   ))}
@@ -178,9 +178,6 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
                 <li key={i} className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <span className="w-36 shrink-0 font-bold">
                     {fmt(e.date, { weekday: "short", month: "short", day: "numeric" })}
-                    {e.until &&
-                      e.until !== e.date &&
-                      ` – ${fmt(e.until, e.until.slice(5, 7) === e.date.slice(5, 7) ? { day: "numeric" } : { month: "short", day: "numeric" })}`}
                   </span>
                   {late(e) && <span className="eyebrow rounded-full bg-[#1c1714] px-2 py-0.5 text-cream">Late</span>}
                   <span className={`eyebrow rounded-full px-2 py-0.5 ${KINDS[e.kind].style}`}>{KINDS[e.kind].name}</span>
@@ -211,10 +208,13 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
         <div className="text-sm">
           <p className="eyebrow mb-2">How dates are set</p>
           <ul className="list-disc space-y-1 pl-5">
-            <li>Schedule each cycle in Linkme {SCHEDULE_LEAD} days before it starts (the Friday before its Monday).</li>
             <li>
-              Make its posts in the {MAKE_DAYS.usual} days before that, or the week before ({MAKE_DAYS.gold} days) when the
-              cycle has a Gold reel.
+              Schedule each cycle in Linkme the Friday before it starts. Each client after the first gets the day before
+              the last one&rsquo;s (Thursday, Wednesday…), so no two clients land on the same day.
+            </li>
+            <li>
+              Start making its posts {MAKE_DAYS.usual} days before that, or a week ({MAKE_DAYS.gold} days) before when the cycle
+              has a Gold reel.
             </li>
             <li>Send each invoice on the client&rsquo;s billing day; checks show on their due date once sent.</li>
             <li>Pay yourself every other Friday: a month&rsquo;s pay from the Budget card spread over 26 paydays a year.</li>

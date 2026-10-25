@@ -30,6 +30,9 @@ export type ClientFile = {
   send_dates?: Record<string, string>;
   /** false keeps the client off the dashboard calendar. */
   calendar?: boolean;
+  /** Days earlier than the usual Friday to schedule this client's cycles (and start making them). Set
+   * automatically from the order clients started, so each client's work lands on its own day. */
+  offset_days?: number;
   notes?: string;
   /** Profile links by platform name, e.g. {"Instagram": "https://www.instagram.com/..."}. */
   socials?: Record<string, string>;

@@ -21,10 +21,8 @@ export type CalendarFile = {
 };
 
 export type CalEvent = {
-  /** YYYY-MM-DD; for making posts, the first day of the window. */
+  /** YYYY-MM-DD; for making posts, the day to start. */
   date: string;
-  /** Last day of a window (making posts), YYYY-MM-DD. */
-  until?: string;
   kind: "make" | "schedule" | "invoice" | "due" | "shoot" | "pay";
   title: string;
   /** "10:00 AM" for a shoot with a time. */
@@ -138,11 +136,17 @@ export async function loadCalendar(
 ): Promise<{ events: CalEvent[]; missing: MissingShoot[]; file: CalendarFile; error?: string }> {
   const file = await loadCalendarFile();
   const events: CalEvent[] = [];
+  // Spread clients out: each one's make and schedule days fall a day earlier than the client before,
+  // in the order they started (client.json "offset_days" overrides). Clients left off still keep their place.
+  const byStart = [...clients].sort(
+    (a, b) => (a.info.cycle_start ?? "9999").localeCompare(b.info.cycle_start ?? "9999") || a.info.client.localeCompare(b.info.client)
+  );
+  const offset = (c: ClientStatus) => c.info.offset_days ?? byStart.indexOf(c) % 5;
   clients = clients.filter((c) => c.info.calendar !== false);
 
   for (const c of clients) {
     for (const p of c.cycles) {
-      const schedule = addDays(p.start, -SCHEDULE_LEAD);
+      const schedule = addDays(p.start, -SCHEDULE_LEAD - offset(c));
       const make = addDays(schedule, -(p.needed.gold ? MAKE_DAYS.gold : MAKE_DAYS.usual));
       if (schedule < from || make > to) continue;
       const need = p.needed.bronze + p.needed.silver + p.needed.gold;
@@ -150,9 +154,8 @@ export async function loadCalendar(
       const made = (["bronze", "silver", "gold"] as const).every((t) => p.made[t] >= p.needed[t]);
       events.push({
         date: make,
-        until: addDays(schedule, -1),
         kind: "make",
-        title: `Make ${c.nickname} Cycle ${p.number}${p.needed.gold ? " (with Gold)" : ""}`,
+        title: `Start making ${c.nickname} Cycle ${p.number}${p.needed.gold ? " (with Gold)" : ""}`,
         client: c.nickname,
         done: made,
       });
@@ -229,7 +232,7 @@ export function toIcs(events: CalEvent[]): string {
   ];
   for (const e of events) {
     if (e.kind === "shoot") continue;
-    const end = addDays(e.until ?? e.date, 1);
+    const end = addDays(e.date, 1);
     lines.push(
       "BEGIN:VEVENT",
       `UID:${ymd(e.date)}-${e.kind}-${esc(e.title).replace(/[^A-Za-z0-9]/g, "").slice(0, 40)}@studiolphotography.com`,
