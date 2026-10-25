@@ -143,7 +143,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
 
   return (
     <section className="flex flex-col border-2 border-red bg-cream">
-      <div className="flex flex-wrap items-baseline justify-between gap-3 bg-red px-5 py-4 text-cream">
+      <div className="flex flex-col gap-1 bg-red px-5 py-4 text-cream">
         <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">{c.info.client}</h2>
         <p className="text-lg">
           {c.info.package ?? "No package"}
