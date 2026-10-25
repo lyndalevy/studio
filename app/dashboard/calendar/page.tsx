@@ -18,6 +18,7 @@ const KINDS: Record<CalEvent["kind"], { name: string; style: string }> = {
   invoice: { name: "Send invoice", style: "border-2 border-red bg-cream-deep" },
   due: { name: "Check due", style: "border-2 border-dashed border-red" },
   pickup: { name: "Pick up check", style: "border-2 border-[#1c1714] bg-cream" },
+  note: { name: "Note", style: "bg-cream-deep" },
   pay: { name: "Pay yourself", style: "bg-[#c39b2a] text-[#1c1714]" },
 };
 
@@ -50,7 +51,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   // A window (making posts) shows once, on its first day, with its dates.
   const onDay = (d: string) => events.filter((e) => e.date === d);
   // Coming up: the next 3 weeks, plus anything from the last month still not done (an unsent invoice, an unscheduled cycle).
-  const late = (e: CalEvent) => e.date < now && e.kind !== "make" && e.kind !== "shoot" && e.kind !== "pay" && e.kind !== "pickup";
+  const late = (e: CalEvent) => e.date < now && e.kind !== "make" && e.kind !== "shoot" && e.kind !== "pay" && e.kind !== "pickup" && e.kind !== "note";
   const soon = events.filter((e) => !e.done && e.date <= soonEnd && (e.date >= now || (late(e) && e.date >= addDays(now, -31))));
   const days: string[] = [];
   for (let d = gridStart; d <= gridEnd; d = addDays(d, 1)) days.push(d);
@@ -160,6 +161,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
             <p className="text-xs opacity-70">
               Book and move shoots in your Apple Calendar on your phone; they show here within a few minutes. Put the
               client&rsquo;s short name in the title (e.g. &ldquo;MCB shoot&rdquo;), and use Repeat for monthly or every-other-week shoots.
+              Anything without &ldquo;shoot&rdquo; in its title shows here as a note.
             </p>
           )}
         </div>
@@ -200,7 +202,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
             Add to Apple Calendar
           </a>
           <p className="mt-2 text-sm">
-            Adds a &ldquo;Studio L to-dos&rdquo; calendar with everything here except shoots (those are already in your
+            Adds a &ldquo;Studio L to-dos&rdquo; calendar with everything here except shoots and notes (those are already in your
             own calendar). It updates on its own. On your iPhone, open this page in Safari and tap the button, or go to
             Settings → Calendar → Accounts → Add Account → Other → Add Subscribed Calendar and paste the link.
           </p>
@@ -220,7 +222,8 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
             </li>
             <li>
               Send each invoice on the client&rsquo;s billing day; checks show on their due date once sent. For clients whose
-              checks you pick up in person ("pickup_checks": true), a pickup shows every Monday after it&rsquo;s sent until it&rsquo;s paid.
+              checks you pick up in person ("pickup_checks": true), the check is due the Monday after you send it, and a pickup
+              shows that Monday and every Monday after until it&rsquo;s paid.
             </li>
             <li>Pay yourself every other Friday: a month&rsquo;s pay from the Budget card spread over 26 paydays a year.</li>
           </ul>

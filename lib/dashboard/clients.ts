@@ -30,8 +30,8 @@ export type ClientFile = {
   send_dates?: Record<string, string>;
   /** false keeps the client off the dashboard calendar. */
   calendar?: boolean;
-  /** true when Lynda picks up this client's checks in person: the calendar shows a pickup every Monday after
-   * the invoice goes out, until it's paid. */
+  /** true when Lynda picks up this client's checks in person: the invoice is due the Monday after it goes out
+   * (instead of due_days), and the calendar shows a pickup that Monday and every Monday after until it's paid. */
   pickup_checks?: boolean;
   /** true while work is on hold: no cycles, invoices, calendar dates or budget, and nothing moves to SHIPPED. */
   paused?: boolean;
@@ -353,7 +353,10 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
         amount += p;
         lines.push(`${x.name} $${p}`);
       }
-      const due = fromTime(toTime(sent) + dueDays * DAY);
+      // Checks picked up in person are due the Monday after the invoice goes out.
+      const due = info.pickup_checks
+        ? fromTime(toTime(sent) + (((8 - new Date(toTime(sent)).getUTCDay()) % 7) || 7) * DAY)
+        : fromTime(toTime(sent) + dueDays * DAY);
       const status: Invoice["status"] = (info.paid ?? []).includes(m)
         ? "paid"
         : went

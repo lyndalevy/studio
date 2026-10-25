@@ -23,7 +23,7 @@ export type CalendarFile = {
 export type CalEvent = {
   /** YYYY-MM-DD; for making posts, the day to start. */
   date: string;
-  kind: "make" | "schedule" | "invoice" | "due" | "pickup" | "shoot" | "pay";
+  kind: "make" | "schedule" | "invoice" | "due" | "pickup" | "shoot" | "note" | "pay";
   title: string;
   /** "10:00 AM" for a shoot with a time. */
   time?: string;
@@ -110,7 +110,9 @@ async function loadShoots(
       if (date < from || date > to) return;
       const s = summary.toLowerCase();
       const c = clients.find((x) => s.includes(x.nickname.toLowerCase()) || s.includes(x.info.client.toLowerCase()));
-      shoots.push({ date, kind: "shoot", title: summary || "Shoot", time: when.isDate ? undefined : nyTime(d), client: c?.nickname });
+      // Only events with "shoot" in the name are shoots; anything else on that calendar is a note.
+      const kind = s.includes("shoot") ? "shoot" : "note";
+      shoots.push({ date, kind, title: summary || "Note", time: when.isDate ? undefined : nyTime(d), client: c?.nickname });
     };
     for (const e of masters.values()) {
       if (e.isRecurring()) {
@@ -172,18 +174,18 @@ export async function loadCalendar(
     }
     for (const inv of c.invoices) {
       if (inv.status === "paid") continue;
-      // Checks picked up in person: every Monday after the invoice goes out until it's paid (just the first one while it's not sent yet).
+      // Checks picked up in person: 2 PM on the due Monday, then every Monday after until it's paid (just the first
+      // one while it's not sent yet). These stand in for the "check due" date.
       if (c.info.pickup_checks) {
-        let d = addDays(inv.sent, 1);
-        while (new Date(`${d}T12:00:00Z`).getUTCDay() !== 1) d = addDays(d, 1);
-        const last = inv.status === "upcoming" ? d : to;
-        for (; d <= last && d <= to; d = addDays(d, 7))
-          if (d >= from) events.push({ date: d, kind: "pickup", title: `Pick up ${c.nickname} check ($${inv.amount})`, client: c.nickname });
+        const last = inv.status === "upcoming" ? inv.due : to;
+        for (let d = inv.due; d <= last && d <= to; d = addDays(d, 7))
+          if (d >= from)
+            events.push({ date: d, kind: "pickup", title: `Pick up ${c.nickname} check ($${inv.amount})`, time: "2:00 PM", client: c.nickname });
       }
       if (inv.status === "upcoming") {
         if (inv.sent >= from && inv.sent <= to)
           events.push({ date: inv.sent, kind: "invoice", title: `Send ${c.nickname} ${inv.label.split(" ")[0]} invoice ($${inv.amount})`, client: c.nickname });
-      } else if (inv.due >= from && inv.due <= to) {
+      } else if (!c.info.pickup_checks && inv.due >= from && inv.due <= to) {
         events.push({ date: inv.due, kind: "due", title: `${c.nickname} check due ($${inv.amount})`, client: c.nickname });
       }
     }
@@ -212,19 +214,22 @@ export async function loadCalendar(
     const got = await loadShoots(file.shoots_calendar, lo, hi, everyone);
     got.shoots = got.shoots.filter((s) => !s.client || shown.has(s.client));
     error = got.error;
-    events.push(...got.shoots.filter((s) => s.date >= from && s.date <= to));
+    // A note that repeats something already here (e.g. a check pickup also put in Apple Calendar) shows once.
+    const same = (e: CalEvent) => `${e.date} ${e.title.trim().toLowerCase()}`;
+    const have = new Set(events.map(same));
+    events.push(...got.shoots.filter((s) => s.date >= from && s.date <= to && !(s.kind === "note" && have.has(same(s)))));
     if (!got.error) {
       for (const m of months)
         for (const c of clients) {
           if (!c.monthly) continue;
           const needed = c.perWeek.gold > 0 ? 2 : 1;
-          const booked = got.shoots.filter((s) => s.client === c.nickname && s.date.startsWith(m)).length;
+          const booked = got.shoots.filter((s) => s.kind === "shoot" && s.client === c.nickname && s.date.startsWith(m)).length;
           if (booked < needed) missing.push({ client: c.nickname, month: m, label: monthLabel(m), booked, needed });
         }
     }
   }
 
-  const order: CalEvent["kind"][] = ["shoot", "invoice", "due", "pickup", "pay", "schedule", "make"];
+  const order: CalEvent["kind"][] = ["shoot", "note", "invoice", "due", "pickup", "pay", "schedule", "make"];
   events.sort((a, b) => a.date.localeCompare(b.date) || order.indexOf(a.kind) - order.indexOf(b.kind));
   return { events, missing, file, error };
 }
@@ -244,7 +249,7 @@ export function toIcs(events: CalEvent[]): string {
     "X-PUBLISHED-TTL:PT6H",
   ];
   for (const e of events) {
-    if (e.kind === "shoot") continue;
+    if (e.kind === "shoot" || e.kind === "note") continue;
     const end = addDays(e.date, 1);
     lines.push(
       "BEGIN:VEVENT",

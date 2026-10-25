@@ -8,6 +8,7 @@ import { loadLibrary, nameNewLinks, type SavedLink } from "@/lib/dashboard/libra
 import { loadClients, today, type ClientStatus, type CyclePlan } from "@/lib/dashboard/clients";
 import { Sparkle } from "../components/Marks";
 import DashboardNav from "./DashboardNav";
+import Fold from "./Fold";
 import IdeasCard from "./IdeasCard";
 import InvoiceButton from "./InvoiceButton";
 import OneTimeCard from "./OneTimeCard";
@@ -147,28 +148,36 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
     .filter((s) => s.items.length);
 
   return (
-    <section className="flex flex-col border-2 border-red bg-cream">
-      <div className="flex flex-col gap-1 bg-red px-5 py-4 text-cream">
-        <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">{c.info.client}</h2>
-        <p className="text-lg">
-          {c.info.package ?? "No package"}
-          {c.monthly !== null && <span className="font-bold"> · ${c.monthly}/mo</span>}
-          {c.info.paused && (
-            <span className="eyebrow ml-3 rounded-full border-2 border-cream px-2 py-0.5 align-middle">Paused</span>
-          )}
-        </p>
-        {c.info.socials && Object.keys(c.info.socials).length > 0 && (
-          <p className="flex w-full flex-wrap gap-x-4 gap-y-1 text-sm">
+    <Fold
+      id={`client-${c.nickname.toLowerCase()}`}
+      className="self-start"
+      headClassName="flex flex-col gap-1"
+      bodyClassName="space-y-6 p-5"
+      head={
+        <>
+          <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">{c.info.client}</h2>
+          <span className="text-lg">
+            {c.info.package ?? "No package"}
+            {c.monthly !== null && <span className="font-bold"> · ${c.monthly}/mo</span>}
+            {c.info.paused && (
+              <span className="eyebrow ml-3 rounded-full border-2 border-cream px-2 py-0.5 align-middle">Paused</span>
+            )}
+          </span>
+        </>
+      }
+      extra={
+        c.info.socials &&
+        Object.keys(c.info.socials).length > 0 && (
+          <p className="mt-1 flex w-full flex-wrap gap-x-4 gap-y-1 text-sm">
             {Object.entries(c.info.socials).map(([name, href]) => (
               <a key={href} href={href} target="_blank" rel="noopener noreferrer" className="link-draw">
                 {name} ↗
               </a>
             ))}
           </p>
-        )}
-      </div>
-
-      <div className="space-y-6 p-5">
+        )
+      }
+    >
         {c.problems.length > 0 && (
           <ul className="space-y-1 border-l-4 border-red pl-3 text-sm">
             {c.problems.map((p) => (
@@ -291,8 +300,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
         </div>
 
         {c.info.notes && <p className="border-t border-red-line pt-4 text-sm italic">{c.info.notes}</p>}
-      </div>
-    </section>
+    </Fold>
   );
 }
 
@@ -312,14 +320,18 @@ function BudgetCard({ b }: { b: Budget }) {
   );
 
   return (
-    <section className="mt-10 border-2 border-red bg-cream">
-      <div className="flex flex-wrap items-baseline justify-between gap-3 bg-red px-5 py-4 text-cream">
-        <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">Budget</h2>
-        <p className="text-lg">
-          Pay yourself <span className="font-bold">{money(b.pay)}/mo</span>
-        </p>
-      </div>
-
+    <Fold
+      id="budget"
+      className="mt-10"
+      head={
+        <>
+          <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">Budget</h2>
+          <span className="text-lg">
+            Pay yourself <span className="font-bold">{money(b.pay)}/mo</span>
+          </span>
+        </>
+      }
+    >
       <div className="grid gap-6 p-5 md:grid-cols-3">
         <div>
           <p className="eyebrow mb-2">Coming in each month</p>
@@ -385,7 +397,7 @@ function BudgetCard({ b }: { b: Budget }) {
       </div>
 
       <OneTimeCard list={b.oneTimeYear} month={today().slice(0, 7)} />
-    </section>
+    </Fold>
   );
 }
 
