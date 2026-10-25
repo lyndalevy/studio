@@ -37,8 +37,7 @@ const PAY_CHART = "https://claude.ai/artifact/U5BsP5nDczF5iwgwFqgcia";
 
 /** Studio tools, linked at the top of the dashboard. */
 const TOOLS = [
-  { name: "Instagram", href: "https://www.instagram.com/studiol.photography/" },
-  { name: "Facebook", href: "https://www.facebook.com/profile.php?id=100094359712349" },
+  { name: "Gmail", href: "https://mail.google.com/mail/?authuser=lynda.studiolphotos@gmail.com" },
   { name: "Meta Business Suite", href: "https://business.facebook.com/latest/home?asset_id=175611065827025&business_id=29512333488363663" },
   { name: "Linkme agency", href: "https://link.me/agency/28249" },
   { name: "Dropbox API", href: "https://www.dropbox.com/developers/console/apps/nqh0vilp6wm6lys/settings" },
@@ -327,7 +326,7 @@ function BudgetCard({ b }: { b: Budget }) {
         <>
           <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">Budget</h2>
           <span className="text-lg">
-            Pay yourself <span className="font-bold">{money(b.pay)}/mo</span>
+            Pay yourself <span className="font-bold">{money(b.payday)}</span> every other week
           </span>
         </>
       }
@@ -357,8 +356,11 @@ function BudgetCard({ b }: { b: Budget }) {
           <ul className="space-y-1.5">
             {row("Profit", b.profit)}
             {row(`Set aside for taxes`, b.taxes, `${b.file.tax_percent}% of profit`)}
-            {row("Pay yourself", b.pay, undefined, true)}
+            {row("Pay yourself every other week", b.payday, "from the pay chart", true)}
           </ul>
+          {b.chartStale && (
+            <p className="mt-2 text-sm font-bold">The pay chart doesn&rsquo;t match this budget yet. Ask Claude to update it.</p>
+          )}
           <p className="mt-4 text-sm">
             Bank: <span className="font-bold">{money(b.file.bank_balance)}</span>, keeping at least{" "}
             {money(b.file.keep_in_bank)}.{" "}

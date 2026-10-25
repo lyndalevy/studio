@@ -37,9 +37,15 @@ export type Budget = {
   spare: number;
   /** The calendar year: this month's recurring money times 12, plus this year's one-time payments. */
   year: { out: number; profit: number; taxes: number; pay: number };
+  /** What to pay yourself every other Friday: the pay chart's after-tax pay for today's clients, over 26 paydays. */
+  payday: number;
+  /** True when the pay chart's numbers no longer match this budget (run STUDIO L/pay_chart.py and re-upload). */
+  chartStale: boolean;
 };
 
 const FILE = "STUDIO L/budget.json";
+/** The pay chart's rows (one per number of clients), written by STUDIO L/pay_chart.py. */
+const CHART = "STUDIO L/pay-by-clients.json";
 
 const round = (n: number) => Math.round(n * 100) / 100;
 
@@ -83,6 +89,15 @@ export async function loadBudget(clients: ClientStatus[]): Promise<{ budget: Bud
   const yearOut = round((recurring + stripeFees) * 12 + oneTimeYear.reduce((n, o) => n + o.amount, 0));
   const yearProfit = round(revenue * 12 - yearOut);
 
+  const yearPay = round(Math.max(0, yearProfit - tax(yearProfit)));
+  // Payday pay comes from the pay chart, so the chart is the one number to trust; fall back to the budget.
+  let chartPay: number | null = null;
+  try {
+    const rows = JSON.parse((await src.read(CHART)) ?? "[]") as { today?: number; after_tax?: number }[];
+    const now = rows.find((r) => r.today === 1);
+    if (typeof now?.after_tax === "number") chartPay = Math.max(0, now.after_tax);
+  } catch {}
+
   return {
     budget: {
       file,
@@ -97,7 +112,9 @@ export async function loadBudget(clients: ClientStatus[]): Promise<{ budget: Bud
       taxes,
       pay: round(Math.max(0, profit - taxes)),
       spare: round(file.bank_balance - file.keep_in_bank),
-      year: { out: yearOut, profit: yearProfit, taxes: tax(yearProfit), pay: round(Math.max(0, yearProfit - tax(yearProfit))) },
+      year: { out: yearOut, profit: yearProfit, taxes: tax(yearProfit), pay: yearPay },
+      payday: round((chartPay ?? yearPay) / 26),
+      chartStale: chartPay === null || Math.abs(chartPay - yearPay) > 1,
     },
   };
 }

@@ -127,7 +127,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
         </div>
       </section>
 
-      {/* Shoots still to book: every client has 1 hour of photography a month, Gold clients a shoot every other week. */}
+      {/* Shoots still to book: every client has 1 hour of photography a month, Gold clients another hour (split however). */}
       <section className="mt-10 border-2 border-red bg-cream">
         <div className="flex flex-wrap items-baseline justify-between gap-3 bg-red px-5 py-4 text-cream">
           <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">Shoots to book</h2>
@@ -151,7 +151,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
                     <span className="font-bold">{x.client}</span> · {x.label}
                   </span>
                   <span className="text-sm">
-                    {x.booked} of {x.needed} booked{x.needed > 1 ? " (Gold: every other week)" : ""}
+                    {Math.round(x.booked * 100) / 100} of {x.needed} hours booked{x.needed > 1 ? " (with Gold: 2 hours a month, split however)" : ""}
                   </span>
                 </li>
               ))}
@@ -225,7 +225,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
               checks you pick up in person ("pickup_checks": true), the check is due the Monday after you send it, and a pickup
               shows that Monday and every Monday after until it&rsquo;s paid.
             </li>
-            <li>Pay yourself every other Friday: a month&rsquo;s pay from the Budget card spread over 26 paydays a year.</li>
+            <li>Pay yourself every other Friday: the every-other-week pay on the Budget card (from the pay chart).</li>
           </ul>
           {!file.pay_yourself_from && (
             <p className="mt-2">Paydays start once STUDIO L/calendar.json has a first payday (pay_yourself_from).</p>

@@ -13,6 +13,12 @@ const SHOW: { status: IdeaStatus; title: string }[] = [
 ];
 
 /** Ideas to film for Lynda's own accounts. Saved in ideas.json in Dropbox. */
+/** Studio L's own accounts, where these ideas get posted. */
+const STUDIO_L = [
+  { name: "Instagram", href: "https://www.instagram.com/studiol.photography/" },
+  { name: "Facebook", href: "https://www.facebook.com/profile.php?id=100094359712349" },
+];
+
 export default function IdeasCard({ ideas }: { ideas: Idea[] }) {
   const [error, add, adding] = useActionState(addIdea, null);
   const [changeError, setChangeError] = useState<string | null>(null);
@@ -54,6 +60,19 @@ export default function IdeasCard({ ideas }: { ideas: Idea[] }) {
       </button>
 
       <div id="ideas-to-film-body" hidden={!open} className="space-y-6 p-5">
+        <p className="flex flex-wrap gap-2">
+          {STUDIO_L.map((t) => (
+            <a
+              key={t.href}
+              href={t.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="eyebrow inline-block rounded-full border-2 border-red px-3 py-1 hover:bg-red hover:text-cream"
+            >
+              Studio L {t.name} ↗
+            </a>
+          ))}
+        </p>
         <form action={add} className="flex flex-col gap-2 sm:flex-row">
           <input
             name="text"

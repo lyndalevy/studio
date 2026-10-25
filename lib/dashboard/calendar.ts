@@ -27,11 +27,14 @@ export type CalEvent = {
   title: string;
   /** "10:00 AM" for a shoot with a time. */
   time?: string;
+  /** How long a shoot runs, in hours (an all-day shoot counts as 1). */
+  hours?: number;
   client?: string;
   done?: boolean;
 };
 
 export type MissingShoot = { client: string; month: string; label: string; booked: number; needed: number };
+/** booked and needed are hours of shooting. */
 
 const FILE = "STUDIO L/calendar.json";
 const DAY = 86_400_000;
@@ -104,7 +107,7 @@ async function loadShoots(
 
     const start = ICAL.Time.fromDateString(addDays(from, -1));
     const end = ICAL.Time.fromDateString(addDays(to, 2));
-    const push = (summary: string, when: ICAL.Time) => {
+    const push = (summary: string, when: ICAL.Time, until?: ICAL.Time) => {
       const d = when.toJSDate();
       const date = when.isDate ? when.toString().slice(0, 10) : nyDate(d);
       if (date < from || date > to) return;
@@ -112,7 +115,8 @@ async function loadShoots(
       const c = clients.find((x) => s.includes(x.nickname.toLowerCase()) || s.includes(x.info.client.toLowerCase()));
       // Only events with "shoot" in the name are shoots; anything else on that calendar is a note.
       const kind = s.includes("shoot") ? "shoot" : "note";
-      shoots.push({ date, kind, title: summary || "Note", time: when.isDate ? undefined : nyTime(d), client: c?.nickname });
+      const hours = when.isDate || !until ? 1 : Math.max(0, (until.toJSDate().getTime() - d.getTime()) / 3_600_000);
+      shoots.push({ date, kind, title: summary || "Note", time: when.isDate ? undefined : nyTime(d), hours, client: c?.nickname });
     };
     for (const e of masters.values()) {
       if (e.isRecurring()) {
@@ -120,9 +124,9 @@ async function loadShoots(
         for (let next = it.next(), n = 0; next && next.compare(end) < 0 && n < 500; next = it.next(), n++) {
           if (next.compare(start) < 0) continue;
           const o = e.getOccurrenceDetails(next);
-          push(o.item.summary, o.startDate);
+          push(o.item.summary, o.startDate, o.endDate);
         }
-      } else push(e.summary, e.startDate);
+      } else push(e.summary, e.startDate, e.endDate);
     }
   } catch {
     return { shoots: [], error: "The shoots calendar link didn't return a calendar." };
@@ -191,16 +195,16 @@ export async function loadCalendar(
     }
   }
 
-  // Pay yourself every other Friday: a month's pay over 26 paydays a year.
+  // Pay yourself every other Friday: the pay chart's after-tax pay over 26 paydays.
   if (budget && file.pay_yourself_from && /^\d{4}-\d{2}-\d{2}$/.test(file.pay_yourself_from)) {
-    const each = Math.floor(((budget.pay * 12) / 26) * 100) / 100;
+    const each = budget.payday;
     let d = file.pay_yourself_from;
     while (d < from) d = addDays(d, 14);
     for (; d <= to; d = addDays(d, 14))
       events.push({ date: d, kind: "pay", title: `Pay yourself $${each.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` });
   }
 
-  // Shoots: every client has 1 hour of photography a month; a client with Gold shoots every other week.
+  // Shoots: every client has 1 hour of photography a month; Gold adds another hour, split however they like.
   const month = today().slice(0, 7);
   const months = [month, nextMonth(month)];
   let error: string | undefined;
@@ -223,7 +227,9 @@ export async function loadCalendar(
         for (const c of clients) {
           if (!c.monthly) continue;
           const needed = c.perWeek.gold > 0 ? 2 : 1;
-          const booked = got.shoots.filter((s) => s.kind === "shoot" && s.client === c.nickname && s.date.startsWith(m)).length;
+          const booked = got.shoots
+            .filter((s) => s.kind === "shoot" && s.client === c.nickname && s.date.startsWith(m))
+            .reduce((n, s) => n + (s.hours ?? 1), 0);
           if (booked < needed) missing.push({ client: c.nickname, month: m, label: monthLabel(m), booked, needed });
         }
     }
