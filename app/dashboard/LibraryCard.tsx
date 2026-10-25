@@ -33,6 +33,7 @@ export default function LibraryCard({
   const [open, setOpen] = useState(true);
   useEffect(() => {
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- read after hydration, so the server and first render match
       if (localStorage.getItem("post-ideas-open") === "0") setOpen(false);
     } catch {}
   }, []);

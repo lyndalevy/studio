@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { isSignedIn, signIn, signOut } from "@/lib/dashboard/auth";
 import { updateOneTime } from "@/lib/dashboard/budget";
+import { saveShootsCalendar } from "@/lib/dashboard/calendar";
 import { advanceInvoice, recentClients, setScheduled, today } from "@/lib/dashboard/clients";
 import { assignLink, deleteLink, renameLink } from "@/lib/dashboard/library";
 import { loadIdeas, removeBusinessLink, STATUSES, updateIdeas, type IdeaStatus } from "@/lib/dashboard/ideas";
@@ -32,6 +33,20 @@ export async function toggleScheduled(folder: string, set: string, name: string,
     return (err as Error).message;
   }
   revalidatePath("/dashboard");
+  return null;
+}
+
+/** Save the public link of the Apple calendar that holds the shoots. */
+export async function saveShootsLink(_: string | null, form: FormData): Promise<string | null> {
+  if (!(await isSignedIn())) return "Signed out. Reload and sign in again.";
+  const link = String(form.get("link") ?? "").trim();
+  if (!/^(webcals?|https):\/\/[^/]*icloud\.com\//i.test(link)) return "That should be an iCloud calendar link (it starts with webcal://).";
+  try {
+    await saveShootsCalendar(link);
+  } catch (err) {
+    return (err as Error).message;
+  }
+  revalidatePath("/dashboard/calendar");
   return null;
 }
 

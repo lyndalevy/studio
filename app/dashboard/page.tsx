@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import type { TierKey } from "@/content/social";
 import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
@@ -7,8 +6,8 @@ import { loadBudget, type Budget } from "@/lib/dashboard/budget";
 import { loadIdeas, syncBusinessLinks } from "@/lib/dashboard/ideas";
 import { loadLibrary, nameNewLinks, type SavedLink } from "@/lib/dashboard/library";
 import { loadClients, today, type ClientStatus, type CyclePlan } from "@/lib/dashboard/clients";
-import { logout } from "./actions";
 import { Sparkle } from "../components/Marks";
+import DashboardNav from "./DashboardNav";
 import IdeasCard from "./IdeasCard";
 import InvoiceButton from "./InvoiceButton";
 import OneTimeCard from "./OneTimeCard";
@@ -74,21 +73,7 @@ export default async function Dashboard() {
 
   return (
     <main className="mx-auto max-w-[90rem] px-4 py-10 sm:px-8 sm:py-14">
-      <nav className="eyebrow flex items-center justify-between">
-        <Link href="/" className="link-draw">
-          Studio L
-        </Link>
-        <span className="flex items-center gap-5">
-          <Link href="/social" className="link-draw">
-            Social
-          </Link>
-          <form action={logout}>
-            <button type="submit" className="eyebrow link-draw">
-              Sign out
-            </button>
-          </form>
-        </span>
-      </nav>
+      <DashboardNav />
 
       <header className="mt-8 text-center">
         <h1 className="font-[family-name:var(--font-display)] text-5xl sm:text-7xl">Dashboard</h1>
