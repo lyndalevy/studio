@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 
 import type { Idea, IdeaStatus } from "@/lib/dashboard/ideas";
 import { addIdea, changeIdea } from "./actions";
@@ -19,14 +19,41 @@ export default function IdeasCard({ ideas }: { ideas: Idea[] }) {
   const [pending, start] = useTransition();
   const change = (id: string, to: IdeaStatus | "delete") =>
     start(async () => setChangeError(await changeIdea(id, to)));
+  // Open or closed, remembered on this device.
+  const [open, setOpen] = useState(true);
+  useEffect(() => {
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- read after hydration, so the server and first render match
+      if (localStorage.getItem("ideas-to-film-open") === "0") setOpen(false);
+    } catch {}
+  }, []);
+  const toggle = () =>
+    setOpen((was) => {
+      try {
+        localStorage.setItem("ideas-to-film-open", was ? "0" : "1");
+      } catch {}
+      return !was;
+    });
 
   return (
     <section className="mt-10 border-2 border-red bg-cream">
-      <div className="flex flex-wrap items-baseline justify-between gap-3 bg-red px-5 py-4 text-cream">
+      <button
+        type="button"
+        onClick={toggle}
+        aria-expanded={open}
+        aria-controls="ideas-to-film-body"
+        className="flex w-full flex-wrap items-baseline justify-between gap-3 bg-red px-5 py-4 text-left text-cream"
+      >
         <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">Ideas to film</h2>
-      </div>
+        <span className="text-lg">
+          {!open && SHOW.map(({ status, title }) => `${ideas.filter((i) => i.status === status).length} ${title.toLowerCase()}`).join(" · ")}
+          <span aria-hidden className="ml-3 inline-block transition-transform" style={{ transform: open ? "rotate(180deg)" : "none" }}>
+            ▾
+          </span>
+        </span>
+      </button>
 
-      <div className="space-y-6 p-5">
+      <div id="ideas-to-film-body" hidden={!open} className="space-y-6 p-5">
         <form action={add} className="flex flex-col gap-2 sm:flex-row">
           <input
             name="text"

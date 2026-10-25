@@ -209,8 +209,9 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
           <p className="eyebrow mb-2">How dates are set</p>
           <ul className="list-disc space-y-1 pl-5">
             <li>
-              Schedule each cycle in Linkme the Friday before it starts. Each client after the first gets the day before
-              the last one&rsquo;s (Thursday, Wednesday…), so no two clients land on the same day.
+              Schedule each cycle in Linkme two weeks ahead: by the Friday before the Monday two weeks before it starts.
+              Each client after the first gets the day before the last one&rsquo;s (Thursday, Wednesday…), so no two clients
+              land on the same day.
             </li>
             <li>
               Start making its posts {MAKE_DAYS.usual} days before that, or a week ({MAKE_DAYS.gold} days) before when the cycle

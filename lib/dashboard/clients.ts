@@ -30,6 +30,8 @@ export type ClientFile = {
   send_dates?: Record<string, string>;
   /** false keeps the client off the dashboard calendar. */
   calendar?: boolean;
+  /** true while work is on hold: no cycles, invoices, calendar dates or budget, and nothing moves to SHIPPED. */
+  paused?: boolean;
   /** Days earlier than the usual Friday to schedule this client's cycles (and start making them). Set
    * automatically from the order clients started, so each client's work lands on its own day. */
   offset_days?: number;
@@ -258,7 +260,7 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
   // A cycle folder whose two weeks are over moves into SHIPPED/, so only live cycles stay in view.
   const ended = topFolders().filter((name) => {
     const date = /^cycle\b/i.test(name) ? setDate(name) : null;
-    return date !== null && toTime(mondayOf(date)) + 13 * DAY < toTime(today());
+    return !info.paused && date !== null && toTime(mondayOf(date)) + 13 * DAY < toTime(today());
   });
   for (const name of ended) {
     try {
@@ -290,7 +292,11 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
   const now = today().slice(0, 7);
   // Cycles: two weeks each, counted from cycle_start (or the Monday of the first dated set).
   const firstSet = sets.find((x) => x.date)?.date ?? null;
-  const anchor = /^\d{4}-\d{2}-\d{2}$/.test(info.cycle_start ?? "") ? mondayOf(info.cycle_start!) : firstSet && mondayOf(firstSet);
+  const anchor = info.paused
+    ? null
+    : /^\d{4}-\d{2}-\d{2}$/.test(info.cycle_start ?? "")
+      ? mondayOf(info.cycle_start!)
+      : firstSet && mondayOf(firstSet);
   // Posts in finished cycles (moved to SHIPPED/) still count toward their cycle.
   const shippedNames = entries
     .filter((e) => e.kind === "folder" && new RegExp(`^${SHIPPED}/cycle\\b`, "i").test(e.path.slice(folder.length + 1)))
@@ -326,7 +332,7 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
   const first = /^\d{4}-\d{2}-\d{2}$/.test(info.first_invoice ?? "") ? info.first_invoice! : null;
   const dueDays = info.due_days ?? 7;
 
-  if (first && monthly !== null) {
+  if (first && monthly !== null && !info.paused) {
     const d = today();
     const nth = Number(first.slice(8, 10));
     const onNth = (m: string) => {
@@ -355,7 +361,7 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
       invoices.push({ month: m, label: monthLabel(m), sent, due, amount, lines, status });
     }
   }
-  if (!first && monthly !== null) problems.push("No invoice sent yet. The payment schedule starts from the first one.");
+  if (!first && monthly !== null && !info.paused) problems.push("No invoice sent yet. The payment schedule starts from the first one.");
 
   const nickname =
     (info.nickname ?? "").trim().toUpperCase() ||

@@ -43,8 +43,8 @@ const nextMonth = (m: string) => {
   return mo === 12 ? `${y + 1}-01` : `${y}-${String(mo + 1).padStart(2, "0")}`;
 };
 
-/** Days before a cycle starts that its posts should be in Linkme (the Friday before its Monday). */
-export const SCHEDULE_LEAD = 3;
+/** Days before a cycle starts that its posts should be in Linkme: the Friday before the Monday two weeks earlier, so Linkme is always two weeks ahead. */
+export const SCHEDULE_LEAD = 17;
 /** Days to make a cycle's posts before scheduling them; a cycle with Gold (filmed) posts gets a week. */
 export const MAKE_DAYS = { usual: 3, gold: 7 };
 
@@ -142,7 +142,9 @@ export async function loadCalendar(
     (a, b) => (a.info.cycle_start ?? "9999").localeCompare(b.info.cycle_start ?? "9999") || a.info.client.localeCompare(b.info.client)
   );
   const offset = (c: ClientStatus) => c.info.offset_days ?? byStart.indexOf(c) % 5;
-  clients = clients.filter((c) => c.info.calendar !== false);
+  const everyone = clients;
+  clients = clients.filter((c) => c.info.calendar !== false && !c.info.paused);
+  const shown = new Set(clients.map((c) => c.nickname));
 
   for (const c of clients) {
     for (const p of c.cycles) {
@@ -197,7 +199,9 @@ export async function loadCalendar(
     const last = addDays(`${nextMonth(months[1])}-01`, -1);
     const lo = from < first ? from : first;
     const hi = to > last ? to : last;
-    const got = await loadShoots(file.shoots_calendar, lo, hi, clients);
+    // Shoots for a client who's off the calendar (or paused) are left out too.
+    const got = await loadShoots(file.shoots_calendar, lo, hi, everyone);
+    got.shoots = got.shoots.filter((s) => !s.client || shown.has(s.client));
     error = got.error;
     events.push(...got.shoots.filter((s) => s.date >= from && s.date <= to));
     if (!got.error) {

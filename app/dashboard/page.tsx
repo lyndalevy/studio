@@ -36,6 +36,9 @@ const PAY_CHART = "https://claude.ai/artifact/U5BsP5nDczF5iwgwFqgcia";
 
 /** Studio tools, linked at the top of the dashboard. */
 const TOOLS = [
+  { name: "Instagram", href: "https://www.instagram.com/studiol.photography/" },
+  { name: "Facebook", href: "https://www.facebook.com/profile.php?id=100094359712349" },
+  { name: "Meta Business Suite", href: "https://business.facebook.com/latest/home?asset_id=175611065827025&business_id=29512333488363663" },
   { name: "Linkme agency", href: "https://link.me/agency/28249" },
   { name: "Dropbox API", href: "https://www.dropbox.com/developers/console/apps/nqh0vilp6wm6lys/settings" },
   { name: "Google AI billing", href: "https://aistudio.google.com/billing?billing=01F2EC-86587D-68AD0F" },
@@ -115,7 +118,9 @@ export default async function Dashboard() {
 
       <LibraryCard
         links={links}
-        clients={clients.map((c) => ({ nickname: c.nickname, tiers: TIERS.filter((t) => c.perWeek[t] > 0) }))}
+        clients={clients
+          .filter((c) => !c.info.paused)
+          .map((c) => ({ nickname: c.nickname, tiers: TIERS.filter((t) => c.perWeek[t] > 0) }))}
       />
       {libraryError && <p className="mx-auto mt-4 max-w-xl border-2 border-red p-5 text-center">{libraryError}</p>}
       <IdeasCard ideas={ideas} />
@@ -148,6 +153,9 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
         <p className="text-lg">
           {c.info.package ?? "No package"}
           {c.monthly !== null && <span className="font-bold"> · ${c.monthly}/mo</span>}
+          {c.info.paused && (
+            <span className="eyebrow ml-3 rounded-full border-2 border-cream px-2 py-0.5 align-middle">Paused</span>
+          )}
         </p>
         {c.info.socials && Object.keys(c.info.socials).length > 0 && (
           <p className="flex w-full flex-wrap gap-x-4 gap-y-1 text-sm">
@@ -175,10 +183,17 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
           {` · ${made} made, ${scheduled} scheduled`}
         </p>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Cycle plan={c.thisCycle} title="This cycle" />
-          <Cycle plan={c.nextCycle} title="Next cycle" todo />
-        </div>
+        {c.info.paused ? (
+          <p className="border border-red-line p-4 text-sm">
+            On pause: no cycles, invoices or calendar dates, and they&rsquo;re left out of the budget. Remove
+            &ldquo;paused&rdquo; from their client.json (or ask Claude) to start again.
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Cycle plan={c.thisCycle} title="This cycle" />
+            <Cycle plan={c.nextCycle} title="Next cycle" todo />
+          </div>
+        )}
 
         {queued.length > 0 && (
           <details className="group">

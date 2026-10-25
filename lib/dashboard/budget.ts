@@ -58,7 +58,7 @@ export async function loadBudget(clients: ClientStatus[]): Promise<{ budget: Bud
   }
 
   const income = clients
-    .filter((c) => c.monthly !== null)
+    .filter((c) => c.monthly !== null && !c.info.paused)
     .map((c) => ({ client: c.info.client, amount: c.monthly! }));
   const revenue = income.reduce((n, i) => n + i.amount, 0);
   // One card payment per client each month.
