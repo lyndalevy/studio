@@ -4,7 +4,7 @@ import type { TierKey } from "@/content/social";
 import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
 import { loadBudget, type Budget } from "@/lib/dashboard/budget";
 import { loadIdeas, syncBusinessLinks } from "@/lib/dashboard/ideas";
-import { loadLibrary, nameNewLinks, type SavedLink } from "@/lib/dashboard/library";
+import { loadLibrary, type SavedLink } from "@/lib/dashboard/library";
 import { loadClients, today, type ClientStatus, type CyclePlan } from "@/lib/dashboard/clients";
 import { Sparkle } from "../components/Marks";
 import DashboardNav from "./DashboardNav";
@@ -67,8 +67,7 @@ export default async function Dashboard() {
 
   const { clients, error } = await loadClients();
   const { budget, error: budgetError } = await loadBudget(clients);
-  // New links saved from the phone get names first; business links then become ideas.
-  await nameNewLinks();
+  // Business links become ideas (links keep the names the phone saved them with).
   const syncError = await syncBusinessLinks(today());
   const { ideas, error: loadError } = await loadIdeas();
   const ideasError = loadError ?? syncError;

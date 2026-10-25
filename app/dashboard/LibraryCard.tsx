@@ -212,7 +212,7 @@ export default function LibraryCard({
         </div>
         <p className="text-xs opacity-70">
           Save Instagram links or photos to ideas/bronze, silver or gold in Dropbox from your phone (Share → Dropbox);
-          new links are named from their captions, and photos still called IMG_… need a name (✎). Tap a client once to queue the idea into their next cycle with room (✓ once
+          links keep the names they were saved with (rename any with ✎). Tap a client once to queue the idea into their next cycle with room (✓ once
           that cycle&rsquo;s posts are made), twice to gray it out as not for them, and again to clear it.
         </p>
       </div>

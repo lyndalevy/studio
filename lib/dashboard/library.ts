@@ -87,69 +87,7 @@ async function listShelf(
 
 // ── naming ───────────────────────────────────────────────────
 
-/** A file still named by its reel code (what the phone saves), not by what it shows. */
-const unnamed = (name: string, url: string) => {
-  const code = url.match(/\/(?:reel|reels|p|tv)\/([^/?#]+)/)?.[1];
-  return name === code || /^[A-Za-z0-9_-]{9,14}$/.test(name);
-};
-
-const clean = (s: string) =>
-  s
-    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
-    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, "&")
-    .replace(/[\u2018\u2019]/g, "'")
-    .replace(/[\p{Extended_Pictographic}\u200d\ufe0f]/gu, " ");
-
-/** A short name from the reel's caption on Instagram (first few words), else "@account reel". */
-async function nameFromInstagram(url: string): Promise<string | null> {
-  try {
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
-      },
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    const desc = (await res.text()).match(/property="og:description" content="([^"]*)"/)?.[1];
-    if (!desc) return null;
-    const m = clean(desc).match(/-\s*([\w.]+) on [^:]+:\s*"?([\s\S]*)$/);
-    const account = m?.[1];
-    const words = (m?.[2] ?? "")
-      .replace(/#\S+|@\S+/g, " ")
-      .replace(/[^\p{L}\p{N}'\s-]/gu, " ")
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 4);
-    if (words.length >= 2) return words.map((w) => w[0].toUpperCase() + w.slice(1)).join(" ").slice(0, 40);
-    return account ? `@${account} reel` : null;
-  } catch {
-    return null;
-  }
-}
-
 const safeName = (n: string) => n.replace(/[\\/:*?"<>|]+/g, " ").replace(/\s+/g, " ").trim().replace(/\.+$/, "").slice(0, 60);
-
-/** Give every link still named by its reel code a real name, in every shelf and in business. */
-export async function nameNewLinks(): Promise<void> {
-  const src = source();
-  if (!src) return;
-  for (const shelf of [...SHELVES, "business" as Shelf]) {
-    for (const l of await listShelf(shelf)) {
-      if (isPhoto(l.url) || !unnamed(l.name, l.url)) continue;
-      const name = await nameFromInstagram(l.url);
-      if (!name) continue;
-      const ext = l.path.match(LINK)![0];
-      try {
-        await src.move(l.path, `${folderOf(shelf)}/${safeName(name)}${ext}`);
-      } catch {
-        // leave it for next time
-      }
-    }
-  }
-}
 
 // ── cycles ───────────────────────────────────────────────────
 
