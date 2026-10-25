@@ -46,6 +46,7 @@ export default function InvoiceButton({ folder, inv, today }: { folder: string; 
   return (
     <span className="flex items-center gap-2">
       <span className={`text-xs ${days < 0 ? "font-bold" : "opacity-70"}`}>{countdown}</span>
+      {status === "upcoming" && <span className="text-xs italic opacity-70">Attach the invoice as a PDF</span>}
       <button
         type="button"
         disabled={pending}

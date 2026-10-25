@@ -20,6 +20,9 @@ export type CalendarFile = {
   pay_yourself_from?: string;
 };
 
+/** Shown on every "Send invoice" reminder. */
+export const INVOICE_NOTE = "Attach the invoice as a PDF";
+
 export type CalEvent = {
   /** YYYY-MM-DD; for making posts, the day to start. */
   date: string;
@@ -30,6 +33,8 @@ export type CalEvent = {
   /** How long a shoot runs, in hours (an all-day shoot counts as 1). */
   hours?: number;
   client?: string;
+  /** A reminder shown under the title, e.g. to attach the invoice PDF. */
+  note?: string;
   done?: boolean;
 };
 
@@ -188,7 +193,7 @@ export async function loadCalendar(
       }
       if (inv.status === "upcoming") {
         if (inv.sent >= from && inv.sent <= to)
-          events.push({ date: inv.sent, kind: "invoice", title: `Send ${c.nickname} ${inv.label.split(" ")[0]} invoice ($${inv.amount})`, client: c.nickname });
+          events.push({ date: inv.sent, kind: "invoice", title: `Send ${c.nickname} ${inv.label.split(" ")[0]} invoice ($${inv.amount})`, note: INVOICE_NOTE, client: c.nickname });
       } else if (!c.info.pickup_checks && inv.due >= from && inv.due <= to) {
         events.push({ date: inv.due, kind: "due", title: `${c.nickname} check due ($${inv.amount})`, client: c.nickname });
       }
@@ -264,6 +269,7 @@ export function toIcs(events: CalEvent[]): string {
       `DTSTART;VALUE=DATE:${ymd(e.date)}`,
       `DTEND;VALUE=DATE:${ymd(end)}`,
       `SUMMARY:${esc(e.done ? `✓ ${e.title}` : e.title)}`,
+      ...(e.note ? [`DESCRIPTION:${esc(e.note)}`] : []),
       "TRANSP:TRANSPARENT",
       "END:VEVENT"
     );
