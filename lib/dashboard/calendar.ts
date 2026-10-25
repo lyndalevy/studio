@@ -36,6 +36,7 @@ export type MissingShoot = { client: string; month: string; label: string; booke
 const FILE = "STUDIO L/calendar.json";
 const DAY = 86_400_000;
 export const addDays = (d: string, n: number) => new Date(Date.parse(`${d}T00:00:00Z`) + n * DAY).toISOString().slice(0, 10);
+const short = (d: string) => new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 const monthLabel = (m: string) =>
   new Date(`${m}-15T12:00:00Z`).toLocaleDateString("en-US", { month: "long", timeZone: "UTC" });
 const nextMonth = (m: string) => {
@@ -157,14 +158,14 @@ export async function loadCalendar(
       events.push({
         date: make,
         kind: "make",
-        title: `Start making ${c.nickname} Cycle ${p.number}${p.needed.gold ? " (with Gold)" : ""}`,
+        title: `Start making ${c.nickname} Cycle ${p.number}${p.needed.gold ? " (with Gold)" : ""}, posting from ${short(p.start)}`,
         client: c.nickname,
         done: made,
       });
       events.push({
         date: schedule,
         kind: "schedule",
-        title: `Schedule ${c.nickname} Cycle ${p.number} in Linkme`,
+        title: `Schedule ${c.nickname} Cycle ${p.number} in Linkme, posting from ${short(p.start)}`,
         client: c.nickname,
         done: p.scheduled >= need,
       });
