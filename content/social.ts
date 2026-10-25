@@ -68,6 +68,7 @@ export const addOns = [
   { name: "+1 Bronze a week", price: "$100/mo" },
   { name: "+1 Silver a week", price: "$125/mo" },
   { name: "+1 Gold a week", price: "$200/mo", note: "With a 30-minute shoot every other week" },
+  { name: "Verification", price: "$50/mo" },
   { name: "Extra platform", price: "$25/mo", note: "Each, beyond Instagram and Facebook" },
   { name: "Extend a shoot by 30 minutes", price: "$100" },
   { name: "Extra 30-minute shoot", price: "$100" },
