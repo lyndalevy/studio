@@ -17,6 +17,7 @@ const KINDS: Record<CalEvent["kind"], { name: string; style: string }> = {
   schedule: { name: "Schedule", style: "bg-red text-cream" },
   invoice: { name: "Send invoice", style: "border-2 border-red bg-cream-deep" },
   due: { name: "Check due", style: "border-2 border-dashed border-red" },
+  pickup: { name: "Pick up check", style: "border-2 border-[#1c1714] bg-cream" },
   pay: { name: "Pay yourself", style: "bg-[#c39b2a] text-[#1c1714]" },
 };
 
@@ -49,7 +50,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
   // A window (making posts) shows once, on its first day, with its dates.
   const onDay = (d: string) => events.filter((e) => e.date === d);
   // Coming up: the next 3 weeks, plus anything from the last month still not done (an unsent invoice, an unscheduled cycle).
-  const late = (e: CalEvent) => e.date < now && e.kind !== "make" && e.kind !== "shoot" && e.kind !== "pay";
+  const late = (e: CalEvent) => e.date < now && e.kind !== "make" && e.kind !== "shoot" && e.kind !== "pay" && e.kind !== "pickup";
   const soon = events.filter((e) => !e.done && e.date <= soonEnd && (e.date >= now || (late(e) && e.date >= addDays(now, -31))));
   const days: string[] = [];
   for (let d = gridStart; d <= gridEnd; d = addDays(d, 1)) days.push(d);
@@ -217,7 +218,10 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
               Start making its posts {MAKE_DAYS.usual} days before that, or a week ({MAKE_DAYS.gold} days) before when the cycle
               has a Gold reel.
             </li>
-            <li>Send each invoice on the client&rsquo;s billing day; checks show on their due date once sent.</li>
+            <li>
+              Send each invoice on the client&rsquo;s billing day; checks show on their due date once sent. For clients whose
+              checks you pick up in person ("pickup_checks": true), a pickup shows every Monday after it&rsquo;s sent until it&rsquo;s paid.
+            </li>
             <li>Pay yourself every other Friday: a month&rsquo;s pay from the Budget card spread over 26 paydays a year.</li>
           </ul>
           {!file.pay_yourself_from && (

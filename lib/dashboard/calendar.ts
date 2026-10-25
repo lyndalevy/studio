@@ -23,7 +23,7 @@ export type CalendarFile = {
 export type CalEvent = {
   /** YYYY-MM-DD; for making posts, the day to start. */
   date: string;
-  kind: "make" | "schedule" | "invoice" | "due" | "shoot" | "pay";
+  kind: "make" | "schedule" | "invoice" | "due" | "pickup" | "shoot" | "pay";
   title: string;
   /** "10:00 AM" for a shoot with a time. */
   time?: string;
@@ -172,6 +172,14 @@ export async function loadCalendar(
     }
     for (const inv of c.invoices) {
       if (inv.status === "paid") continue;
+      // Checks picked up in person: every Monday after the invoice goes out until it's paid (just the first one while it's not sent yet).
+      if (c.info.pickup_checks) {
+        let d = addDays(inv.sent, 1);
+        while (new Date(`${d}T12:00:00Z`).getUTCDay() !== 1) d = addDays(d, 1);
+        const last = inv.status === "upcoming" ? d : to;
+        for (; d <= last && d <= to; d = addDays(d, 7))
+          if (d >= from) events.push({ date: d, kind: "pickup", title: `Pick up ${c.nickname} check ($${inv.amount})`, client: c.nickname });
+      }
       if (inv.status === "upcoming") {
         if (inv.sent >= from && inv.sent <= to)
           events.push({ date: inv.sent, kind: "invoice", title: `Send ${c.nickname} ${inv.label.split(" ")[0]} invoice ($${inv.amount})`, client: c.nickname });
@@ -216,7 +224,7 @@ export async function loadCalendar(
     }
   }
 
-  const order: CalEvent["kind"][] = ["shoot", "invoice", "due", "pay", "schedule", "make"];
+  const order: CalEvent["kind"][] = ["shoot", "invoice", "due", "pickup", "pay", "schedule", "make"];
   events.sort((a, b) => a.date.localeCompare(b.date) || order.indexOf(a.kind) - order.indexOf(b.kind));
   return { events, missing, file, error };
 }

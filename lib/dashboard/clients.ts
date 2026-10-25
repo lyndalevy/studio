@@ -30,6 +30,9 @@ export type ClientFile = {
   send_dates?: Record<string, string>;
   /** false keeps the client off the dashboard calendar. */
   calendar?: boolean;
+  /** true when Lynda picks up this client's checks in person: the calendar shows a pickup every Monday after
+   * the invoice goes out, until it's paid. */
+  pickup_checks?: boolean;
   /** true while work is on hold: no cycles, invoices, calendar dates or budget, and nothing moves to SHIPPED. */
   paused?: boolean;
   /** Days earlier than the usual Friday to schedule this client's cycles (and start making them). Set
