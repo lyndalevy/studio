@@ -9,10 +9,10 @@ export type BudgetFile = {
   keep_in_bank: number;
   /** Share of profit put aside for income tax and self-employment tax. */
   tax_percent: number;
-  /** Stripe's card fee, per paid invoice. */
-  stripe: { percent: number; fixed: number };
-  /** Monthly bills, in dollars. */
-  costs: { name: string; monthly: number; note?: string }[];
+  /** Stripe's card fee, per paid invoice. Leave it out when clients pay by check. */
+  stripe?: { percent: number; fixed: number };
+  /** Monthly bills, in dollars. With per_client, the bill is whichever is more: monthly, or per_client for each client. */
+  costs: { name: string; monthly: number; per_client?: number; note?: string }[];
 };
 
 export type Budget = {
@@ -20,6 +20,8 @@ export type Budget = {
   income: { client: string; amount: number }[];
   revenue: number;
   stripeFees: number;
+  /** Each bill for this month, with per-client bills worked out. */
+  bills: { name: string; amount: number; note?: string }[];
   costs: number;
   profit: number;
   taxes: number;
@@ -48,8 +50,14 @@ export async function loadBudget(clients: ClientStatus[]): Promise<{ budget: Bud
     .map((c) => ({ client: c.info.client, amount: c.monthly! }));
   const revenue = income.reduce((n, i) => n + i.amount, 0);
   // One card payment per client each month.
-  const stripeFees = round(income.reduce((n, i) => n + (i.amount * file.stripe.percent) / 100 + file.stripe.fixed, 0));
-  const costs = round(file.costs.reduce((n, c) => n + c.monthly, 0));
+  const stripe = file.stripe;
+  const stripeFees = stripe ? round(income.reduce((n, i) => n + (i.amount * stripe.percent) / 100 + stripe.fixed, 0)) : 0;
+  const bills = file.costs.map((c) => ({
+    name: c.name,
+    amount: round(Math.max(c.monthly, (c.per_client ?? 0) * income.length)),
+    note: c.note,
+  }));
+  const costs = round(bills.reduce((n, c) => n + c.amount, 0));
   const profit = round(revenue - stripeFees - costs);
   const taxes = round(Math.max(0, profit) * (file.tax_percent / 100));
 
@@ -59,6 +67,7 @@ export async function loadBudget(clients: ClientStatus[]): Promise<{ budget: Bud
       income,
       revenue,
       stripeFees,
+      bills,
       costs,
       profit,
       taxes,
