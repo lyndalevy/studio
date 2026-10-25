@@ -102,6 +102,7 @@ export default async function Social() {
                   );
                 })}
               </ul>
+              {pkg.extra && <p className="mt-4 text-sm leading-snug opacity-80">{pkg.extra}</p>}
             </div>
           ))}
         </div>

@@ -46,12 +46,12 @@ export const tiers: { key: TierKey; name: string; what: string }[] = [
 /** The monthly base fee, already inside every package price. */
 export const baseFee = 150;
 
-/** Prices are per month and already include the $150 base fee. */
-export const packages = [
+/** Prices are per month and already include the $150 base fee. Gold comes with a shoot every other week ($50 of the price). */
+export const packages: { name: string; price: number; perWeek: string[]; extra?: string }[] = [
   { name: "Steady", price: 250, perWeek: ["1 Bronze"] },
   { name: "Momentum", price: 375, perWeek: ["1 Bronze", "1 Silver"] },
   { name: "Showcase", price: 500, perWeek: ["1 Bronze", "2 Silver"] },
-  { name: "Spotlight", price: 625, perWeek: ["2 Bronze", "1 Silver", "1 Gold"] },
+  { name: "Spotlight", price: 675, perWeek: ["2 Bronze", "1 Silver", "1 Gold"], extra: "A 30-minute shoot every other week" },
 ];
 
 /** What the $150 base fee covers, in every package. */
@@ -67,7 +67,7 @@ export const addOns = [
   { name: "Linkme link", price: "$50/mo", note: "Highly recommended" },
   { name: "+1 Bronze a week", price: "$100/mo" },
   { name: "+1 Silver a week", price: "$125/mo" },
-  { name: "+1 Gold a week", price: "$150/mo" },
+  { name: "+1 Gold a week", price: "$200/mo", note: "With a 30-minute shoot every other week" },
   { name: "Extra platform", price: "$25/mo", note: "Each, beyond Instagram and Facebook" },
   { name: "Extend a shoot by 30 minutes", price: "$100" },
   { name: "Extra 30-minute shoot", price: "$100" },
