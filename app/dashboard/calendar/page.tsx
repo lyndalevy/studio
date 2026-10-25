@@ -72,6 +72,59 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
         <p className="mt-2 opacity-70">What to do, and when</p>
       </header>
 
+      <section className="mt-10 border-2 border-red bg-cream">
+        <div className="flex items-center justify-between gap-3 bg-red px-5 py-4 text-cream">
+          <Link href={`/dashboard/calendar?m=${prevMonth}`} className="eyebrow link-draw" aria-label="Previous month">
+            ← {fmt(`${prevMonth}-15`, { month: "short" })}
+          </Link>
+          <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">
+            {fmt(`${month}-15`, { month: "long", year: "numeric" })}
+          </h2>
+          <Link href={`/dashboard/calendar?m=${nextMonth}`} className="eyebrow link-draw" aria-label="Next month">
+            {fmt(`${nextMonth}-15`, { month: "short" })} →
+          </Link>
+        </div>
+        <div className="overflow-x-auto p-2 sm:p-4">
+          <div className="grid min-w-[44rem] grid-cols-7 border-l border-t border-red-line">
+            {WEEKDAYS.map((w) => (
+              <div key={w} className="eyebrow border-b border-r border-red-line px-2 py-1 text-center">
+                {w}
+              </div>
+            ))}
+            {days.map((d) => (
+              <div
+                key={d}
+                className={`min-h-28 border-b border-r border-red-line p-1.5 ${d.startsWith(month) ? "" : "opacity-40"} ${
+                  d === now ? "bg-cream-deep" : ""
+                }`}
+              >
+                <p className={`text-xs ${d === now ? "font-bold text-red" : "opacity-70"}`}>{Number(d.slice(8))}</p>
+                <ul className="mt-1 space-y-1">
+                  {onDay(d).map((e, i) => (
+                    <li
+                      key={i}
+                      title={e.title}
+                      className={`rounded px-1.5 py-0.5 text-[11px] leading-tight ${KINDS[e.kind].style} ${e.done ? "line-through opacity-50" : ""}`}
+                    >
+                      {e.title}
+                      {range(e)}
+                      {e.time && ` · ${e.time}`}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2 border-t-2 border-red p-5">
+          {Object.values(KINDS).map((k) => (
+            <span key={k.name} className={`eyebrow rounded-full px-2 py-0.5 ${k.style}`}>
+              {k.name}
+            </span>
+          ))}
+        </div>
+      </section>
+
       {/* Shoots still to book: every client has 1 hour of photography a month, Gold clients a shoot every other week. */}
       <section className="mt-10 border-2 border-red bg-cream">
         <div className="flex flex-wrap items-baseline justify-between gap-3 bg-red px-5 py-4 text-cream">
@@ -139,59 +192,6 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
               ))}
             </ul>
           )}
-        </div>
-      </section>
-
-      <section className="mt-10 border-2 border-red bg-cream">
-        <div className="flex items-center justify-between gap-3 bg-red px-5 py-4 text-cream">
-          <Link href={`/dashboard/calendar?m=${prevMonth}`} className="eyebrow link-draw" aria-label="Previous month">
-            ← {fmt(`${prevMonth}-15`, { month: "short" })}
-          </Link>
-          <h2 className="font-[family-name:var(--font-display)] text-3xl sm:text-4xl">
-            {fmt(`${month}-15`, { month: "long", year: "numeric" })}
-          </h2>
-          <Link href={`/dashboard/calendar?m=${nextMonth}`} className="eyebrow link-draw" aria-label="Next month">
-            {fmt(`${nextMonth}-15`, { month: "short" })} →
-          </Link>
-        </div>
-        <div className="overflow-x-auto p-2 sm:p-4">
-          <div className="grid min-w-[44rem] grid-cols-7 border-l border-t border-red-line">
-            {WEEKDAYS.map((w) => (
-              <div key={w} className="eyebrow border-b border-r border-red-line px-2 py-1 text-center">
-                {w}
-              </div>
-            ))}
-            {days.map((d) => (
-              <div
-                key={d}
-                className={`min-h-28 border-b border-r border-red-line p-1.5 ${d.startsWith(month) ? "" : "opacity-40"} ${
-                  d === now ? "bg-cream-deep" : ""
-                }`}
-              >
-                <p className={`text-xs ${d === now ? "font-bold text-red" : "opacity-70"}`}>{Number(d.slice(8))}</p>
-                <ul className="mt-1 space-y-1">
-                  {onDay(d).map((e, i) => (
-                    <li
-                      key={i}
-                      title={e.title}
-                      className={`rounded px-1.5 py-0.5 text-[11px] leading-tight ${KINDS[e.kind].style} ${e.done ? "line-through opacity-50" : ""}`}
-                    >
-                      {e.title}
-                      {range(e)}
-                      {e.time && ` · ${e.time}`}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-2 border-t-2 border-red p-5">
-          {Object.values(KINDS).map((k) => (
-            <span key={k.name} className={`eyebrow rounded-full px-2 py-0.5 ${k.style}`}>
-              {k.name}
-            </span>
-          ))}
         </div>
       </section>
 
