@@ -1,6 +1,5 @@
 import { addOns, packages, type TierKey } from "@/content/social";
 import { source, type Entry, type Source } from "./source";
-import { stripeInvoices, type StripeInvoice } from "./stripe";
 
 /**
  * Everything the dashboard shows for one client, worked out from their folder
@@ -23,7 +22,9 @@ export type ClientFile = {
   extras?: { month: string; name: string }[];
   first_invoice?: string | null;
   due_days?: number;
-  stripe_customer?: string;
+  /** Invoices sent, by month (YYYY-MM) with the day it went out (YYYY-MM-DD). Set from the dashboard. */
+  sent?: Record<string, string>;
+  /** Months paid (YYYY-MM). Set from the dashboard. */
   paid?: string[];
   notes?: string;
   /** Profile links by platform name, e.g. {"Instagram": "https://www.instagram.com/..."}. */
@@ -58,13 +59,11 @@ export type CyclePlan = {
 export type Invoice = {
   month: string;
   label: string;
-  sent: string; // YYYY-MM-DD (actual from Stripe, or projected)
+  sent: string; // YYYY-MM-DD: the day it went out, or the day it should
   due: string;
   amount: number;
   lines: string[];
-  status: "paid" | "overdue" | "sent" | "not sent" | "upcoming";
-  number: string | null; // Stripe invoice number, once it exists
-  url: string | null; // Stripe's hosted invoice page
+  status: "paid" | "overdue" | "sent" | "upcoming";
 };
 
 export type ClientStatus = {
@@ -314,22 +313,11 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
   const current = anchor ? Math.max(1, Math.floor((toTime(today()) - toTime(anchor)) / (14 * DAY)) + 1) : 0;
 
   // Payments: monthly on the same day as the first invoice (the "nth"), due a set number of days
-  // later. Real invoices come from Stripe when it's connected; the rest of the schedule is projected.
+  // after it goes out. Clients pay by check; the dashboard's buttons mark each one sent, then paid.
   const monthly = pkg ? pkg.price + (info.add_ons ?? []).reduce((n, a) => n + (priceOf(a) ?? 0), 0) : null;
   const invoices: Invoice[] = [];
-  let real: StripeInvoice[] | null = null;
-  try {
-    real = info.stripe_customer ? await stripeInvoices(info.stripe_customer) : null;
-  } catch (err) {
-    problems.push((err as Error).message);
-  }
-  const sentReal = (real ?? []).filter((i) => i.sent && i.status !== "void").sort((a, b) => a.sent!.localeCompare(b.sent!));
-  const drafts = (real ?? []).filter((i) => i.status === "draft");
-  const first = sentReal[0]?.sent ?? (/^\d{4}-\d{2}-\d{2}$/.test(info.first_invoice ?? "") ? info.first_invoice! : null);
-  const dueDays =
-    sentReal[0]?.due && sentReal[0].sent
-      ? Math.round((toTime(sentReal[0].due) - toTime(sentReal[0].sent)) / DAY)
-      : (info.due_days ?? 7);
+  const first = /^\d{4}-\d{2}-\d{2}$/.test(info.first_invoice ?? "") ? info.first_invoice! : null;
+  const dueDays = info.due_days ?? 7;
 
   if (first && monthly !== null) {
     const d = today();
@@ -338,9 +326,9 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
       const last = new Date(Date.UTC(Number(m.slice(0, 4)), Number(m.slice(5, 7)), 0)).getUTCDate();
       return `${m}-${String(Math.min(nth, last)).padStart(2, "0")}`;
     };
-    for (let m = first.slice(0, 7), i = 0; m <= addMonths(now, 2); m = addMonths(m, 1), i++) {
-      const sent = onNth(m);
-      const r = sentReal[i];
+    for (let m = first.slice(0, 7); m <= addMonths(now, 2); m = addMonths(m, 1)) {
+      const went = info.sent?.[m];
+      const sent = went ?? onNth(m);
       const extras = (info.extras ?? []).filter((x) => x.month === m);
       const lines = [`${info.package} $${pkg!.price}`, ...(info.add_ons ?? []).map((a) => `${a} $${priceOf(a)}`)];
       let amount = monthly;
@@ -349,27 +337,18 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
         amount += p;
         lines.push(`${x.name} $${p}`);
       }
-      const due = r?.due ?? fromTime(toTime(sent) + dueDays * DAY);
-      let status: Invoice["status"];
-      if (r) status = r.status === "paid" ? "paid" : r.status === "uncollectible" || d > due ? "overdue" : "sent";
-      else if ((info.paid ?? []).includes(m)) status = "paid";
-      else if (real && d >= sent) status = "not sent";
-      else status = d > due ? "overdue" : d >= sent ? "sent" : "upcoming";
-      invoices.push({
-        month: m,
-        label: monthLabel(m),
-        sent: r?.sent ?? sent,
-        due,
-        amount: r?.amount ?? amount,
-        lines,
-        status,
-        number: r?.number ?? null,
-        url: r?.url ?? null,
-      });
+      const due = fromTime(toTime(sent) + dueDays * DAY);
+      const status: Invoice["status"] = (info.paid ?? []).includes(m)
+        ? "paid"
+        : went
+          ? d > due
+            ? "overdue"
+            : "sent"
+          : "upcoming";
+      invoices.push({ month: m, label: monthLabel(m), sent, due, amount, lines, status });
     }
   }
   if (!first && monthly !== null) problems.push("No invoice sent yet. The payment schedule starts from the first one.");
-  if (drafts.length) problems.push(`${drafts.length} unsent draft invoice${drafts.length > 1 ? "s" : ""} in Stripe.`);
 
   const nickname =
     (info.nickname ?? "").trim().toUpperCase() ||
@@ -431,6 +410,24 @@ async function readClients(): Promise<{ clients: ClientStatus[]; error?: string 
   } catch (err) {
     return { clients: [], error: (err as Error).message };
   }
+}
+
+/** Move a month's invoice to its next step: upcoming → sent (today) → paid. Saved in the client's client.json. */
+export async function advanceInvoice(folder: string, month: string): Promise<void> {
+  const src = source();
+  if (!src) throw new Error("Dropbox isn't connected yet.");
+  if (!folder || folder.includes("/") || folder.includes("..") || !/^\d{4}-\d{2}$/.test(month)) throw new Error("That isn't an invoice.");
+  const raw = await src.read(`${folder}/client.json`);
+  if (raw === null) throw new Error("That isn't a client folder.");
+  const info = JSON.parse(raw) as ClientFile;
+  if ((info.paid ?? []).includes(month)) return;
+  if (info.sent?.[month]) {
+    info.paid = [...(info.paid ?? []), month].sort();
+  } else {
+    info.sent = { ...(info.sent ?? {}), [month]: today() };
+  }
+  await src.write(`${folder}/client.json`, JSON.stringify(info, null, 2) + "\n");
+  recent = null;
 }
 
 /**

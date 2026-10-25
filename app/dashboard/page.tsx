@@ -6,10 +6,11 @@ import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
 import { loadBudget, type Budget } from "@/lib/dashboard/budget";
 import { loadIdeas, syncBusinessLinks } from "@/lib/dashboard/ideas";
 import { loadLibrary, nameNewLinks, type SavedLink } from "@/lib/dashboard/library";
-import { loadClients, today, type ClientStatus, type CyclePlan, type Invoice } from "@/lib/dashboard/clients";
+import { loadClients, today, type ClientStatus, type CyclePlan } from "@/lib/dashboard/clients";
 import { logout } from "./actions";
 import { Sparkle } from "../components/Marks";
 import IdeasCard from "./IdeasCard";
+import InvoiceButton from "./InvoiceButton";
 import OneTimeCard from "./OneTimeCard";
 import LibraryCard from "./LibraryCard";
 import LoginForm from "./LoginForm";
@@ -27,13 +28,6 @@ const TIERS: TierKey[] = ["bronze", "silver", "gold"];
 const tierColor: Record<TierKey, string> = { bronze: "#b0744a", silver: "#8e959c", gold: "#c39b2a" };
 const tierName: Record<TierKey, string> = { bronze: "Bronze", silver: "Silver", gold: "Gold" };
 
-const statusStyle: Record<Invoice["status"], string> = {
-  paid: "bg-red text-cream",
-  overdue: "bg-[#1c1714] text-cream",
-  sent: "border-2 border-red",
-  "not sent": "border-2 border-dashed border-red",
-  upcoming: "border border-red-line opacity-70",
-};
 
 /** Finder shows ":" in a name as "/", so show it that way here too. */
 const finder = (name: string) => name.replace(/:/g, "/");
@@ -153,6 +147,8 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
   const queued = links
     .flatMap((l) => l.assigned.filter((a) => a.client === c.nickname && !a.done).map((a) => ({ ...a, link: l })))
     .sort((a, b) => a.cycle - b.cycle || a.at.localeCompare(b.at));
+  // Paid invoices drop off the list.
+  const unpaid = c.invoices.filter((i) => i.status !== "paid");
   const scheduled = c.sets.flatMap((s) => s.items).filter((i) => i.scheduled).length;
   const made = c.sets.flatMap((s) => s.items).length;
   // Deliverables only shows posts whose week hasn't ended yet.
@@ -200,9 +196,12 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
         </div>
 
         {queued.length > 0 && (
-          <div>
-            <p className="eyebrow mb-2">Post ideas queued</p>
-            <ul className="space-y-1 text-sm">
+          <details className="group">
+            <summary className="eyebrow flex cursor-pointer list-none items-center gap-2">
+              Post ideas queued · {queued.length}
+              <span aria-hidden className="transition-transform group-open:rotate-180">▾</span>
+            </summary>
+            <ul className="mt-2 space-y-1 text-sm">
               {queued.map((q) => (
                 <li key={q.link.path} className="flex items-center gap-2">
                   <span className="w-16 shrink-0 font-bold">Cycle {q.cycle}</span>
@@ -213,7 +212,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
                 </li>
               ))}
             </ul>
-          </div>
+          </details>
         )}
 
         <div>
@@ -265,28 +264,22 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
           <p className="eyebrow mb-2">Payments</p>
           {c.invoices.length === 0 ? (
             <p className="text-sm opacity-70">The schedule starts once the first invoice is sent.</p>
+          ) : unpaid.length === 0 ? (
+            <p className="text-sm opacity-70">Everything&rsquo;s paid.</p>
           ) : (
             <ul className="space-y-1.5">
-              {c.invoices.map((inv) => (
+              {unpaid.map((inv) => (
                 <li key={inv.month} className="flex flex-wrap items-center justify-between gap-2 text-sm">
                   <span>
                     <span className="font-bold">{inv.label}</span>
-                    {inv.number &&
-                      (inv.url ? (
-                        <a href={inv.url} target="_blank" rel="noopener noreferrer" className="link-draw ml-1.5">
-                          {inv.number}
-                        </a>
-                      ) : (
-                        <span className="ml-1.5">{inv.number}</span>
-                      ))}
                     <span className="opacity-70">
                       {" "}
-                      · {inv.status === "upcoming" || inv.status === "not sent" ? "sends" : "sent"} {fmtDay(inv.sent)}, due {fmtDay(inv.due)}
+                      · {inv.status === "upcoming" ? "send" : "sent"} {fmtDay(inv.sent)}, due {fmtDay(inv.due)}
                     </span>
                   </span>
                   <span className="flex items-center gap-2">
                     <span className="font-bold">${inv.amount}</span>
-                    <InvoiceStatus inv={inv} />
+                    <InvoiceButton folder={c.folder} inv={inv} today={today()} />
                   </span>
                 </li>
               ))}
@@ -394,19 +387,6 @@ function BudgetCard({ b }: { b: Budget }) {
       <OneTimeCard list={b.oneTimeYear} month={today().slice(0, 7)} />
     </section>
   );
-}
-
-/** The invoice's status pill. In the week before it's due to go out, it counts down as a reminder. */
-function InvoiceStatus({ inv }: { inv: Invoice }) {
-  const days = Math.round((Date.parse(`${inv.sent}T00:00:00Z`) - Date.parse(`${today()}T00:00:00Z`)) / 86_400_000);
-  if (inv.status === "upcoming" && days >= 0 && days <= 7) {
-    return (
-      <span className="eyebrow rounded-full border-2 border-red bg-cream-deep px-2.5 py-0.5">
-        {days === 0 ? "Today" : `In ${days} day${days === 1 ? "" : "s"}`}
-      </span>
-    );
-  }
-  return <span className={`eyebrow rounded-full px-2.5 py-0.5 ${statusStyle[inv.status]}`}>{inv.status}</span>;
 }
 
 function Cycle({ plan, title, todo = false }: { plan: CyclePlan | null; title: string; todo?: boolean }) {

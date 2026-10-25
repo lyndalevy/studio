@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { isSignedIn, signIn, signOut } from "@/lib/dashboard/auth";
 import { updateOneTime } from "@/lib/dashboard/budget";
-import { recentClients, setScheduled, today } from "@/lib/dashboard/clients";
+import { advanceInvoice, recentClients, setScheduled, today } from "@/lib/dashboard/clients";
 import { assignLink, deleteLink, renameLink } from "@/lib/dashboard/library";
 import { loadIdeas, removeBusinessLink, STATUSES, updateIdeas, type IdeaStatus } from "@/lib/dashboard/ideas";
 
@@ -28,6 +28,18 @@ export async function toggleScheduled(folder: string, set: string, name: string,
   if (!(await isSignedIn())) return "Signed out. Reload and sign in again.";
   try {
     await setScheduled(folder, set, name, on);
+  } catch (err) {
+    return (err as Error).message;
+  }
+  revalidatePath("/dashboard");
+  return null;
+}
+
+/** Move an invoice to its next step: upcoming → sent → paid. */
+export async function stepInvoice(folder: string, month: string): Promise<string | null> {
+  if (!(await isSignedIn())) return "Signed out. Reload and sign in again.";
+  try {
+    await advanceInvoice(folder, month);
   } catch (err) {
     return (err as Error).message;
   }
