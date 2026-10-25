@@ -60,7 +60,7 @@ export const included = [
   "Social media management tool",
   "Editing and AI tools",
   "Posting and scheduling",
-  "1 30-minute shoot a month",
+  "1 hour of photography a month",
 ];
 
 export const addOns = [
