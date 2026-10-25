@@ -131,6 +131,20 @@ export async function changeIdea(id: string, to: IdeaStatus | "delete"): Promise
   return null;
 }
 
+/** Rename an idea to film. A renamed link idea keeps its new name even if its Dropbox file is renamed later. */
+export async function renameIdea(id: string, text: string): Promise<string | null> {
+  if (!(await isSignedIn())) return "Signed out. Reload and sign in again.";
+  const name = text.trim().slice(0, 500);
+  if (!name) return "Give it a name.";
+  try {
+    await updateIdeas((ideas) => ideas.map((i) => (i.id === id ? { ...i, text: name } : i)));
+  } catch (err) {
+    return (err as Error).message;
+  }
+  revalidatePath("/dashboard");
+  return null;
+}
+
 /** Assign a post idea to a client (or take it off), rename it, or delete it. */
 export async function changeLink(
   path: string,

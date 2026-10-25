@@ -73,7 +73,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
           <Link href={`/dashboard/calendar?from=${prevStart}`} className="eyebrow link-draw" aria-label="Earlier weeks">
             ← Earlier
           </Link>
-          <h2 className="text-center font-[family-name:var(--font-display)] text-2xl sm:text-4xl">
+          <h2 className="text-center font-[family-name:var(--font-body)] text-2xl sm:text-4xl">
             {span}
             {gridStart !== thisWeek && (
               <Link href="/dashboard/calendar" className="eyebrow link-draw ml-3 align-middle">
