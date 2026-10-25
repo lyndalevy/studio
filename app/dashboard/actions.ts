@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { isSignedIn, signIn, signOut } from "@/lib/dashboard/auth";
+import { updateOneTime } from "@/lib/dashboard/budget";
 import { recentClients, setScheduled, today } from "@/lib/dashboard/clients";
 import { assignLink, deleteLink, renameLink } from "@/lib/dashboard/library";
 import { loadIdeas, removeBusinessLink, STATUSES, updateIdeas, type IdeaStatus } from "@/lib/dashboard/ideas";
@@ -27,6 +28,36 @@ export async function toggleScheduled(folder: string, set: string, name: string,
   if (!(await isSignedIn())) return "Signed out. Reload and sign in again.";
   try {
     await setScheduled(folder, set, name, on);
+  } catch (err) {
+    return (err as Error).message;
+  }
+  revalidatePath("/dashboard");
+  return null;
+}
+
+/** Add a one-time payment (a filing fee, new gear) to budget.json for the month it's due. */
+export async function addOneTime(_: string | null, form: FormData): Promise<string | null> {
+  if (!(await isSignedIn())) return "Signed out. Reload and sign in again.";
+  const name = String(form.get("name") ?? "").trim().slice(0, 80);
+  const amount = Math.round(Number(form.get("amount")) * 100) / 100;
+  const month = String(form.get("month") ?? "");
+  if (!name) return "Say what the payment is for.";
+  if (!(amount > 0)) return "The amount should be more than $0.";
+  if (!/^\d{4}-\d{2}$/.test(month)) return "Pick the month it's due.";
+  try {
+    await updateOneTime((list) => [...list, { id: crypto.randomUUID(), month, name, amount }]);
+  } catch (err) {
+    return (err as Error).message;
+  }
+  revalidatePath("/dashboard");
+  return null;
+}
+
+/** Take a one-time payment off the budget. */
+export async function removeOneTime(id: string): Promise<string | null> {
+  if (!(await isSignedIn())) return "Signed out. Reload and sign in again.";
+  try {
+    await updateOneTime((list) => list.filter((o) => o.id !== id));
   } catch (err) {
     return (err as Error).message;
   }

@@ -10,6 +10,7 @@ import { loadClients, today, type ClientStatus, type CyclePlan, type Invoice } f
 import { logout } from "./actions";
 import { Sparkle } from "../components/Marks";
 import IdeasCard from "./IdeasCard";
+import OneTimeCard from "./OneTimeCard";
 import LibraryCard from "./LibraryCard";
 import LoginForm from "./LoginForm";
 import PostPill from "./PostPill";
@@ -36,6 +37,9 @@ const statusStyle: Record<Invoice["status"], string> = {
 
 /** Finder shows ":" in a name as "/", so show it that way here too. */
 const finder = (name: string) => name.replace(/:/g, "/");
+
+/** Pay before and after taxes by number of clients, and NYC salaries (a private Claude artifact). */
+const PAY_CHART = "https://claude.ai/artifact/U5BsP5nDczF5iwgwFqgcia";
 
 /** Studio tools, linked at the top of the dashboard. */
 const TOOLS = [
@@ -338,6 +342,7 @@ function BudgetCard({ b }: { b: Budget }) {
             {b.bills.map((c) => row(c.name, c.amount, c.note))}
             {b.file.stripe &&
               row("Stripe fees", b.stripeFees, `${b.file.stripe.percent}% + ${money(b.file.stripe.fixed)} per payment`)}
+            {b.oneTime.map((o) => row(o.name, o.amount, "one time"))}
             {row("Total", b.costs + b.stripeFees, undefined, true)}
           </ul>
         </div>
@@ -367,10 +372,10 @@ function BudgetCard({ b }: { b: Budget }) {
         <dl className="grid grid-cols-2 gap-4 text-center sm:grid-cols-3 lg:grid-cols-5">
           {[
             ["Coming in", b.revenue * 12],
-            ["Going out", (b.costs + b.stripeFees) * 12],
-            ["Salary before taxes", b.profit * 12],
-            ["Estimated taxes", b.taxes * 12],
-            ["Salary after taxes", b.pay * 12],
+            ["Going out", b.year.out],
+            ["Salary before taxes", b.year.profit],
+            ["Estimated taxes", b.year.taxes],
+            ["Salary after taxes", b.year.pay],
           ].map(([label, amount]) => (
             <div key={label}>
               <dt className="text-sm opacity-80">{label}</dt>
@@ -378,7 +383,15 @@ function BudgetCard({ b }: { b: Budget }) {
             </div>
           ))}
         </dl>
+        <p className="mt-4 text-center text-sm">
+          One-time payments count in this year&rsquo;s totals.{" "}
+          <a href={PAY_CHART} target="_blank" rel="noopener noreferrer" className="link-draw">
+            Pay chart: pay by number of clients ↗
+          </a>
+        </p>
       </div>
+
+      <OneTimeCard list={b.oneTimeYear} month={today().slice(0, 7)} />
     </section>
   );
 }
