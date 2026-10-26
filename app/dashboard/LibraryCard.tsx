@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useOptimistic, useState, useTransition } from "react";
+import { useActionState, useEffect, useOptimistic, useState, useTransition } from "react";
 
 import type { TierKey } from "@/content/social";
 import type { SavedLink, Shelf } from "@/lib/dashboard/library";
 import { isPhoto, photoRef } from "@/lib/dashboard/photo";
-import { changeLink } from "./actions";
+import { addPostIdea, changeLink } from "./actions";
 
 const COLUMNS: { shelf: Shelf; title: string; color: string }[] = [
   { shelf: "bronze", title: "Bronze", color: "#b0744a" },
@@ -26,6 +26,17 @@ export default function LibraryCard({
   clients: { nickname: string; tiers: TierKey[] }[];
 }) {
   const [error, setError] = useState<string | null>(null);
+  // Adding a link or photo. The link is kept if saving fails, so it doesn't have to be pasted again.
+  const [link, setLink] = useState("");
+  const [photoName, setPhotoName] = useState("");
+  const [addError, add, adding] = useActionState(async (prev: string | null, form: FormData) => {
+    const err = await addPostIdea(prev, form);
+    if (!err) {
+      setLink("");
+      setPhotoName("");
+    }
+    return err;
+  }, null);
   const [editing, setEditing] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [, start] = useTransition();
@@ -86,6 +97,51 @@ export default function LibraryCard({
         </span>
       </button>
       <div id="post-ideas-body" hidden={!open} className="space-y-4 p-5">
+        <form action={add} className="flex flex-wrap items-center gap-2 border border-red-line p-3">
+          <span className="eyebrow mr-1">Add an idea</span>
+          <span className="flex gap-1" role="radiogroup" aria-label="Tier">
+            {COLUMNS.map(({ shelf, title, color }) => (
+              <label key={shelf} className="cursor-pointer">
+                <input type="radio" name="shelf" value={shelf} defaultChecked={shelf === "bronze"} className="peer sr-only" />
+                <span
+                  className="eyebrow block rounded-full border px-2.5 py-0.5 peer-checked:bg-[var(--tier)] peer-checked:text-cream peer-focus-visible:outline-2"
+                  style={{ borderColor: color, ["--tier" as string]: color }}
+                >
+                  {title}
+                </span>
+              </label>
+            ))}
+          </span>
+          <input
+            name="link"
+            type="url"
+            inputMode="url"
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            placeholder="Paste a link"
+            aria-label="Link to an Instagram post or reel"
+            className="min-w-0 flex-1 basis-48 border border-red bg-cream px-2 py-1 text-sm outline-none"
+          />
+          <span className="text-sm opacity-70">or</span>
+          <label className="eyebrow cursor-pointer rounded-full border border-red px-2.5 py-1 hover:bg-cream-deep">
+            {photoName ? `📷 ${photoName}` : "Add a photo"}
+            <input
+              name="photo"
+              type="file"
+              accept="image/*,.heic,.heif"
+              onChange={(e) => setPhotoName(e.target.files?.[0]?.name ?? "")}
+              className="sr-only"
+            />
+          </label>
+          <button
+            type="submit"
+            disabled={adding}
+            className="eyebrow rounded-full bg-red px-3 py-1 text-cream disabled:opacity-60"
+          >
+            {adding ? "Saving…" : "Add"}
+          </button>
+          {addError && <p className="w-full text-sm">{addError}</p>}
+        </form>
         {error && <p className="text-sm">{error}</p>}
         <div className="grid gap-4 md:grid-cols-3">
           {COLUMNS.map(({ shelf, title, color }) => {
@@ -211,7 +267,7 @@ export default function LibraryCard({
           })}
         </div>
         <p className="text-xs opacity-70">
-          Save Instagram links or photos to ideas/bronze, silver or gold in Dropbox from your phone (Share → Dropbox);
+          Add a link or photo above, or save them to ideas/bronze, silver or gold in Dropbox from your phone (Share → Dropbox);
           links keep the names they were saved with (rename any with ✎). Tap a client once to queue the idea into their next cycle with room (✓ once
           that cycle&rsquo;s posts are made), twice to gray it out as not for them, and again to clear it.
         </p>

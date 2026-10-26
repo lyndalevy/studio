@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Phone photos added to the dashboard's post ideas are a few MB each.
+  experimental: { serverActions: { bodySizeLimit: "25mb" } },
   images: {
     remotePatterns: [
       // iCloud Shared Albums

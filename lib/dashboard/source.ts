@@ -22,6 +22,8 @@ export interface Source {
   read(file: string): Promise<string | null>;
   /** Save a small text file, replacing what's there. */
   write(file: string, text: string): Promise<void>;
+  /** Save a new file (a photo or a link) without replacing anything: a taken name gets " (1)". Returns where it went. */
+  upload(file: string, body: Uint8Array): Promise<string>;
   /** Move a file or folder, making the folders it goes into. */
   move(from: string, to: string): Promise<void>;
   /** Delete a file (Dropbox keeps it in Deleted files for 30 days). */
@@ -130,6 +132,23 @@ const dropbox: Source = {
     if (!res.ok) throw new Error(`Couldn't save ${file} to Dropbox (${res.status}): ${await reason(res)}`);
   },
 
+  async upload(file, body) {
+    const token = await accessToken();
+    const res = await fetch("https://content.dropboxapi.com/2/files/upload", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/octet-stream",
+        "Dropbox-API-Arg": headerJson({ path: `${ROOT}/${file}`, mode: "add", autorename: true, mute: true }),
+      },
+      body: body as BodyInit,
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`Couldn't save ${file} to Dropbox (${res.status}): ${await reason(res)}`);
+    const saved = (await res.json()) as { path_display: string };
+    return saved.path_display.slice(ROOT.length + 1);
+  },
+
   async move(from, to) {
     const token = await accessToken();
     const res = await fetch("https://api.dropboxapi.com/2/files/move_v2", {
@@ -205,6 +224,19 @@ function local(root: string): Source {
     },
     async write(file, text) {
       await writeFile(path.join(root, file), text, "utf8");
+    },
+    async upload(file, body) {
+      const ext = path.extname(file);
+      const stem = file.slice(0, file.length - ext.length);
+      for (let n = 0; ; n++) {
+        const name = n ? `${stem} (${n})${ext}` : file;
+        try {
+          await writeFile(path.join(root, name), body, { flag: "wx" }); // never replaces a file
+          return name;
+        } catch (err) {
+          if ((err as NodeJS.ErrnoException).code !== "EEXIST") throw err;
+        }
+      }
     },
     async move(from, to) {
       await mkdir(path.dirname(path.join(root, to)), { recursive: true });

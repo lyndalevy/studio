@@ -236,6 +236,56 @@ export async function assignLink(path: string, url: string, nickname: string, cl
   await writeMeta(meta);
 }
 
+// ── adding from the dashboard ────────────────────────────────
+
+const MAX_PHOTO = 20 * 1024 * 1024;
+
+/**
+ * The name a pasted link is saved under, the way a phone would save it: an Instagram post or reel keeps its
+ * code (DeAZsuwoiw6), anything else its site and page. Ideas are never given titles (CLAUDE.md).
+ */
+function linkName(url: URL) {
+  const code = url.pathname.match(/^\/(?:[^/]+\/)?(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/)?.[1];
+  if (code) return code;
+  const page = url.pathname.split("/").filter(Boolean).pop();
+  return safeName(page ? `${url.hostname.replace(/^www\./, "")} ${page}` : url.hostname.replace(/^www\./, ""));
+}
+
+/** Save a pasted link (as a .url file) or a photo into a tier's folder. Returns where it was saved. */
+export async function addPostIdea(
+  shelf: Shelf,
+  idea: { link: string } | { photo: { name: string; bytes: Uint8Array } }
+): Promise<string> {
+  if (!SHELVES.includes(shelf)) throw new Error("Pick Bronze, Silver or Gold.");
+  const src = source();
+  if (!src) throw new Error("Dropbox isn't connected.");
+
+  if ("link" in idea) {
+    let url: URL;
+    try {
+      url = new URL(idea.link.trim());
+    } catch {
+      throw new Error("That doesn't look like a link. Paste the whole thing, starting with https://");
+    }
+    if (url.protocol !== "https:") throw new Error("The link should start with https://");
+    // The same reel saved twice would just be merged into one later, so say where it already is.
+    for (const s of SHELVES) {
+      const have = (await listShelf(s)).find((l) => !isPhoto(l.url) && linkKey(l.url) === linkKey(url.href));
+      if (have) throw new Error(`That one's already saved in ${s[0].toUpperCase() + s.slice(1)} as "${have.name}".`);
+    }
+    const text = `[InternetShortcut]\nURL=${url.href}\n`;
+    return src.upload(`${folderOf(shelf)}/${linkName(url)}.url`, new TextEncoder().encode(text));
+  }
+
+  const { name, bytes } = idea.photo;
+  const ext = name.match(PHOTO)?.[0].toLowerCase();
+  if (!ext) throw new Error("That should be a photo (JPG, PNG, HEIC, WebP or GIF).");
+  if (!bytes.length) throw new Error("That photo is empty.");
+  if (bytes.length > MAX_PHOTO) throw new Error("That photo is over 20 MB. Send a smaller copy.");
+  const stem = safeName(name.slice(0, -ext.length)) || "photo";
+  return src.upload(`${folderOf(shelf)}/${stem}${ext}`, bytes);
+}
+
 // ── moving, naming and deleting files ────────────────────────
 
 /** Only link and photo files directly inside one of the ideas/ shelves can be changed. */

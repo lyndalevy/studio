@@ -7,7 +7,7 @@ import { isSignedIn, signIn, signOut } from "@/lib/dashboard/auth";
 import { updateOneTime } from "@/lib/dashboard/budget";
 import { saveShootsCalendar } from "@/lib/dashboard/calendar";
 import { advanceInvoice, recentClients, setScheduled, today } from "@/lib/dashboard/clients";
-import { assignLink, deleteLink, renameLink } from "@/lib/dashboard/library";
+import { addPostIdea as saveIdea, assignLink, deleteLink, renameLink, type Shelf } from "@/lib/dashboard/library";
 import { loadIdeas, removeBusinessLink, STATUSES, updateIdeas, type IdeaStatus } from "@/lib/dashboard/ideas";
 
 export async function login(_: string | null, form: FormData): Promise<string | null> {
@@ -138,6 +138,27 @@ export async function renameIdea(id: string, text: string): Promise<string | nul
   if (!name) return "Give it a name.";
   try {
     await updateIdeas((ideas) => ideas.map((i) => (i.id === id ? { ...i, text: name } : i)));
+  } catch (err) {
+    return (err as Error).message;
+  }
+  revalidatePath("/dashboard");
+  return null;
+}
+
+/** Add a post idea from the dashboard: a pasted link or a photo, into the tier picked. */
+export async function addPostIdea(_: string | null, form: FormData): Promise<string | null> {
+  if (!(await isSignedIn())) return "Signed out. Reload and sign in again.";
+  const shelf = String(form.get("shelf") ?? "") as Shelf;
+  const link = String(form.get("link") ?? "").trim();
+  const photo = form.get("photo");
+  const hasPhoto = photo instanceof File && photo.size > 0;
+  if (!link && !hasPhoto) return "Paste a link or pick a photo first.";
+  if (link && hasPhoto) return "Add the link and the photo one at a time.";
+  try {
+    await saveIdea(
+      shelf,
+      hasPhoto ? { photo: { name: photo.name, bytes: new Uint8Array(await photo.arrayBuffer()) } } : { link }
+    );
   } catch (err) {
     return (err as Error).message;
   }
