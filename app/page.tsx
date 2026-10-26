@@ -12,7 +12,7 @@ export const revalidate = 300;
 
 /** A peek at the social side: a few favourite posts, by feed (or tier) and id. */
 const peek = [
-  feedPosts["bold-and-bright"].find((p) => p.id === "01-beach"),
+  feedPosts["bold-and-bright"].find((p) => p.id === "03-charger"),
   feedPosts["fun-and-playful"].find((p) => p.id === "03-grandma-texts"),
   feedPosts["earthy-and-naturalistic"].find((p) => p.id === "08-coffee-headline"),
   feedPosts["earthy-and-naturalistic"].find((p) => p.id === "03-coffee-sip"),

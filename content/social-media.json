@@ -2,162 +2,81 @@
  "feeds": {
   "bold-and-bright": [
    {
-    "id": "01-beach",
+    "id": "01-out-of-office",
     "kind": "video",
-    "src": "/social/feeds/bold-and-bright/01-beach.mp4",
-    "poster": "/social/feeds/bold-and-bright/01-beach.jpg",
+    "src": "/social/feeds/bold-and-bright/01-out-of-office.mp4",
+    "poster": "/social/feeds/bold-and-bright/01-out-of-office.jpg",
     "w": 720,
     "h": 900,
     "sound": false
    },
    {
-    "id": "02-kiwi-sky",
+    "id": "02-plus-four",
     "kind": "image",
-    "src": "/social/feeds/bold-and-bright/02-kiwi-sky.jpg",
-    "poster": "/social/feeds/bold-and-bright/02-kiwi-sky.jpg",
+    "src": "/social/feeds/bold-and-bright/02-plus-four.jpg",
+    "poster": "/social/feeds/bold-and-bright/02-plus-four.jpg",
     "w": 1080,
     "h": 1350
    },
    {
-    "id": "03-good-fats",
-    "kind": "carousel",
-    "slides": [
-     {
-      "src": "/social/feeds/bold-and-bright/03-good-fats/1.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/03-good-fats/2.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/03-good-fats/3.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/03-good-fats/4.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/03-good-fats/5.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/03-good-fats/6.jpg",
-      "w": 1080,
-      "h": 1350
-     }
-    ],
-    "poster": "/social/feeds/bold-and-bright/03-good-fats/1.jpg",
-    "w": 1080,
-    "h": 1350
-   },
-   {
-    "id": "04-potatoes",
-    "kind": "image",
-    "src": "/social/feeds/bold-and-bright/04-potatoes.jpg",
-    "poster": "/social/feeds/bold-and-bright/04-potatoes.jpg",
-    "w": 1080,
-    "h": 1350
-   },
-   {
-    "id": "05-cucumbers",
-    "kind": "image",
-    "src": "/social/feeds/bold-and-bright/05-cucumbers.jpg",
-    "poster": "/social/feeds/bold-and-bright/05-cucumbers.jpg",
-    "w": 1080,
-    "h": 1350
-   },
-   {
-    "id": "06-whats-in-the-bowl",
-    "kind": "carousel",
-    "slides": [
-     {
-      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/1.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/2.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/3.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/4.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/5.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/6.jpg",
-      "w": 1080,
-      "h": 1350
-     }
-    ],
-    "poster": "/social/feeds/bold-and-bright/06-whats-in-the-bowl/1.jpg",
-    "w": 1080,
-    "h": 1350
-   },
-   {
-    "id": "07-kiwi-salad",
+    "id": "03-charger",
     "kind": "video",
-    "src": "/social/feeds/bold-and-bright/07-kiwi-salad.mp4",
-    "poster": "/social/feeds/bold-and-bright/07-kiwi-salad.jpg",
+    "src": "/social/feeds/bold-and-bright/03-charger.mp4",
+    "poster": "/social/feeds/bold-and-bright/03-charger.jpg",
     "w": 720,
     "h": 900,
     "sound": false
    },
    {
-    "id": "08-avocado-float",
+    "id": "04-tic-tac-toe",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/04-tic-tac-toe.jpg",
+    "poster": "/social/feeds/bold-and-bright/04-tic-tac-toe.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "05-drawn-box",
     "kind": "video",
-    "src": "/social/feeds/bold-and-bright/08-avocado-float.mp4",
-    "poster": "/social/feeds/bold-and-bright/08-avocado-float.jpg",
+    "src": "/social/feeds/bold-and-bright/05-drawn-box.mp4",
+    "poster": "/social/feeds/bold-and-bright/05-drawn-box.jpg",
     "w": 720,
     "h": 900,
     "sound": false
    },
    {
-    "id": "09-chickpea-crunch",
-    "kind": "carousel",
-    "slides": [
-     {
-      "src": "/social/feeds/bold-and-bright/09-chickpea-crunch/1.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/09-chickpea-crunch/2.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/09-chickpea-crunch/3.jpg",
-      "w": 1080,
-      "h": 1350
-     },
-     {
-      "src": "/social/feeds/bold-and-bright/09-chickpea-crunch/4.jpg",
-      "w": 1080,
-      "h": 1350
-     }
-    ],
-    "poster": "/social/feeds/bold-and-bright/09-chickpea-crunch/1.jpg",
+    "id": "06-pantone",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/06-pantone.jpg",
+    "poster": "/social/feeds/bold-and-bright/06-pantone.jpg",
     "w": 1080,
     "h": 1350
+   },
+   {
+    "id": "07-how-to-trap",
+    "kind": "video",
+    "src": "/social/feeds/bold-and-bright/07-how-to-trap.mp4",
+    "poster": "/social/feeds/bold-and-bright/07-how-to-trap.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
+   },
+   {
+    "id": "08-fresh-batch",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/08-fresh-batch.jpg",
+    "poster": "/social/feeds/bold-and-bright/08-fresh-batch.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "09-love-more",
+    "kind": "video",
+    "src": "/social/feeds/bold-and-bright/09-love-more.mp4",
+    "poster": "/social/feeds/bold-and-bright/09-love-more.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
    }
   ],
   "dark-and-romantic": [
