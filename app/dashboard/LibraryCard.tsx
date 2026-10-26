@@ -26,13 +26,15 @@ export default function LibraryCard({
   clients: { nickname: string; tiers: TierKey[] }[];
 }) {
   const [error, setError] = useState<string | null>(null);
-  // Adding a link or photo. The link is kept if saving fails, so it doesn't have to be pasted again.
+  // Adding a link or photo. The link and name are kept if saving fails, so they don't have to be typed again.
   const [link, setLink] = useState("");
+  const [name, setName] = useState("");
   const [photoName, setPhotoName] = useState("");
   const [addError, add, adding] = useActionState(async (prev: string | null, form: FormData) => {
     const err = await addPostIdea(prev, form);
     if (!err) {
       setLink("");
+      setName("");
       setPhotoName("");
     }
     return err;
@@ -133,6 +135,15 @@ export default function LibraryCard({
               className="sr-only"
             />
           </label>
+          <input
+            name="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={60}
+            placeholder="Name (optional)"
+            aria-label="Name to show for this idea (optional)"
+            className="min-w-0 flex-1 basis-40 border border-red bg-cream px-2 py-1 text-sm outline-none"
+          />
           <button
             type="submit"
             disabled={adding}

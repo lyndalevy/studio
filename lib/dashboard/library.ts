@@ -251,14 +251,19 @@ function linkName(url: URL) {
   return safeName(page ? `${url.hostname.replace(/^www\./, "")} ${page}` : url.hostname.replace(/^www\./, ""));
 }
 
-/** Save a pasted link (as a .url file) or a photo into a tier's folder. Returns where it was saved. */
+/**
+ * Save a pasted link (as a .url file) or a photo into a tier's folder, under the name Lynda typed if she
+ * gave one. Returns where it was saved.
+ */
 export async function addPostIdea(
   shelf: Shelf,
-  idea: { link: string } | { photo: { name: string; bytes: Uint8Array } }
+  idea: { link: string } | { photo: { name: string; bytes: Uint8Array } },
+  name = ""
 ): Promise<string> {
   if (!SHELVES.includes(shelf)) throw new Error("Pick Bronze, Silver or Gold.");
   const src = source();
   if (!src) throw new Error("Dropbox isn't connected.");
+  const given = safeName(name);
 
   if ("link" in idea) {
     let url: URL;
@@ -274,15 +279,15 @@ export async function addPostIdea(
       if (have) throw new Error(`That one's already saved in ${s[0].toUpperCase() + s.slice(1)} as "${have.name}".`);
     }
     const text = `[InternetShortcut]\nURL=${url.href}\n`;
-    return src.upload(`${folderOf(shelf)}/${linkName(url)}.url`, new TextEncoder().encode(text));
+    return src.upload(`${folderOf(shelf)}/${given || linkName(url)}.url`, new TextEncoder().encode(text));
   }
 
-  const { name, bytes } = idea.photo;
-  const ext = name.match(PHOTO)?.[0].toLowerCase();
+  const { name: file, bytes } = idea.photo;
+  const ext = file.match(PHOTO)?.[0].toLowerCase();
   if (!ext) throw new Error("That should be a photo (JPG, PNG, HEIC, WebP or GIF).");
   if (!bytes.length) throw new Error("That photo is empty.");
   if (bytes.length > MAX_PHOTO) throw new Error("That photo is over 20 MB. Send a smaller copy.");
-  const stem = safeName(name.slice(0, -ext.length)) || "photo";
+  const stem = given || safeName(file.slice(0, -ext.length)) || "photo";
   return src.upload(`${folderOf(shelf)}/${stem}${ext}`, bytes);
 }
 

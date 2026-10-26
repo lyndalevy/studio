@@ -150,6 +150,7 @@ export async function addPostIdea(_: string | null, form: FormData): Promise<str
   if (!(await isSignedIn())) return "Signed out. Reload and sign in again.";
   const shelf = String(form.get("shelf") ?? "") as Shelf;
   const link = String(form.get("link") ?? "").trim();
+  const name = String(form.get("name") ?? "").trim();
   const photo = form.get("photo");
   const hasPhoto = photo instanceof File && photo.size > 0;
   if (!link && !hasPhoto) return "Paste a link or pick a photo first.";
@@ -157,7 +158,8 @@ export async function addPostIdea(_: string | null, form: FormData): Promise<str
   try {
     await saveIdea(
       shelf,
-      hasPhoto ? { photo: { name: photo.name, bytes: new Uint8Array(await photo.arrayBuffer()) } } : { link }
+      hasPhoto ? { photo: { name: photo.name, bytes: new Uint8Array(await photo.arrayBuffer()) } } : { link },
+      name
     );
   } catch (err) {
     return (err as Error).message;
