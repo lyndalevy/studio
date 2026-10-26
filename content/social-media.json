@@ -253,12 +253,13 @@
     "h": 1350
    },
    {
-    "id": "03-coffee-sip",
-    "kind": "image",
-    "src": "/social/feeds/earthy-and-naturalistic/03-coffee-sip.jpg",
-    "poster": "/social/feeds/earthy-and-naturalistic/03-coffee-sip.jpg",
-    "w": 1080,
-    "h": 1350
+    "id": "03-leave-your-mark",
+    "kind": "video",
+    "src": "/social/feeds/earthy-and-naturalistic/03-leave-your-mark.mp4",
+    "poster": "/social/feeds/earthy-and-naturalistic/03-leave-your-mark.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
    },
    {
     "id": "04-coffee-crema",
@@ -269,10 +270,10 @@
     "h": 1350
    },
    {
-    "id": "05-yogurt-stop-motion",
+    "id": "05-croissant-delivery",
     "kind": "video",
-    "src": "/social/feeds/earthy-and-naturalistic/05-yogurt-stop-motion.mp4",
-    "poster": "/social/feeds/earthy-and-naturalistic/05-yogurt-stop-motion.jpg",
+    "src": "/social/feeds/earthy-and-naturalistic/05-croissant-delivery.mp4",
+    "poster": "/social/feeds/earthy-and-naturalistic/05-croissant-delivery.jpg",
     "w": 720,
     "h": 900,
     "sound": false
