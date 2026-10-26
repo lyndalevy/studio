@@ -6,7 +6,7 @@ import { brand } from "@/content/brand";
 import { site } from "@/content/site";
 import { addOns, baseFee, feeds, included, packages, social, terms, tiers } from "@/content/social";
 import { loadCaptions } from "@/lib/captions";
-import { feedPosts, tierPosts } from "@/lib/socialMedia";
+import { feedPosts } from "@/lib/socialMedia";
 import { Sparkle } from "../components/Marks";
 import PostGrid from "./components/PostGrid";
 import { feedStyle } from "./fonts";
@@ -72,13 +72,31 @@ export default async function Social() {
       </header>
 
       <div className="eyebrow mt-10 flex justify-center gap-8 border-y-2 border-red py-3 sm:mt-14">
-        <a href="#packages" className="link-draw">Packages</a>
         <a href="#posts" className="link-draw">Post types</a>
+        <a href="#packages" className="link-draw">Packages</a>
         <a href="#samples" className="link-draw">Samples</a>
       </div>
 
+      {/* Bronze, silver, gold: what each tier is. */}
+      <section id="posts" className="scroll-mt-6 pt-14 sm:pt-20">
+        <h2 className="text-center font-[family-name:var(--font-display)] text-5xl sm:text-6xl">Post types</h2>
+        <div className="mx-auto mt-10 max-w-3xl space-y-6">
+          {tiers.map((tier) => (
+            <div key={tier.key}>
+              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <h3 className="flex items-center gap-2.5 text-3xl font-bold" style={{ color: tierColor[tier.key] }}>
+                  <Sparkle className="h-5 w-5" />
+                  {tier.name}
+                </h3>
+                <p className="text-lg">{tier.what}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* What each package gets you, and the price. */}
-      <section id="packages" className="scroll-mt-6 pt-14 sm:pt-20">
+      <section id="packages" className="scroll-mt-6 pt-20 sm:pt-28">
         <h2 className="text-center font-[family-name:var(--font-display)] text-5xl sm:text-6xl">Packages</h2>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -133,25 +151,6 @@ export default async function Social() {
         </div>
 
         <p className="mt-6 text-center text-sm tracking-wide opacity-70">{terms.join("  ·  ")}</p>
-      </section>
-
-      {/* Bronze, silver, gold, with examples. */}
-      <section id="posts" className="scroll-mt-6 pt-20 sm:pt-28">
-        <h2 className="text-center font-[family-name:var(--font-display)] text-5xl sm:text-6xl">Post types</h2>
-        <div className="mt-10 space-y-14">
-          {tiers.map((tier) => (
-            <div key={tier.key}>
-              <div className="mb-4 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                <h3 className="flex items-center gap-2.5 text-3xl font-bold" style={{ color: tierColor[tier.key] }}>
-                  <Sparkle className="h-5 w-5" />
-                  {tier.name}
-                </h3>
-                <p className="text-lg">{tier.what}</p>
-              </div>
-              <PostGrid posts={tierPosts[tier.key]} title={tier.name} layout="row" />
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* The sample feeds. */}
