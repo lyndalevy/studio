@@ -42,6 +42,8 @@ const TOOLS = [
   { name: "Linkme agency", href: "https://link.me/agency/28249" },
   { name: "Dropbox API", href: "https://www.dropbox.com/developers/console/apps/nqh0vilp6wm6lys/settings" },
   { name: "Google AI billing", href: "https://aistudio.google.com/billing?billing=01F2EC-86587D-68AD0F" },
+  { name: "Atlas Cloud billing", href: "https://www.atlascloud.ai/console/billing" },
+  { name: "OpenAI billing", href: "https://platform.openai.com/settings/organization/billing/overview" },
 ];
 
 /** A post's week is over once the Sunday after its Monday has passed. */
