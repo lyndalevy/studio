@@ -10,19 +10,9 @@ const money = (n: number) =>
 const monthName = (m: string) =>
   new Date(`${m}-15T12:00:00Z`).toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
-/** AI bills paid as they come (no fixed monthly cost), offered first in the list. */
-const AI_BILLS = ["Google AI", "Atlas Cloud", "OpenAI"];
-const OTHER = "other";
-
 /** One-time payments for the budget (saved in budget.json): a form to add one, and this year's list. */
 export default function OneTime({ list, month }: { list: OneTime[]; month: string }) {
-  // What the payment is for: one of the AI bills, or typed in.
-  const [pick, setPick] = useState("");
-  const [error, add, adding] = useActionState(async (prev: string | null, form: FormData) => {
-    const err = await addOneTime(prev, form);
-    if (!err) setPick("");
-    return err;
-  }, null);
+  const [error, add, adding] = useActionState(addOneTime, null);
   const [removeError, setRemoveError] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
@@ -30,35 +20,13 @@ export default function OneTime({ list, month }: { list: OneTime[]; month: strin
     <div className="border-t-2 border-red p-5">
       <p className="eyebrow mb-3">One-time payments</p>
       <form action={add} className="flex flex-col gap-2 sm:flex-row">
-        <select
-          value={pick}
-          onChange={(e) => setPick(e.target.value)}
+        <input
+          name="name"
           required
-          aria-label="What it's for"
-          className="border-2 border-red bg-cream px-3 py-2 outline-none sm:w-44"
-        >
-          <option value="" disabled>
-            What it&rsquo;s for…
-          </option>
-          {AI_BILLS.map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-          <option value={OTHER}>Something else…</option>
-        </select>
-        {pick === OTHER ? (
-          <input
-            name="name"
-            required
-            autoFocus
-            maxLength={80}
-            placeholder="What it's for, e.g. Trade name filing"
-            className="min-w-0 flex-1 border-2 border-red bg-cream px-3 py-2 outline-none"
-          />
-        ) : (
-          <input type="hidden" name="name" value={pick} />
-        )}
+          maxLength={80}
+          placeholder="What it's for, e.g. Trade name filing"
+          className="min-w-0 flex-1 border-2 border-red bg-cream px-3 py-2 outline-none"
+        />
         <input
           name="amount"
           type="number"
