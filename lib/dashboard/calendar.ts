@@ -199,11 +199,11 @@ export async function loadCalendar(
     }
     for (const inv of c.invoices) {
       if (inv.status === "paid") continue;
-      // Checks picked up in person: 2 PM on the due Monday, then every Monday after until it's paid (just the first
+      // Checks picked up in person: 2 PM on the due Monday, then every other Monday until it's paid (just the first
       // one while it's not sent yet). These stand in for the "check due" date.
       if (c.info.pickup_checks) {
         const last = inv.status === "upcoming" ? inv.due : to;
-        for (let d = inv.due; d <= last && d <= to; d = addDays(d, 7))
+        for (let d = inv.due; d <= last && d <= to; d = addDays(d, 14))
           if (d >= from)
             events.push({ date: d, kind: "pickup", title: `Pick up ${c.nickname} check ($${inv.amount})`, time: "2:00 PM", client: c.nickname });
       }

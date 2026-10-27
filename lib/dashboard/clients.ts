@@ -31,7 +31,7 @@ export type ClientFile = {
   /** false keeps the client off the dashboard calendar. */
   calendar?: boolean;
   /** true when Lynda picks up this client's checks in person: the invoice is due the Monday after it goes out
-   * (instead of due_days), and the calendar shows a pickup that Monday and every Monday after until it's paid. */
+   * (instead of due_days), and the calendar shows a pickup that Monday and every other Monday until it's paid. */
   pickup_checks?: boolean;
   /** true while work is on hold: no cycles, invoices, calendar dates or budget, and nothing moves to SHIPPED. */
   paused?: boolean;
