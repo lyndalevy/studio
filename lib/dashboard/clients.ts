@@ -35,9 +35,6 @@ export type ClientFile = {
   pickup_checks?: boolean;
   /** true while work is on hold: no cycles, invoices, calendar dates or budget, and nothing moves to SHIPPED. */
   paused?: boolean;
-  /** true takes the client off the dashboard completely (cards, calendar, budget, post idea pills). Nothing in
-   * the folder is touched; remove it to bring them back. */
-  hidden?: boolean;
   /** Days earlier than the usual Friday to schedule this client's cycles (and start making them). Set
    * automatically from the order clients started, so each client's work lands on its own day. */
   offset_days?: number;
@@ -425,9 +422,9 @@ async function readClients(): Promise<{ clients: ClientStatus[]; error?: string 
     const found = await Promise.all(
       top.map(async (f) => ({ folder: f.path, raw: await src.read(`${f.path}/client.json`) }))
     );
-    const clients = (
-      await Promise.all(found.filter((f) => f.raw !== null).map((f) => load(src, f.folder, f.raw!)))
-    ).filter((c) => !c.info.hidden);
+    const clients = await Promise.all(
+      found.filter((f) => f.raw !== null).map((f) => load(src, f.folder, f.raw!))
+    );
     return { clients: clients.sort((a, b) => a.info.client.localeCompare(b.info.client)) };
   } catch (err) {
     return { clients: [], error: (err as Error).message };
