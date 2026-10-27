@@ -31,7 +31,7 @@ export type ClientFile = {
   /** false keeps the client off the dashboard calendar. */
   calendar?: boolean;
   /** true when Lynda picks up this client's checks in person: the invoice is due the Monday after it goes out
-   * (instead of due_days), and the calendar shows a pickup that Monday and every other Monday until it's paid. */
+   * (instead of due_days), and the calendar shows a pickup that Monday. */
   pickup_checks?: boolean;
   /** true while work is on hold: no cycles, invoices, calendar dates or budget, and nothing moves to SHIPPED. */
   paused?: boolean;
@@ -328,8 +328,8 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
   };
   const current = anchor ? Math.max(1, Math.floor((toTime(today()) - toTime(anchor)) / (14 * DAY)) + 1) : 0;
 
-  // Payments: monthly on the same day as the first invoice (the "nth"), due a set number of days
-  // after it goes out. Clients pay by check; the dashboard's buttons mark each one sent, then paid.
+  // Payments: invoices go out on the last Wednesday of each month, starting the month of the first
+  // invoice, and are due a set number of days after. Clients pay by check; the dashboard's buttons mark each one sent, then paid.
   const monthly = pkg ? pkg.price + (info.add_ons ?? []).reduce((n, a) => n + (priceOf(a) ?? 0), 0) : null;
   const invoices: Invoice[] = [];
   const first = /^\d{4}-\d{2}-\d{2}$/.test(info.first_invoice ?? "") ? info.first_invoice! : null;
@@ -337,14 +337,13 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
 
   if (first && monthly !== null && !info.paused) {
     const d = today();
-    const nth = Number(first.slice(8, 10));
-    const onNth = (m: string) => {
-      const last = new Date(Date.UTC(Number(m.slice(0, 4)), Number(m.slice(5, 7)), 0)).getUTCDate();
-      return `${m}-${String(Math.min(nth, last)).padStart(2, "0")}`;
+    const lastWednesday = (m: string) => {
+      const end = new Date(Date.UTC(Number(m.slice(0, 4)), Number(m.slice(5, 7)), 0));
+      return fromTime(end.getTime() - ((end.getUTCDay() + 4) % 7) * DAY);
     };
     for (let m = first.slice(0, 7); m <= addMonths(now, 2); m = addMonths(m, 1)) {
       const went = info.sent?.[m];
-      const sent = went ?? info.send_dates?.[m] ?? onNth(m);
+      const sent = went ?? info.send_dates?.[m] ?? lastWednesday(m);
       const extras = (info.extras ?? []).filter((x) => x.month === m);
       const lines = [`${info.package} $${pkg!.price}`, ...(info.add_ons ?? []).map((a) => `${a} $${priceOf(a)}`)];
       let amount = monthly;

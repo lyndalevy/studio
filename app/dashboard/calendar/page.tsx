@@ -225,9 +225,8 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
               has a Gold reel.
             </li>
             <li>
-              Send each invoice on the client&rsquo;s billing day; checks show on their due date once sent. For clients whose
-              checks you pick up in person (&ldquo;pickup_checks&rdquo;: true), the check is due the Monday after you send it, and a pickup
-              shows that Monday and every other Monday until it&rsquo;s paid.
+              Send every invoice on the last Wednesday of the month. Checks show on their due date once sent; for clients whose
+              checks you pick up in person (&ldquo;pickup_checks&rdquo;: true), a pickup shows the Monday after you send it.
             </li>
             <li>Pay yourself every other Friday: the every-other-week pay on the Budget card (from the pay chart).</li>
           </ul>
