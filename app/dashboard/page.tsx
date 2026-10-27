@@ -44,6 +44,7 @@ const TOOLS = [
   { name: "Google AI billing", href: "https://aistudio.google.com/billing?billing=01F2EC-86587D-68AD0F" },
   { name: "Atlas Cloud billing", href: "https://www.atlascloud.ai/console/billing" },
   { name: "OpenAI billing", href: "https://platform.openai.com/settings/organization/billing/overview" },
+  { name: "Link account", href: "https://app.link.com/activity/lbctxn_1UVB8MAOB3oAEyJYi7JPBjJp" },
 ];
 
 /** A post's week is over once the Sunday after its Monday has passed. */
