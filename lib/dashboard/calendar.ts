@@ -18,6 +18,8 @@ export type CalendarFile = {
   shoots_calendar?: string;
   /** A Friday to pay yourself on; it repeats every 14 days from there. YYYY-MM-DD. */
   pay_yourself_from?: string;
+  /** Calendar items marked done by clicking them, by eventKey(). */
+  done?: string[];
 };
 
 /** Shown on every "Send invoice" reminder. */
@@ -66,6 +68,20 @@ export async function loadCalendarFile(): Promise<CalendarFile> {
   } catch {
     return {};
   }
+}
+
+/** What a click on the calendar remembers an item by: its day, kind and title. */
+export const eventKey = (e: Pick<CalEvent, "date" | "kind" | "title">) => `${e.date} ${e.kind} ${e.title}`;
+
+/** Mark a calendar item done (or not done) in calendar.json. */
+export async function setEventDone(key: string, on: boolean): Promise<void> {
+  const src = source();
+  if (!src) throw new Error("Dropbox isn't connected yet.");
+  const file = await loadCalendarFile();
+  const done = new Set(file.done ?? []);
+  if (on) done.add(key);
+  else done.delete(key);
+  await src.write(FILE, JSON.stringify({ ...file, done: [...done].sort() }, null, 2) + "\n");
 }
 
 export async function saveShootsCalendar(link: string): Promise<void> {
@@ -239,6 +255,10 @@ export async function loadCalendar(
         }
     }
   }
+
+  // Items she clicked done; done on their own (posts made or scheduled) stay done either way.
+  const clicked = new Set(file.done ?? []);
+  for (const e of events) if (clicked.has(eventKey(e))) e.done = true;
 
   const order: CalEvent["kind"][] = ["shoot", "note", "invoice", "due", "pickup", "pay", "schedule", "make"];
   events.sort((a, b) => a.date.localeCompare(b.date) || order.indexOf(a.kind) - order.indexOf(b.kind));

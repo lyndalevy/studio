@@ -4,9 +4,10 @@ import { redirect } from "next/navigation";
 
 import { isSignedIn } from "@/lib/dashboard/auth";
 import { loadBudget } from "@/lib/dashboard/budget";
-import { addDays, feedKey, loadCalendar, MAKE_DAYS, type CalEvent } from "@/lib/dashboard/calendar";
+import { addDays, eventKey, feedKey, loadCalendar, MAKE_DAYS, type CalEvent } from "@/lib/dashboard/calendar";
 import { loadClients, today } from "@/lib/dashboard/clients";
 import DashboardNav from "../DashboardNav";
+import EventItem from "./EventItem";
 import ShootsLinkForm from "./ShootsLinkForm";
 
 export const dynamic = "force-dynamic";
@@ -104,15 +105,15 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
                 </p>
                 <ul className="mt-1 space-y-1">
                   {onDay(d).map((e, i) => (
-                    <li
+                    <EventItem
                       key={i}
+                      id={eventKey(e)}
+                      done={!!e.done}
+                      style={KINDS[e.kind].style}
                       title={e.title}
-                      className={`rounded px-1.5 py-0.5 text-[11px] leading-tight ${KINDS[e.kind].style} ${e.done ? "line-through opacity-50" : ""}`}
-                    >
-                      {e.title}
-                      {e.time && ` · ${e.time}`}
-                      {e.note && <span className="block italic opacity-80">{e.note}</span>}
-                    </li>
+                      time={e.time}
+                      note={e.note}
+                    />
                   ))}
                 </ul>
               </div>
@@ -125,6 +126,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
               {k.name}
             </span>
           ))}
+          <span className="text-xs opacity-70">Click anything to mark it done.</span>
         </div>
       </section>
 

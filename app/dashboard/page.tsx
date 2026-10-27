@@ -47,9 +47,8 @@ const TOOLS = [
   { name: "Link account", href: "https://app.link.com/activity/lbctxn_1UVB8MAOB3oAEyJYi7JPBjJp" },
 ];
 
-/** A post's week is over once the Sunday after its Monday has passed. */
-const weekOver = (week: string | null) =>
-  week !== null && Date.parse(`${week}T00:00:00Z`) + 6 * 86_400_000 < Date.parse(`${today()}T00:00:00Z`);
+/** A post's week has started once its Monday has come (it's already in Linkme by then). */
+const weekStarted = (week: string | null) => week !== null && week <= today();
 
 const fmtDay = (d: string) =>
   new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
@@ -143,9 +142,9 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
   const unpaid = c.invoices.filter((i) => i.status !== "paid");
   const scheduled = c.sets.flatMap((s) => s.items).filter((i) => i.scheduled).length;
   const made = c.sets.flatMap((s) => s.items).length;
-  // Deliverables only shows posts whose week hasn't ended yet.
+  // Deliverables only shows posts whose week hasn't started yet.
   const showing = c.sets
-    .map((s) => ({ ...s, items: s.items.filter((it) => !weekOver(it.week)) }))
+    .map((s) => ({ ...s, items: s.items.filter((it) => !weekStarted(it.week)) }))
     .filter((s) => s.items.length);
 
   return (
@@ -229,7 +228,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
           <p className="eyebrow mb-2">Deliverables</p>
           {c.sets.length === 0 && <p className="text-sm opacity-70">No sets yet.</p>}
           {c.sets.length > 0 && showing.length === 0 && (
-            <p className="text-sm opacity-70">Every post&rsquo;s week is over. Add the next cycle.</p>
+            <p className="text-sm opacity-70">Every post&rsquo;s week has started. Add the next cycle.</p>
           )}
           <div className="space-y-3">
             {showing.map((s) => (
@@ -266,7 +265,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
                 {tierName[t]}
               </span>
             ))}
-            <span>filled = scheduled · click a post to mark it · past weeks are hidden</span>
+            <span>filled = scheduled · click a post to mark it · posts drop off once their week starts</span>
           </p>
         </div>
 
