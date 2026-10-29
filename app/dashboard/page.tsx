@@ -5,7 +5,7 @@ import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
 import { loadBudget, type Budget } from "@/lib/dashboard/budget";
 import { loadIdeas, syncBusinessLinks } from "@/lib/dashboard/ideas";
 import { loadLibrary, type SavedLink } from "@/lib/dashboard/library";
-import { addDays } from "@/lib/dashboard/calendar";
+import { addDays, loadCalendar, type CalEvent } from "@/lib/dashboard/calendar";
 import { loadClients, today, type ClientStatus, type CyclePlan } from "@/lib/dashboard/clients";
 import { Sparkle } from "../components/Marks";
 import DashboardNav from "./DashboardNav";
@@ -97,6 +97,8 @@ export default async function Dashboard() {
   const { ideas, error: loadError } = await loadIdeas();
   const ideasError = loadError ?? syncError;
   const { links, error: libraryError } = await loadLibrary(clients);
+  // What's coming up on the calendar for each client, shown next to their package.
+  const { events: upcoming } = await loadCalendar(clients, budget, today(), addDays(today(), 21));
 
   return (
     <main className="mx-auto max-w-[90rem] px-4 py-10 sm:px-8 sm:py-14">
@@ -136,7 +138,7 @@ export default async function Dashboard() {
 
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
         {clients.map((c) => (
-          <ClientCard key={c.folder} c={c} links={links} />
+          <ClientCard key={c.folder} c={c} links={links} events={upcoming.filter((e) => e.client === c.nickname && !e.done)} />
         ))}
       </div>
 
@@ -156,7 +158,7 @@ export default async function Dashboard() {
   );
 }
 
-function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
+function ClientCard({ c, links, events }: { c: ClientStatus; links: SavedLink[]; events: CalEvent[] }) {
   // Post ideas queued for this client, soonest cycle first.
   const queued = links
     .flatMap((l) => l.assigned.filter((a) => a.client === c.nickname && !a.done).map((a) => ({ ...a, link: l })))
@@ -191,6 +193,17 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
               <span className="eyebrow ml-3 rounded-full border-2 border-cream px-2 py-0.5 align-middle">Paused</span>
             )}
           </span>
+          {events.length > 0 && (
+            <span className="text-sm">
+              <span className="eyebrow mr-2">Upcoming</span>
+              {events.slice(0, 3).map((e, i) => (
+                <span key={`${e.date} ${e.title}`}>
+                  {i > 0 && " · "}
+                  <span className="font-bold">{fmtDay(e.date)}</span> {e.title.replace(` ${c.nickname} `, " ").replace(`${c.nickname}'s `, "")}
+                </span>
+              ))}
+            </span>
+          )}
         </>
       }
       extra={
@@ -457,6 +470,15 @@ function Cycle({ plan, title, todo = false }: { plan: CyclePlan | null; title: s
   }
   const through = cycleProgress(plan);
   const left = TIERS.filter((t) => plan.needed[t] > plan.made[t]);
+  // Made and scheduled come from the posts clicked (or marked) in Deliverables.
+  const made = TIERS.reduce((n, t) => n + plan.made[t], 0);
+  const status = !TIERS.some((t) => plan.needed[t])
+    ? "Set a package to see what's needed"
+    : left.length
+      ? `To make: ${left.map((t) => `${plan.needed[t] - plan.made[t]} ${tierName[t]}`).join(", ")}${plan.scheduled ? ` · ${plan.scheduled} scheduled` : ""}`
+      : plan.scheduled >= made
+        ? "All made and scheduled ✓"
+        : `All made ✓ · ${plan.scheduled} of ${made} scheduled`;
   return (
     <div className="relative border border-red-line p-4 pb-5" aria-label={title}>
       <p className="font-bold">
@@ -480,17 +502,7 @@ function Cycle({ plan, title, todo = false }: { plan: CyclePlan | null; title: s
           );
         })}
       </ul>
-      {todo ? (
-        <p className="mt-3 text-sm font-bold">
-          {!TIERS.some((t) => plan.needed[t])
-            ? "Set a package to see what's needed"
-            : left.length
-            ? `To make: ${left.map((t) => `${plan.needed[t] - plan.made[t]} ${tierName[t]}`).join(", ")}`
-            : "All made ✓"}
-        </p>
-      ) : (
-        <p className="mt-3 text-sm opacity-70">{plan.scheduled} scheduled</p>
-      )}
+      <p className="mt-3 text-sm font-bold">{status}</p>
       {/* This cycle's bottom edge fills in as the cycle goes by. */}
       {!todo && <div
         className="absolute -inset-x-px -bottom-px h-1.5"
