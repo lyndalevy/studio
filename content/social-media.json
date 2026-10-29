@@ -549,10 +549,10 @@
   ],
   "sleek-and-electric": [
    {
-    "id": "01-the-front",
+    "id": "09-holiday-season",
     "kind": "video",
-    "src": "/social/feeds/sleek-and-electric/01-the-front.mp4",
-    "poster": "/social/feeds/sleek-and-electric/01-the-front.jpg",
+    "src": "/social/feeds/sleek-and-electric/09-holiday-season.mp4",
+    "poster": "/social/feeds/sleek-and-electric/09-holiday-season.jpg",
     "w": 720,
     "h": 1280,
     "sound": true
@@ -647,10 +647,10 @@
     "h": 1350
    },
    {
-    "id": "09-holiday-season",
+    "id": "01-the-front",
     "kind": "video",
-    "src": "/social/feeds/sleek-and-electric/09-holiday-season.mp4",
-    "poster": "/social/feeds/sleek-and-electric/09-holiday-season.jpg",
+    "src": "/social/feeds/sleek-and-electric/01-the-front.mp4",
+    "poster": "/social/feeds/sleek-and-electric/01-the-front.jpg",
     "w": 720,
     "h": 1280,
     "sound": true
