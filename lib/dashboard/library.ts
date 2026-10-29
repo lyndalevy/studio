@@ -106,11 +106,17 @@ function cycleDone(c: ClientStatus, cycle: number, tier: TierKey) {
   return !!p && p.needed[tier] > 0 && p.made[tier] >= p.needed[tier];
 }
 
-/** The first cycle from now on with room for one more of this tier, after posts made and earlier ideas. */
+/**
+ * The first cycle from now on with room for one more of this tier, after posts made and earlier ideas, and
+ * under the client's ideas_per_cycle limit (any tier).
+ */
 function openCycle(c: ClientStatus, tier: TierKey, taken: Assignment[], tiers: Map<Assignment, TierKey>) {
+  const cap = c.info.ideas_per_cycle;
   for (let n = Math.max(1, c.current); n <= c.cycles.length; n++) {
     const p = c.cycles[n - 1];
-    const used = p.made[tier] + taken.filter((a) => a.client === c.nickname && a.cycle === n && tiers.get(a) === tier).length;
+    const inCycle = taken.filter((a) => a.client === c.nickname && a.cycle === n);
+    if (cap !== undefined && inCycle.length >= cap) continue;
+    const used = p.made[tier] + inCycle.filter((a) => tiers.get(a) === tier).length;
     if (used < p.needed[tier]) return n;
   }
   return null;
@@ -188,6 +194,31 @@ export async function loadLibrary(clients: ClientStatus[]): Promise<{ links: Sav
           changed = true;
         }
       }
+    }
+  }
+
+  // A client with an ideas_per_cycle limit: a cycle holding more ideas than that keeps the ones queued first,
+  // and the rest move on to the next cycles with room, in queue order.
+  const linkOf = new Map<Assignment, SavedLink>();
+  for (const l of links) for (const a of l.assigned) linkOf.set(a, l);
+  for (const c of clients) {
+    if (c.info.ideas_per_cycle === undefined) continue;
+    const mine = all.filter((a) => a.client === c.nickname).sort((a, b) => a.cycle - b.cycle || a.at.localeCompare(b.at));
+    const placed: Assignment[] = [];
+    for (const a of mine) {
+      const inCycle = placed.filter((x) => x.cycle === a.cycle).length;
+      if (a.done || inCycle < c.info.ideas_per_cycle) {
+        placed.push(a);
+        continue;
+      }
+      const n = openCycle(c, tiers.get(a)!, placed, tiers);
+      if (n && n !== a.cycle) {
+        a.cycle = n;
+        const l = linkOf.get(a)!;
+        meta[linkKey(l.url)].assigned = l.assigned.map((x) => ({ client: x.client, cycle: x.cycle, at: x.at }));
+        changed = true;
+      }
+      placed.push(a);
     }
   }
   if (changed) {

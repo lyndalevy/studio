@@ -51,6 +51,8 @@ export type ClientFile = {
   cycle_start?: string;
   /** Short label for the post idea library, e.g. "MCB". Defaults to the client's initials. */
   nickname?: string;
+  /** The most post ideas (inspos) queued into one cycle, across all tiers. No limit when left out. */
+  ideas_per_cycle?: number;
 };
 
 export type Deliverable = {
