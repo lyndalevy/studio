@@ -12,12 +12,11 @@ export const revalidate = 300;
 
 /** A peek at the social side: a few favourite posts, by feed (or tier) and id. */
 const peek = [
+  feedPosts["sleek-and-electric"].find((p) => p.id === "04-content-warning"),
   feedPosts["bold-and-bright"].find((p) => p.id === "03-charger"),
-  feedPosts["fun-and-playful"].find((p) => p.id === "03-grandma-texts"),
-  feedPosts["earthy-and-naturalistic"].find((p) => p.id === "08-coffee-headline"),
-  feedPosts["earthy-and-naturalistic"].find((p) => p.id === "03-coffee-sip"),
-  feedPosts["sculptural-and-sunlit"].find((p) => p.id === "06-baguette-worn"),
-  tierPosts.gold.find((p) => p.id === "oyster-point-long-day"),
+  feedPosts["bold-and-bright"].find((p) => p.id === "09-love-more"),
+  feedPosts["dark-and-romantic"].find((p) => p.id === "06-table"),
+  feedPosts["sculptural-and-sunlit"].find((p) => p.id === "09-yellow-diamond-bracelet"),
 ].filter((p) => p !== undefined);
 
 /** The front door: photography on one side, social on the other. */
