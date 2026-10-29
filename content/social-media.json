@@ -20,13 +20,12 @@
     "sound": false
    },
    {
-    "id": "03-love-more",
-    "kind": "video",
-    "src": "/social/feeds/bold-and-bright/03-love-more.mp4",
-    "poster": "/social/feeds/bold-and-bright/03-love-more.jpg",
-    "w": 720,
-    "h": 900,
-    "sound": false
+    "id": "03-charger",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/03-charger-d9609d.jpg",
+    "poster": "/social/feeds/bold-and-bright/03-charger-d9609d.jpg",
+    "w": 1080,
+    "h": 1350
    },
    {
     "id": "04-tic-tac-toe",
@@ -69,12 +68,13 @@
     "h": 1350
    },
    {
-    "id": "09-charger",
-    "kind": "image",
-    "src": "/social/feeds/bold-and-bright/09-charger-d9609d.jpg",
-    "poster": "/social/feeds/bold-and-bright/09-charger-d9609d.jpg",
-    "w": 1080,
-    "h": 1350
+    "id": "09-love-more",
+    "kind": "video",
+    "src": "/social/feeds/bold-and-bright/09-love-more.mp4",
+    "poster": "/social/feeds/bold-and-bright/09-love-more.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
    }
   ],
   "dark-and-romantic": [

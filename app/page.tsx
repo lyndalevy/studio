@@ -13,8 +13,8 @@ export const revalidate = 300;
 /** A peek at the social side: a few favourite posts, by feed (or tier) and id. */
 const peek = [
   feedPosts["sleek-and-electric"].find((p) => p.id === "04-content-warning"),
-  feedPosts["bold-and-bright"].find((p) => p.id === "09-charger"),
-  feedPosts["bold-and-bright"].find((p) => p.id === "03-love-more"),
+  feedPosts["bold-and-bright"].find((p) => p.id === "03-charger"),
+  feedPosts["bold-and-bright"].find((p) => p.id === "09-love-more"),
   feedPosts["dark-and-romantic"].find((p) => p.id === "04-aperitivo"),
   feedPosts["sculptural-and-sunlit"].find((p) => p.id === "09-yellow-diamond-bracelet"),
   feedPosts["sleek-and-electric"].find((p) => p.id === "05-acura-edit"),
