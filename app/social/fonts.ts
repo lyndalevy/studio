@@ -1,4 +1,4 @@
-import { Bodoni_Moda, GFS_Didot, Montserrat, Nunito, Nunito_Sans } from "next/font/google";
+import { Fraunces, GFS_Didot, Montserrat, Nunito, Nunito_Sans } from "next/font/google";
 
 import type { FeedKey } from "@/content/social";
 
@@ -11,15 +11,15 @@ import type { FeedKey } from "@/content/social";
 const round = Nunito({ weight: "800", subsets: ["latin"], display: "swap", variable: "--font-round" });
 const didot = GFS_Didot({ weight: "400", subsets: ["latin"], display: "swap", variable: "--font-didot" });
 const avenir = Nunito_Sans({ weight: "300", subsets: ["latin"], display: "swap", variable: "--font-avenir" });
-const sunlit = Bodoni_Moda({ weight: "400", subsets: ["latin"], display: "swap" });
+const sunlit = Fraunces({ weight: "400", subsets: ["latin"], display: "swap" });
 const electric = Montserrat({ weight: "600", subsets: ["latin"], display: "swap" });
 
 export const feedStyle: Record<FeedKey, { font: string; color: string }> = {
-  "bold-and-bright": { font: "feed-arial", color: "#ff3d7f" },
+  "bold-and-bright": { font: "feed-arial", color: "#ff7eb0" },
   "luxury-and-architectural": { font: `${didot.variable} feed-didot`, color: "#1f5c8b" },
-  "dark-and-romantic": { font: `${didot.variable} feed-didot`, color: "#1c1714" },
+  "dark-and-romantic": { font: `${didot.variable} feed-didot`, color: "#c99a2e" },
   "earthy-and-naturalistic": { font: `${avenir.variable} feed-avenir`, color: "#6b5a43" },
   "fun-and-playful": { font: `${round.variable} feed-round`, color: "#c6362f" },
-  "sculptural-and-sunlit": { font: sunlit.className, color: "#f2661b" },
+  "sculptural-and-sunlit": { font: sunlit.className, color: "#3a7fc4" },
   "sleek-and-electric": { font: electric.className, color: "#1f47d6" },
 };
