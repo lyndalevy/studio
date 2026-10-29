@@ -268,10 +268,11 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
       .filter((e) => e.kind === "folder" && /^(set|cycle)\b/i.test(e.path.slice(folder.length + 1)) && !e.path.slice(folder.length + 1).includes("/"))
       .map((e) => e.path.slice(folder.length + 1));
 
-  // A cycle folder whose two weeks are over moves into SHIPPED/, so only live cycles stay in view.
+  // A cycle folder moves into SHIPPED/ on its last Sunday, when the dashboard moves on to the next weeks, so
+  // only live cycles stay in view.
   const ended = topFolders().filter((name) => {
     const date = /^cycle\b/i.test(name) ? setDate(name) : null;
-    return !info.paused && date !== null && toTime(mondayOf(date)) + 13 * DAY < toTime(today());
+    return !info.paused && date !== null && toTime(mondayOf(date)) + 13 * DAY <= toTime(today());
   });
   for (const name of ended) {
     try {
