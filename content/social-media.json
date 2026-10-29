@@ -546,6 +546,115 @@
     "h": 900,
     "sound": false
    }
+  ],
+  "sleek-and-electric": [
+   {
+    "id": "01-the-front",
+    "kind": "video",
+    "src": "/social/feeds/sleek-and-electric/01-the-front.mp4",
+    "poster": "/social/feeds/sleek-and-electric/01-the-front.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   },
+   {
+    "id": "02-every-tire",
+    "kind": "carousel",
+    "slides": [
+     {
+      "src": "/social/feeds/sleek-and-electric/02-every-tire/1.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/sleek-and-electric/02-every-tire/2.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/sleek-and-electric/02-every-tire/3.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/sleek-and-electric/02-every-tire/4.jpg",
+      "w": 1080,
+      "h": 1350
+     }
+    ],
+    "poster": "/social/feeds/sleek-and-electric/02-every-tire/1.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "03-2026-integra",
+    "kind": "image",
+    "src": "/social/feeds/sleek-and-electric/03-2026-integra.jpg",
+    "poster": "/social/feeds/sleek-and-electric/03-2026-integra.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "04-content-warning",
+    "kind": "carousel",
+    "slides": [
+     {
+      "src": "/social/feeds/sleek-and-electric/04-content-warning/1.jpg",
+      "w": 1080,
+      "h": 1350
+     },
+     {
+      "src": "/social/feeds/sleek-and-electric/04-content-warning/2.jpg",
+      "w": 1080,
+      "h": 1350
+     }
+    ],
+    "poster": "/social/feeds/sleek-and-electric/04-content-warning/1.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "05-my-name-is-sal",
+    "kind": "video",
+    "src": "/social/feeds/sleek-and-electric/05-my-name-is-sal.mp4",
+    "poster": "/social/feeds/sleek-and-electric/05-my-name-is-sal.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   },
+   {
+    "id": "06-rdx",
+    "kind": "image",
+    "src": "/social/feeds/sleek-and-electric/06-rdx.jpg",
+    "poster": "/social/feeds/sleek-and-electric/06-rdx.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "07-love-more",
+    "kind": "image",
+    "src": "/social/feeds/sleek-and-electric/07-love-more.jpg",
+    "poster": "/social/feeds/sleek-and-electric/07-love-more.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "08-the-team",
+    "kind": "image",
+    "src": "/social/feeds/sleek-and-electric/08-the-team.jpg",
+    "poster": "/social/feeds/sleek-and-electric/08-the-team.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "09-holiday-season",
+    "kind": "video",
+    "src": "/social/feeds/sleek-and-electric/09-holiday-season.mp4",
+    "poster": "/social/feeds/sleek-and-electric/09-holiday-season.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
+   }
   ]
  },
  "tiers": {
