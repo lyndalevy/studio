@@ -551,8 +551,8 @@
    {
     "id": "09-holiday-season",
     "kind": "video",
-    "src": "/social/feeds/sleek-and-electric/09-holiday-season.mp4",
-    "poster": "/social/feeds/sleek-and-electric/09-holiday-season.jpg",
+    "src": "/social/feeds/sleek-and-electric/09-holiday-season-e61a07.mp4",
+    "poster": "/social/feeds/sleek-and-electric/09-holiday-season-167ffe.jpg",
     "w": 720,
     "h": 1280,
     "sound": true
@@ -562,35 +562,35 @@
     "kind": "carousel",
     "slides": [
      {
-      "src": "/social/feeds/sleek-and-electric/02-every-tire/1.jpg",
+      "src": "/social/feeds/sleek-and-electric/02-every-tire/1-e8fdde.jpg",
       "w": 1080,
       "h": 1350
      },
      {
-      "src": "/social/feeds/sleek-and-electric/02-every-tire/2.jpg",
+      "src": "/social/feeds/sleek-and-electric/02-every-tire/2-5a207c.jpg",
       "w": 1080,
       "h": 1350
      },
      {
-      "src": "/social/feeds/sleek-and-electric/02-every-tire/3.jpg",
+      "src": "/social/feeds/sleek-and-electric/02-every-tire/3-ff95ca.jpg",
       "w": 1080,
       "h": 1350
      },
      {
-      "src": "/social/feeds/sleek-and-electric/02-every-tire/4.jpg",
+      "src": "/social/feeds/sleek-and-electric/02-every-tire/4-7de91a.jpg",
       "w": 1080,
       "h": 1350
      }
     ],
-    "poster": "/social/feeds/sleek-and-electric/02-every-tire/1.jpg",
+    "poster": "/social/feeds/sleek-and-electric/02-every-tire/1-e8fdde.jpg",
     "w": 1080,
     "h": 1350
    },
    {
     "id": "03-2026-integra",
     "kind": "image",
-    "src": "/social/feeds/sleek-and-electric/03-2026-integra.jpg",
-    "poster": "/social/feeds/sleek-and-electric/03-2026-integra.jpg",
+    "src": "/social/feeds/sleek-and-electric/03-2026-integra-74cbc6.jpg",
+    "poster": "/social/feeds/sleek-and-electric/03-2026-integra-74cbc6.jpg",
     "w": 1080,
     "h": 1350
    },
@@ -599,25 +599,25 @@
     "kind": "carousel",
     "slides": [
      {
-      "src": "/social/feeds/sleek-and-electric/04-content-warning/1.jpg",
+      "src": "/social/feeds/sleek-and-electric/04-content-warning/1-925feb.jpg",
       "w": 1080,
       "h": 1350
      },
      {
-      "src": "/social/feeds/sleek-and-electric/04-content-warning/2.jpg",
+      "src": "/social/feeds/sleek-and-electric/04-content-warning/2-b9bdbc.jpg",
       "w": 1080,
       "h": 1350
      }
     ],
-    "poster": "/social/feeds/sleek-and-electric/04-content-warning/1.jpg",
+    "poster": "/social/feeds/sleek-and-electric/04-content-warning/1-925feb.jpg",
     "w": 1080,
     "h": 1350
    },
    {
     "id": "05-acura-edit",
     "kind": "video",
-    "src": "/social/feeds/sleek-and-electric/05-acura-edit.mp4",
-    "poster": "/social/feeds/sleek-and-electric/05-acura-edit.jpg",
+    "src": "/social/feeds/sleek-and-electric/05-acura-edit-3057f9.mp4",
+    "poster": "/social/feeds/sleek-and-electric/05-acura-edit-3fcac6.jpg",
     "w": 720,
     "h": 1280,
     "sound": true
@@ -625,32 +625,32 @@
    {
     "id": "06-rdx",
     "kind": "image",
-    "src": "/social/feeds/sleek-and-electric/06-rdx.jpg",
-    "poster": "/social/feeds/sleek-and-electric/06-rdx.jpg",
+    "src": "/social/feeds/sleek-and-electric/06-rdx-d60b0e.jpg",
+    "poster": "/social/feeds/sleek-and-electric/06-rdx-d60b0e.jpg",
     "w": 1080,
     "h": 1350
    },
    {
     "id": "07-backseat",
     "kind": "image",
-    "src": "/social/feeds/sleek-and-electric/07-backseat.jpg",
-    "poster": "/social/feeds/sleek-and-electric/07-backseat.jpg",
+    "src": "/social/feeds/sleek-and-electric/07-backseat-84bc5a.jpg",
+    "poster": "/social/feeds/sleek-and-electric/07-backseat-84bc5a.jpg",
     "w": 1080,
     "h": 1350
    },
    {
     "id": "08-mdx",
     "kind": "image",
-    "src": "/social/feeds/sleek-and-electric/08-mdx.jpg",
-    "poster": "/social/feeds/sleek-and-electric/08-mdx.jpg",
+    "src": "/social/feeds/sleek-and-electric/08-mdx-b78b81.jpg",
+    "poster": "/social/feeds/sleek-and-electric/08-mdx-b78b81.jpg",
     "w": 1080,
     "h": 1350
    },
    {
     "id": "01-the-front",
     "kind": "video",
-    "src": "/social/feeds/sleek-and-electric/01-the-front.mp4",
-    "poster": "/social/feeds/sleek-and-electric/01-the-front.jpg",
+    "src": "/social/feeds/sleek-and-electric/01-the-front-d7cfe0.mp4",
+    "poster": "/social/feeds/sleek-and-electric/01-the-front-04d219.jpg",
     "w": 720,
     "h": 1280,
     "sound": true
