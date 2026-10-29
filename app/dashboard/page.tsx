@@ -16,6 +16,7 @@ import OneTimeCard from "./OneTimeCard";
 import LibraryCard from "./LibraryCard";
 import LoginForm from "./LoginForm";
 import PostPill from "./PostPill";
+import SavedDetails from "./SavedDetails";
 
 export const metadata: Metadata = {
   title: "Dashboard — Studio L",
@@ -246,7 +247,7 @@ function ClientCard({ c, links, events }: { c: ClientStatus; links: SavedLink[];
         )}
 
         {queued.length > 0 && (
-          <details className="group">
+          <SavedDetails id={`${c.folder}-ideas-queued`} className="group">
             <summary className="eyebrow flex cursor-pointer list-none items-center gap-2">
               Post ideas queued · {queued.length}
               <span aria-hidden className="transition-transform group-open:rotate-180">▾</span>
@@ -262,10 +263,10 @@ function ClientCard({ c, links, events }: { c: ClientStatus; links: SavedLink[];
                 </li>
               ))}
             </ul>
-          </details>
+          </SavedDetails>
         )}
 
-        <details open className="group">
+        <SavedDetails id={`${c.folder}-deliverables`} defaultOpen className="group">
           <summary className="eyebrow flex cursor-pointer list-none items-center gap-2">
             Deliverables
             <span aria-hidden className="transition-transform group-open:rotate-180">▾</span>
@@ -312,9 +313,9 @@ function ClientCard({ c, links, events }: { c: ClientStatus; links: SavedLink[];
             ))}
             <span>filled = scheduled · click a post to mark it · posts drop off the day after they go up</span>
           </p>
-        </details>
+        </SavedDetails>
 
-        <details open className="group">
+        <SavedDetails id={`${c.folder}-payments`} defaultOpen className="group">
           <summary className="eyebrow flex cursor-pointer list-none items-center gap-2">
             Payments
             <span aria-hidden className="transition-transform group-open:rotate-180">▾</span>
@@ -346,7 +347,7 @@ function ClientCard({ c, links, events }: { c: ClientStatus; links: SavedLink[];
           <p className="mt-2 text-xs opacity-70">
             {c.minimumEnds && `3-month minimum runs through ${c.minimumEnds}.`}
           </p>
-        </details>
+        </SavedDetails>
 
     </Fold>
   );
