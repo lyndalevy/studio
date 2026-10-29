@@ -7,7 +7,7 @@ import { source, type Entry, type Source } from "./source";
  *
  *   <CLIENT>/client.json            package, add-ons, cycle start, billing
  *   <CLIENT>/CYCLE 1 - 10:19:26/... one folder per 2-week cycle (or SET), dated in its name
- *   10:26 BRONZE living-room.mp4    each post named by its week's Monday and tier
+ *   11:17 BRONZE living-room.mp4    each post named by the day it posts (older ones: its week's Monday) and tier
  *   <CLIENT>/SET 1 .../captions.txt a post marked "(SCHEDULED)" or "(POSTED)" is scheduled
  *
  * A post's tier comes from what it is: a photo or an animated .mp4 is Bronze,
@@ -60,7 +60,7 @@ export type Deliverable = {
   name: string;
   kind: "photo" | "carousel" | "video";
   tier: TierKey;
-  /** The Monday of the post's week (from "10:26 ..." at the start of its name), else the set's date. */
+  /** The Monday of the post's week (from the "11:17 ..." date at the start of its name), else the set's date. */
   week: string | null;
   /** Scheduled in Linkme or already posted: either way, nothing left to do. */
   scheduled: boolean;
@@ -144,13 +144,13 @@ const mondayOf = (d: string) => {
 const shortDay = (d: string) =>
   new Date(toTime(d)).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
-/** "10:26 SILVER ..." (or the older "W2 10:26 ...") → that Monday, in the year of the folder it's in. */
+/** "11:17 SILVER ..." (or the older "W2 10:26 ...") → the Monday of that day's week, in the year of the folder it's in. */
 function weekDate(name: string, folderDate: string | null): string | null {
   const m = name.match(/^(?:W\d+\s+)?(\d{1,2})[:/](\d{1,2})\b/i);
   if (!m || !folderDate) return folderDate;
   let year = Number(folderDate.slice(0, 4));
   if (Number(m[1]) < Number(folderDate.slice(5, 7))) year++; // a cycle running into January
-  return `${monthKey(year, Number(m[1]))}-${m[2].padStart(2, "0")}`;
+  return mondayOf(`${monthKey(year, Number(m[1]))}-${m[2].padStart(2, "0")}`);
 }
 
 /** "SET 2 - 10:27:26" → 2026-10-27. Finder shows the colons as slashes, so accept those too. */
