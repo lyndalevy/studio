@@ -458,8 +458,7 @@ function Cycle({ plan, title, todo = false }: { plan: CyclePlan | null; title: s
   const through = cycleProgress(plan);
   const left = TIERS.filter((t) => plan.needed[t] > plan.made[t]);
   return (
-    <div className="relative border border-red-line p-4 pb-5">
-      <p className="eyebrow">{title}</p>
+    <div className="relative border border-red-line p-4 pb-5" aria-label={title}>
       <p className="font-bold">
         Cycle {plan.number} <span className="font-normal opacity-70">· {plan.label}</span>
       </p>
