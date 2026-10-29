@@ -17,6 +17,7 @@ const peek = [
   feedPosts["bold-and-bright"].find((p) => p.id === "09-love-more"),
   feedPosts["dark-and-romantic"].find((p) => p.id === "06-table"),
   feedPosts["sculptural-and-sunlit"].find((p) => p.id === "09-yellow-diamond-bracelet"),
+  feedPosts["sleek-and-electric"].find((p) => p.id === "05-my-name-is-sal"),
 ].filter((p) => p !== undefined);
 
 /** The front door: photography on one side, social on the other. */

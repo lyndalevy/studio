@@ -32,7 +32,6 @@ export const feeds: { key: FeedKey; label: string; plan: string }[] = [
   { key: "sculptural-and-sunlit", label: "Sculptural & Sunlit", plan: "Momentum" },
   { key: "dark-and-romantic", label: "Dark & Romantic", plan: "Momentum" },
   { key: "sleek-and-electric", label: "Sleek & Electric", plan: "Spotlight" },
-  { key: "fun-and-playful", label: "Playful & Personal", plan: "Spotlight" },
 ];
 
 export type TierKey = "bronze" | "silver" | "gold";

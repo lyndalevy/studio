@@ -20,6 +20,6 @@ export const feedStyle: Record<FeedKey, { font: string; color: string }> = {
   "dark-and-romantic": { font: `${didot.variable} feed-didot`, color: "#1c1714" },
   "earthy-and-naturalistic": { font: `${avenir.variable} feed-avenir`, color: "#6b5a43" },
   "fun-and-playful": { font: `${round.variable} feed-round`, color: "#c6362f" },
-  "sculptural-and-sunlit": { font: sunlit.className, color: "#b4532a" },
-  "sleek-and-electric": { font: electric.className, color: "#d7262e" },
+  "sculptural-and-sunlit": { font: sunlit.className, color: "#f2661b" },
+  "sleek-and-electric": { font: electric.className, color: "#1f47d6" },
 };
