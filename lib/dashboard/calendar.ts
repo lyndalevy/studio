@@ -3,7 +3,7 @@ import { createHmac } from "node:crypto";
 import ICAL from "ical.js";
 
 import type { Budget } from "./budget";
-import { today, type ClientStatus } from "./clients";
+import { today, WEEKDAYS, type ClientStatus } from "./clients";
 import { source } from "./source";
 
 /**
@@ -177,7 +177,9 @@ export async function loadCalendar(
   for (const c of clients) {
     for (const p of c.cycles) {
       const schedule = addDays(p.start, -SCHEDULE_LEAD - offset(c));
-      const make = addDays(schedule, -(p.needed.gold ? MAKE_DAYS.gold : MAKE_DAYS.usual));
+      let make = addDays(schedule, -(p.needed.gold ? MAKE_DAYS.gold : MAKE_DAYS.usual));
+      const makeDay = WEEKDAYS.indexOf((c.info.make_day ?? "").toLowerCase());
+      if (makeDay >= 0) make = addDays(make, makeDay - new Date(`${make}T00:00:00Z`).getUTCDay());
       if (schedule < from || make > to) continue;
       const need = p.needed.bronze + p.needed.silver + p.needed.gold;
       if (!need) continue;

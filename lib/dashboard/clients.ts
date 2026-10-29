@@ -30,6 +30,8 @@ export type ClientFile = {
   send_dates?: Record<string, string>;
   /** The weekday this client's invoices go out, on the last one of each month (default "Wednesday"). */
   send_day?: string;
+  /** The weekday to start making each cycle, e.g. "Wednesday": the usual make day moves to that day of its week. */
+  make_day?: string;
   /** false keeps the client off the dashboard calendar. */
   calendar?: boolean;
   /** true when Lynda picks up this client's checks in person: the invoice is due the Monday after it goes out
@@ -108,7 +110,7 @@ export type ClientStatus = {
 };
 
 const TIERS: TierKey[] = ["bronze", "silver", "gold"];
-const WEEKDAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+export const WEEKDAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 const zero = (): Record<TierKey, number> => ({ bronze: 0, silver: 0, gold: 0 });
 
 const IMAGE = /\.(jpe?g|png|webp|heic)$/i;

@@ -222,7 +222,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
             </li>
             <li>
               Start making its posts {MAKE_DAYS.usual} days before that, or a week ({MAKE_DAYS.gold} days) before when the cycle
-              has a Gold reel.
+              has a Gold reel. A client&rsquo;s &ldquo;make_day&rdquo; moves that to its day of the week (MCB: Wednesday).
             </li>
             <li>
               Send every invoice on the last Wednesday of the month (or the last of the client&rsquo;s &ldquo;send_day&rdquo;, e.g. Tuesday for MCB). Checks show on their due date once sent; for clients whose
