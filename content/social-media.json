@@ -20,12 +20,13 @@
     "sound": false
    },
    {
-    "id": "03-charger",
-    "kind": "image",
-    "src": "/social/feeds/bold-and-bright/03-charger-d9609d.jpg",
-    "poster": "/social/feeds/bold-and-bright/03-charger-d9609d.jpg",
-    "w": 1080,
-    "h": 1350
+    "id": "03-love-more",
+    "kind": "video",
+    "src": "/social/feeds/bold-and-bright/03-love-more.mp4",
+    "poster": "/social/feeds/bold-and-bright/03-love-more.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
    },
    {
     "id": "04-tic-tac-toe",
@@ -68,13 +69,12 @@
     "h": 1350
    },
    {
-    "id": "09-love-more",
-    "kind": "video",
-    "src": "/social/feeds/bold-and-bright/09-love-more.mp4",
-    "poster": "/social/feeds/bold-and-bright/09-love-more.jpg",
-    "w": 720,
-    "h": 900,
-    "sound": false
+    "id": "09-charger",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/09-charger-d9609d.jpg",
+    "poster": "/social/feeds/bold-and-bright/09-charger-d9609d.jpg",
+    "w": 1080,
+    "h": 1350
    }
   ],
   "dark-and-romantic": [
@@ -631,12 +631,13 @@
     "h": 1350
    },
    {
-    "id": "07-backseat",
-    "kind": "image",
-    "src": "/social/feeds/sleek-and-electric/07-backseat-8ca5d0.jpg",
-    "poster": "/social/feeds/sleek-and-electric/07-backseat-8ca5d0.jpg",
-    "w": 1080,
-    "h": 1350
+    "id": "01-the-front",
+    "kind": "video",
+    "src": "/social/feeds/sleek-and-electric/01-the-front-d7cfe0.mp4",
+    "poster": "/social/feeds/sleek-and-electric/01-the-front-04d219.jpg",
+    "w": 720,
+    "h": 1280,
+    "sound": true
    },
    {
     "id": "08-mdx",
@@ -647,13 +648,12 @@
     "h": 1350
    },
    {
-    "id": "01-the-front",
-    "kind": "video",
-    "src": "/social/feeds/sleek-and-electric/01-the-front-d7cfe0.mp4",
-    "poster": "/social/feeds/sleek-and-electric/01-the-front-04d219.jpg",
-    "w": 720,
-    "h": 1280,
-    "sound": true
+    "id": "07-backseat",
+    "kind": "image",
+    "src": "/social/feeds/sleek-and-electric/07-backseat-8ca5d0.jpg",
+    "poster": "/social/feeds/sleek-and-electric/07-backseat-8ca5d0.jpg",
+    "w": 1080,
+    "h": 1350
    }
   ]
  },

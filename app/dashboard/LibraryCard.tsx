@@ -284,7 +284,7 @@ export default function LibraryCard({
           })}
         </div>
         <p className="text-xs opacity-70">
-          Add a link or photo above, or save them to ideas/bronze, silver or gold in Dropbox from your phone (Share → Dropbox);
+          Add a link or photo above, or save them to ideas/bronze, silver, or gold in Dropbox from your phone (Share → Dropbox);
           links keep the names they were saved with (rename any with ✎). Ones still named by their code or IMG number wait under
           &ldquo;Needs a name&rdquo; at the top of each tier until you rename them. Tap a client once to queue the idea into their next cycle with room (✓ once
           that cycle&rsquo;s posts are made), twice to gray it out as not for them, and again to clear it.

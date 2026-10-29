@@ -3,7 +3,7 @@ Edit the text under each post's name. Keep the "== name ==" lines as they are.
 Anything above the first post is a note and never shows on the site.
 
 == 01-meet-bianca ==
-Fior di latte, olive oil and a blistered crust, with not a drop of tomato in sight.
+Fior di latte, olive oil, and a blistered crust, with not a drop of tomato in sight.
 
 == 02-dinner-is-served ==
 Handmade ravioli, revealed tableside by candlelight.
@@ -15,7 +15,7 @@ Every pizza spends about ninety seconds in a nine-hundred-degree oven.
 A stirred Negroni and a pick of Castelvetrano olives while your table gets ready.
 
 == 05-cacio-e-pepe ==
-Three ingredients, one pan and a whole lot of Pecorino Romano.
+Three ingredients, one pan, and a whole lot of Pecorino Romano.
 
 == 06-hung-up ==
 Tagliatelle cut every morning and left to dry right here in the kitchen.
@@ -24,7 +24,7 @@ Tagliatelle cut every morning and left to dry right here in the kitchen.
 Our dough rests for two full days before it ever meets the fire.
 
 == 08-pizza-night ==
-Two pizzas, two glasses of red and a table for as long as you want it.
+Two pizzas, two glasses of red, and a table for as long as you want it.
 
 == 09-notte-rossa ==
 Candlelit dinners, Tuesday through Sunday, from five until late.

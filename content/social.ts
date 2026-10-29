@@ -58,7 +58,7 @@ export const packages: { name: string; price: number; perWeek: string[]; extra?:
 /** What the $200 base fee covers, in every package. */
 export const included = [
   "Instagram and Facebook",
-  "Page management: engagement, DM monitoring and feed aesthetic",
+  "Page management: engagement, DM monitoring, and feed aesthetic",
   "Editing and AI tools",
   "Posting and scheduling",
   "Bi-weekly deliverables of content for upcoming cycles, weeks ahead of time",
@@ -70,14 +70,14 @@ export const addOns = [
   {
     name: "Analytics review and in-depth content strategy",
     price: "$50/mo",
-    note: "Includes monthly meetings about strategy online, including goals, reach and more",
+    note: "Includes monthly meetings about strategy online, including goals, reach, and more",
   },
   { name: "+1 Bronze a week", price: "$100/mo" },
   { name: "+1 Silver a week", price: "$150/mo" },
   { name: "+1 Gold a week", price: "$200/mo", note: "With 1 hour worth of shooting a month, split however you like" },
   { name: "Verification", price: "$50/mo" },
   { name: "Extra platform", price: "$25/mo", note: "Each, beyond Instagram and Facebook" },
-  { name: "Extra 1-hour shoot", price: "$150" },
+  { name: "Photography for an event", price: "$150/hour" },
   { name: "Extra revision", price: "$10" },
 ];
 

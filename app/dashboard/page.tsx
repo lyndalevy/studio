@@ -194,7 +194,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
 
         {c.info.paused ? (
           <p className="border border-red-line p-4 text-sm">
-            On pause: no cycles, invoices or calendar dates, and they&rsquo;re left out of the budget. Remove
+            On pause: no cycles, invoices, or calendar dates, and they&rsquo;re left out of the budget. Remove
             &ldquo;paused&rdquo; from their client.json (or ask Claude) to start again.
           </p>
         ) : (
