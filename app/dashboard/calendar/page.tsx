@@ -225,7 +225,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
               has a Gold reel.
             </li>
             <li>
-              Send every invoice on the last Wednesday of the month. Checks show on their due date once sent; for clients whose
+              Send every invoice on the last Wednesday of the month (or the last of the client&rsquo;s &ldquo;send_day&rdquo;, e.g. Tuesday for MCB). Checks show on their due date once sent; for clients whose
               checks you pick up in person (&ldquo;pickup_checks&rdquo;: true), a pickup shows the Monday after you send it.
             </li>
             <li>Pay yourself every other Friday: the every-other-week pay on the Budget card (from the pay chart).</li>

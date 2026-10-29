@@ -28,6 +28,8 @@ export type ClientFile = {
   paid?: string[];
   /** A month's invoice goes out on a different day than usual, e.g. {"2026-10": "2026-10-26"}. */
   send_dates?: Record<string, string>;
+  /** The weekday this client's invoices go out, on the last one of each month (default "Wednesday"). */
+  send_day?: string;
   /** false keeps the client off the dashboard calendar. */
   calendar?: boolean;
   /** true when Lynda picks up this client's checks in person: the invoice is due the Monday after it goes out
@@ -99,6 +101,7 @@ export type ClientStatus = {
 };
 
 const TIERS: TierKey[] = ["bronze", "silver", "gold"];
+const WEEKDAYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 const zero = (): Record<TierKey, number> => ({ bronze: 0, silver: 0, gold: 0 });
 
 const IMAGE = /\.(jpe?g|png|webp|heic)$/i;
@@ -328,7 +331,7 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
   };
   const current = anchor ? Math.max(1, Math.floor((toTime(today()) - toTime(anchor)) / (14 * DAY)) + 1) : 0;
 
-  // Payments: invoices go out on the last Wednesday of each month, starting the month of the first
+  // Payments: invoices go out on the last Wednesday (or the client's send_day) of each month, starting the month of the first
   // invoice, and are due a set number of days after. Clients pay by check; the dashboard's buttons mark each one sent, then paid.
   const monthly = pkg ? pkg.price + (info.add_ons ?? []).reduce((n, a) => n + (priceOf(a) ?? 0), 0) : null;
   const invoices: Invoice[] = [];
@@ -337,13 +340,15 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
 
   if (first && monthly !== null && !info.paused) {
     const d = today();
-    const lastWednesday = (m: string) => {
+    const day = WEEKDAYS.indexOf((info.send_day ?? "").toLowerCase());
+    const weekday = day < 0 ? 3 : day; // Wednesday unless the client has a send_day
+    const lastSendDay = (m: string) => {
       const end = new Date(Date.UTC(Number(m.slice(0, 4)), Number(m.slice(5, 7)), 0));
-      return fromTime(end.getTime() - ((end.getUTCDay() + 4) % 7) * DAY);
+      return fromTime(end.getTime() - ((end.getUTCDay() - weekday + 7) % 7) * DAY);
     };
     for (let m = first.slice(0, 7); m <= addMonths(now, 2); m = addMonths(m, 1)) {
       const went = info.sent?.[m];
-      const sent = went ?? info.send_dates?.[m] ?? lastWednesday(m);
+      const sent = went ?? info.send_dates?.[m] ?? lastSendDay(m);
       const extras = (info.extras ?? []).filter((x) => x.month === m);
       const lines = [`${info.package} $${pkg!.price}`, ...(info.add_ons ?? []).map((a) => `${a} $${priceOf(a)}`)];
       let amount = monthly;
