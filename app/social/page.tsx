@@ -130,7 +130,10 @@ export default async function Social() {
             <p className="eyebrow">Every package includes · ${baseFee}/month base</p>
             <ul className="mt-3 space-y-1.5 text-lg">
               {included.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item} className="flex items-baseline gap-2.5">
+                  <Sparkle className="h-4 w-4 shrink-0 translate-y-0.5" />
+                  {item}
+                </li>
               ))}
             </ul>
           </div>
@@ -139,9 +142,12 @@ export default async function Social() {
             <ul className="mt-3 space-y-1.5 text-lg">
               {addOns.map((a) => (
                 <li key={a.name} className="flex justify-between gap-4">
-                  <span>
+                  <span className="flex items-baseline gap-2.5">
+                    <Sparkle className="h-4 w-4 shrink-0 translate-y-0.5" />
+                    <span>
                     {a.name}
                     {a.note && <span className="ml-2 text-sm italic opacity-70">{a.note}</span>}
+                    </span>
                   </span>
                   <span className="font-bold">{a.price}</span>
                 </li>
