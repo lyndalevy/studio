@@ -20,7 +20,7 @@ export type SavedLink = {
   name: string;
   /** The reel's link, or "photo:<Dropbox id>" for a photo. */
   url: string;
-  /** A photo still named like "IMG_1234" (it has no caption to name it from). */
+  /** Still named the way the phone saved it: a photo like "IMG_1234", or a link like "DeAZsuwoiw6". */
   needsName?: boolean;
   /** A fingerprint of a photo's contents, to spot the same photo saved twice. */
   hash?: string;
@@ -41,6 +41,9 @@ const cameraName = (name: string) =>
   /^(IMG|DSC|DSCN|PXL|MVIMG|Photo|image|Screenshot)[\s_-]?[\d\s_-]+/i.test(name) ||
   /^temp_image/i.test(name) ||
   /[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}/i.test(name);
+/** A link still named by its Instagram code (DeAZsuwoiw6) or its site and page (example.com page). */
+const codeName = (name: string) =>
+  (/^[A-Za-z0-9_-]{8,}$/.test(name) && /\d|[a-z][A-Z]/.test(name)) || /^[\w-]+(\.[\w-]+)*\.[a-z]{2,}( |$)/i.test(name);
 /** A link without its tracking query, so the same reel shared twice still matches. */
 export const linkKey = (u: string) => u.replace(/\?.*$/, "").replace(/\/$/, "");
 
@@ -80,7 +83,8 @@ async function listShelf(
   const links = [];
   for (const { path, text } of read) {
     const url = text.match(/^URL=(\S+)/m)?.[1] ?? text.match(/<string>(https?:[^<]+)<\/string>/)?.[1];
-    if (url) links.push({ path, name: path.split("/").pop()!.replace(LINK, ""), url: url.trim() });
+    const name = path.split("/").pop()!.replace(LINK, "");
+    if (url) links.push({ path, name, url: url.trim(), needsName: codeName(name) });
   }
   return [...links, ...photos];
 }

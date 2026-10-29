@@ -63,7 +63,7 @@ export default function LibraryCard({
       if (l.path !== step.path) return [l];
       const a = step.action;
       if ("delete" in a) return [];
-      if ("rename" in a) return [{ ...l, name: a.rename }];
+      if ("rename" in a) return [{ ...l, name: a.rename, needsName: false }];
       // blank → queued → grayed out → blank
       if (l.assigned.some((x) => x.client === a.assign))
         return [{ ...l, assigned: l.assigned.filter((x) => x.client !== a.assign), declined: [...l.declined, a.assign] }];
@@ -78,6 +78,115 @@ export default function LibraryCard({
       setError(await changeLink(l.path, l.url, action));
     });
   };
+
+  // One idea, with its rename, delete and client buttons.
+  const item = (l: SavedLink, shelf: Shelf) => (
+    <li key={l.path} className="text-sm">
+      {editing === l.path ? (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            act(l, { rename: draft });
+          }}
+          className="flex gap-1.5"
+        >
+          <input
+            autoFocus
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            maxLength={60}
+            className="min-w-0 flex-1 border border-red bg-cream px-2 py-0.5 outline-none"
+          />
+          <button type="submit" className="eyebrow rounded-full border border-red px-2 py-0.5">
+            Save
+          </button>
+        </form>
+      ) : (
+        <span className="flex items-start justify-between gap-2">
+          {isPhoto(l.url) ? (
+            <a
+              href={`/dashboard/idea-image?size=large&ref=${encodeURIComponent(photoRef(l.url))}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-2"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- a signed-in preview, not a site image */}
+              <img
+                src={`/dashboard/idea-image?ref=${encodeURIComponent(photoRef(l.url))}`}
+                alt=""
+                loading="lazy"
+                className="h-16 w-16 shrink-0 border border-red-line object-cover"
+              />
+              <span className="link-draw">
+                {l.name}
+              </span>
+            </a>
+          ) : (
+            <a href={l.url} target="_blank" rel="noopener noreferrer" className="link-draw">
+              {l.name} ↗
+            </a>
+          )}
+          <span className="flex shrink-0 gap-1">
+            <button
+              type="button"
+              onClick={() => {
+                setEditing(l.path);
+                setDraft(l.name);
+              }}
+              title="Rename"
+              aria-label={`Rename "${l.name}"`}
+              className="eyebrow rounded-full border border-red px-2 py-0.5 hover:bg-cream-deep"
+            >
+              ✎
+            </button>
+            <button
+              type="button"
+              onClick={() => act(l, { delete: true })}
+              title="Delete this link from Dropbox"
+              aria-label={`Delete "${l.name}"`}
+              className="eyebrow rounded-full border border-red px-2 py-0.5 hover:bg-cream-deep"
+            >
+              ✕
+            </button>
+          </span>
+        </span>
+      )}
+      <span className="mt-1.5 flex flex-wrap gap-1">
+        {clients
+          .filter((c) => c.tiers.includes(shelf as TierKey))
+          .map(({ nickname: nick }) => {
+          const a = l.assigned.find((x) => x.client === nick);
+          const no = l.declined.includes(nick);
+          return (
+            <button
+              key={nick}
+              type="button"
+              aria-pressed={!!a}
+              onClick={() => act(l, { assign: nick })}
+              title={
+                a
+                  ? `${nick}: cycle ${a.cycle}${a.done ? ", made" : ""}. Tap to mark it not for ${nick}.`
+                  : no
+                    ? `Not for ${nick}. Tap to clear.`
+                    : `Queue for ${nick}'s next cycle with room`
+              }
+              className={`eyebrow rounded-full px-2 py-0.5 ${
+                a
+                  ? "bg-red text-cream"
+                  : no
+                    ? "border border-[#c9bfb8] bg-[#e6ddd6] text-[#9b8f87] line-through"
+                    : "border border-red hover:bg-cream-deep"
+              }`}
+            >
+              {nick}
+              {a && (a.cycle ? ` · C${a.cycle}` : " · …")}
+              {a?.done && " ✓"}
+            </button>
+          );
+        })}
+      </span>
+    </li>
+  );
 
   return (
     <section className="mt-10 border-2 border-red bg-cream">
@@ -163,123 +272,21 @@ export default function LibraryCard({
                   {title} · {list.length}
                 </p>
                 {list.length === 0 && <p className="text-sm opacity-70">Nothing here yet.</p>}
-                <ul className="space-y-3">
-                  {list.map((l) => (
-                    <li key={l.path} className="text-sm">
-                      {editing === l.path ? (
-                        <form
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            act(l, { rename: draft });
-                          }}
-                          className="flex gap-1.5"
-                        >
-                          <input
-                            autoFocus
-                            value={draft}
-                            onChange={(e) => setDraft(e.target.value)}
-                            maxLength={60}
-                            className="min-w-0 flex-1 border border-red bg-cream px-2 py-0.5 outline-none"
-                          />
-                          <button type="submit" className="eyebrow rounded-full border border-red px-2 py-0.5">
-                            Save
-                          </button>
-                        </form>
-                      ) : (
-                        <span className="flex items-start justify-between gap-2">
-                          {isPhoto(l.url) ? (
-                            <a
-                              href={`/dashboard/idea-image?size=large&ref=${encodeURIComponent(photoRef(l.url))}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-start gap-2"
-                            >
-                              {/* eslint-disable-next-line @next/next/no-img-element -- a signed-in preview, not a site image */}
-                              <img
-                                src={`/dashboard/idea-image?ref=${encodeURIComponent(photoRef(l.url))}`}
-                                alt=""
-                                loading="lazy"
-                                className="h-16 w-16 shrink-0 border border-red-line object-cover"
-                              />
-                              <span className="link-draw">
-                                {l.name}
-                                {l.needsName && <span className="ml-1 text-xs italic opacity-70">(name me ✎)</span>}
-                              </span>
-                            </a>
-                          ) : (
-                            <a href={l.url} target="_blank" rel="noopener noreferrer" className="link-draw">
-                              {l.name} ↗
-                            </a>
-                          )}
-                          <span className="flex shrink-0 gap-1">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditing(l.path);
-                                setDraft(l.name);
-                              }}
-                              title="Rename"
-                              aria-label={`Rename "${l.name}"`}
-                              className="eyebrow rounded-full border border-red px-2 py-0.5 hover:bg-cream-deep"
-                            >
-                              ✎
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => act(l, { delete: true })}
-                              title="Delete this link from Dropbox"
-                              aria-label={`Delete "${l.name}"`}
-                              className="eyebrow rounded-full border border-red px-2 py-0.5 hover:bg-cream-deep"
-                            >
-                              ✕
-                            </button>
-                          </span>
-                        </span>
-                      )}
-                      <span className="mt-1.5 flex flex-wrap gap-1">
-                        {clients
-                          .filter((c) => c.tiers.includes(shelf as TierKey))
-                          .map(({ nickname: nick }) => {
-                          const a = l.assigned.find((x) => x.client === nick);
-                          const no = l.declined.includes(nick);
-                          return (
-                            <button
-                              key={nick}
-                              type="button"
-                              aria-pressed={!!a}
-                              onClick={() => act(l, { assign: nick })}
-                              title={
-                                a
-                                  ? `${nick}: cycle ${a.cycle}${a.done ? ", made" : ""}. Tap to mark it not for ${nick}.`
-                                  : no
-                                    ? `Not for ${nick}. Tap to clear.`
-                                    : `Queue for ${nick}'s next cycle with room`
-                              }
-                              className={`eyebrow rounded-full px-2 py-0.5 ${
-                                a
-                                  ? "bg-red text-cream"
-                                  : no
-                                    ? "border border-[#c9bfb8] bg-[#e6ddd6] text-[#9b8f87] line-through"
-                                    : "border border-red hover:bg-cream-deep"
-                              }`}
-                            >
-                              {nick}
-                              {a && (a.cycle ? ` · C${a.cycle}` : " · …")}
-                              {a?.done && " ✓"}
-                            </button>
-                          );
-                        })}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                {list.some((l) => l.needsName) && (
+                  <div className="mb-4 border border-dashed border-red p-3">
+                    <p className="eyebrow mb-2">Needs a name · {list.filter((l) => l.needsName).length}</p>
+                    <ul className="space-y-3">{list.filter((l) => l.needsName).map((l) => item(l, shelf))}</ul>
+                  </div>
+                )}
+                <ul className="space-y-3">{list.filter((l) => !l.needsName).map((l) => item(l, shelf))}</ul>
               </div>
             );
           })}
         </div>
         <p className="text-xs opacity-70">
           Add a link or photo above, or save them to ideas/bronze, silver or gold in Dropbox from your phone (Share → Dropbox);
-          links keep the names they were saved with (rename any with ✎). Tap a client once to queue the idea into their next cycle with room (✓ once
+          links keep the names they were saved with (rename any with ✎). Ones still named by their code or IMG number wait under
+          &ldquo;Needs a name&rdquo; at the top of each tier until you rename them. Tap a client once to queue the idea into their next cycle with room (✓ once
           that cycle&rsquo;s posts are made), twice to gray it out as not for them, and again to clear it.
         </p>
       </div>
