@@ -168,9 +168,9 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
   // The cards move on every Sunday: this week (or, from Sunday, the coming one) and the week after. Deliverables
   // lists every post from that week on.
   const thisWeek = weekPlan(c, shownMonday());
-  const nextWeek = weekPlan(c, addDays(thisWeek.monday, 7));
   // The cycle the shown week belongs to (from its last Sunday on, the coming one).
   const thisCycle = c.cycles.find((p) => p.start <= thisWeek.monday && thisWeek.monday < addDays(p.start, 14)) ?? null;
+  const nextCycle = thisCycle ? (c.cycles.find((p) => p.number === thisCycle.number + 1) ?? null) : null;
   const showing = c.sets
     .map((s) => ({ ...s, items: s.items.filter((it) => it.week === null || it.week >= thisWeek.monday) }))
     .filter((s) => s.items.length);
@@ -228,7 +228,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             <Cycle plan={thisCycle} title="This cycle" />
-            <Week plan={nextWeek} title="Next week" todo />
+            <Cycle plan={nextCycle} title="Next cycle" todo />
           </div>
         )}
 
@@ -439,7 +439,7 @@ function cycleProgress(plan: CyclePlan) {
   return Math.round(Math.min(14, Math.max(0, days)) / 14 * 100);
 }
 
-function Cycle({ plan, title }: { plan: CyclePlan | null; title: string }) {
+function Cycle({ plan, title, todo = false }: { plan: CyclePlan | null; title: string; todo?: boolean }) {
   if (!plan) {
     return (
       <div className="border border-red-line p-4">
@@ -449,54 +449,12 @@ function Cycle({ plan, title }: { plan: CyclePlan | null; title: string }) {
     );
   }
   const through = cycleProgress(plan);
+  const left = TIERS.filter((t) => plan.needed[t] > plan.made[t]);
   return (
     <div className="relative border border-red-line p-4 pb-5">
       <p className="eyebrow">{title}</p>
       <p className="font-bold">
         Cycle {plan.number} <span className="font-normal opacity-70">· {plan.label}</span>
-      </p>
-      <ul className="mt-3 space-y-2">
-        {TIERS.filter((t) => plan.needed[t] || plan.made[t]).map((t) => {
-          const pct = plan.needed[t] ? Math.min(100, (plan.made[t] / plan.needed[t]) * 100) : 100;
-          return (
-            <li key={t} className="text-sm">
-              <div className="flex justify-between">
-                <span>{tierName[t]}</span>
-                <span>
-                  {plan.made[t]} / {plan.needed[t]}
-                </span>
-              </div>
-              <div className="mt-1 h-1.5 bg-red-line">
-                <div className="h-full" style={{ width: `${pct}%`, background: tierColor[t] }} />
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-      <p className="mt-3 text-sm opacity-70">{plan.scheduled} scheduled</p>
-      {/* The box's bottom edge fills in as the cycle goes by. */}
-      <div
-        className="absolute -inset-x-px -bottom-px h-1.5 bg-red-line"
-        role="progressbar"
-        aria-valuenow={through}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="How far through the cycle"
-      >
-        <div className="h-full bg-red" style={{ width: `${through}%` }} />
-      </div>
-    </div>
-  );
-}
-
-function Week({ plan, title, todo = false }: { plan: WeekPlan; title: string; todo?: boolean }) {
-  const left = TIERS.filter((t) => plan.needed[t] > plan.made[t]);
-  return (
-    <div className="border border-red-line p-4">
-      <p className="eyebrow">{title}</p>
-      <p className="font-bold">
-        {plan.label}
-        {plan.cycle !== null && <span className="font-normal opacity-70"> · Cycle {plan.cycle}</span>}
       </p>
       <ul className="mt-3 space-y-2">
         {TIERS.filter((t) => plan.needed[t] || plan.made[t]).map((t) => {
@@ -527,6 +485,18 @@ function Week({ plan, title, todo = false }: { plan: WeekPlan; title: string; to
       ) : (
         <p className="mt-3 text-sm opacity-70">{plan.scheduled} scheduled</p>
       )}
+      {/* This cycle's bottom edge fills in as the cycle goes by. */}
+      {!todo && <div
+        className="absolute -inset-x-px -bottom-px h-1.5 bg-red-line"
+        role="progressbar"
+        aria-valuenow={through}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="How far through the cycle"
+      >
+        <div className="h-full bg-red" style={{ width: `${through}%` }} />
+      </div>}
     </div>
   );
 }
+
