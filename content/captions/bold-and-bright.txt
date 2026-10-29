@@ -14,14 +14,14 @@ fully charged in one bite.
 == 04-tic-tac-toe ==
 pick your player in the comments.
 
-== 05-drawn-box ==
-six flavors, one box, no sharing.
-
-== 06-pantone ==
+== 05-pantone ==
 pink sugar, cookie dough or dark chocolate?
 
-== 07-how-to-trap ==
+== 06-how-to-trap ==
 tag the one who'd fall for this.
+
+== 07-drawn-box ==
+six flavors, one box, no sharing.
 
 == 08-fresh-batch ==
 fresh off the rack and still warm.
