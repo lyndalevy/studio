@@ -165,14 +165,14 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
   const unpaid = c.invoices.filter((i) => i.status !== "paid");
   const scheduled = c.sets.flatMap((s) => s.items).filter((i) => i.scheduled).length;
   const made = c.sets.flatMap((s) => s.items).length;
-  // The cards move on every Sunday: this week (or, from Sunday, the coming one) and the week after. Deliverables
-  // lists every post from that week on.
+  // The cards move on every Sunday: this cycle and the next. Deliverables lists every post still to go up: a
+  // post drops off once its day has passed (the page reads the date fresh on every visit).
   const thisWeek = weekPlan(c, shownMonday());
   // The cycle the shown week belongs to (from its last Sunday on, the coming one).
   const thisCycle = c.cycles.find((p) => p.start <= thisWeek.monday && thisWeek.monday < addDays(p.start, 14)) ?? null;
   const nextCycle = thisCycle ? (c.cycles.find((p) => p.number === thisCycle.number + 1) ?? null) : null;
   const showing = c.sets
-    .map((s) => ({ ...s, items: s.items.filter((it) => it.week === null || it.week >= thisWeek.monday) }))
+    .map((s) => ({ ...s, items: s.items.filter((it) => (it.day ? it.day >= today() : it.week === null || it.week >= thisWeek.monday)) }))
     .filter((s) => s.items.length);
 
   return (
@@ -293,7 +293,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
                 {tierName[t]}
               </span>
             ))}
-            <span>filled = scheduled · click a post to mark it · posts drop off once their week is over (on Sunday)</span>
+            <span>filled = scheduled · click a post to mark it · posts drop off the day after they go up</span>
           </p>
         </div>
 

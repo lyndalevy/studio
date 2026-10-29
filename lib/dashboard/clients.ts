@@ -62,6 +62,8 @@ export type Deliverable = {
   tier: TierKey;
   /** The Monday of the post's week (from the "11:17 ..." date at the start of its name), else the set's date. */
   week: string | null;
+  /** The day it posts, from the date at the start of its name (null when the name has none). */
+  day: string | null;
   /** Scheduled in Linkme or already posted: either way, nothing left to do. */
   scheduled: boolean;
 };
@@ -149,11 +151,17 @@ const shortDay = (d: string) =>
  * Sunday to Saturday and are known by their Monday, so a Sunday post counts toward the Monday after it.
  */
 function weekDate(name: string, folderDate: string | null): string | null {
+  const day = postDay(name, folderDate);
+  return day ? mondayOf(fromTime(toTime(day) + DAY)) : folderDate;
+}
+
+/** The date at the start of a post's name ("11:17 SILVER ..."), in the year of the folder it's in. */
+function postDay(name: string, folderDate: string | null): string | null {
   const m = name.match(/^(?:W\d+\s+)?(\d{1,2})[:/](\d{1,2})\b/i);
-  if (!m || !folderDate) return folderDate;
+  if (!m || !folderDate) return null;
   let year = Number(folderDate.slice(0, 4));
   if (Number(m[1]) < Number(folderDate.slice(5, 7))) year++; // a cycle running into January
-  return mondayOf(fromTime(toTime(`${monthKey(year, Number(m[1]))}-${m[2].padStart(2, "0")}`) + DAY));
+  return `${monthKey(year, Number(m[1]))}-${m[2].padStart(2, "0")}`;
 }
 
 /** "SET 2 - 10:27:26" → 2026-10-27. Finder shows the colons as slashes, so accept those too. */
@@ -237,7 +245,7 @@ function deliverables(
     tier = info.tiers?.[`${set}/${name}`] ?? tier;
     const stem = name.replace(/\.[^.]+$/, "").toLowerCase();
     const scheduled = markedLines.some((l) => headingFor(l, name, stem));
-    items.push({ set, name, kind, tier, week: weekDate(name, date), scheduled });
+    items.push({ set, name, kind, tier, week: weekDate(name, date), day: postDay(name, date), scheduled });
   }
   return items.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 }
