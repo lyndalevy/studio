@@ -28,7 +28,6 @@ export default async function Social() {
       };
     })
   );
-  const postCount = looks.reduce((n, l) => n + l.posts.length, 0);
 
   return (
     <main className="mx-auto max-w-[80rem] px-4 py-10 sm:px-8 sm:py-16">
@@ -46,29 +45,12 @@ export default async function Social() {
         </span>
       </nav>
 
-      {/* Profile header, Instagram style. */}
-      <header className="mt-10 flex flex-col items-center gap-6 text-center sm:mt-14 sm:flex-row sm:justify-center sm:gap-12 sm:text-left">
-        <Image src={brand.mark} alt="" priority className="h-28 w-28 rounded-full sm:h-36 sm:w-36" />
-        <div>
-          <h1>
-            <Image src={brand.logoSocial} alt={social.name} priority className="mx-auto h-auto w-[min(26rem,100%)] sm:mx-0" />
-          </h1>
-          <p className="mt-1 text-lg opacity-80">{social.byline}</p>
-          <dl className="mt-4 flex justify-center gap-8 sm:justify-start">
-            {[
-              [feeds.length, "looks"],
-              [postCount, "posts"],
-              [tiers.length, "tiers"],
-            ].map(([n, label]) => (
-              <div key={label} className="flex items-baseline gap-1.5">
-                <dt className="sr-only">{label}</dt>
-                <dd className="text-xl font-bold">{n}</dd>
-                <span className="opacity-80">{label}</span>
-              </div>
-            ))}
-          </dl>
-          <p className="mt-3 text-lg">{social.bio}</p>
-        </div>
+      {/* Profile header. */}
+      <header className="mt-10 text-center sm:mt-14">
+        <h1>
+          <Image src={brand.logoSocial} alt={social.name} priority className="mx-auto h-auto w-[min(26rem,100%)]" />
+        </h1>
+        <p className="mt-1 text-lg opacity-80">{social.byline}</p>
       </header>
 
       <div className="eyebrow mt-10 flex justify-center gap-8 border-y-2 border-red py-3 sm:mt-14">

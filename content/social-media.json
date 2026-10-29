@@ -51,21 +51,21 @@
     "h": 1350
    },
    {
-    "id": "07-drawn-box",
+    "id": "07-fresh-batch",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/07-fresh-batch.jpg",
+    "poster": "/social/feeds/bold-and-bright/07-fresh-batch.jpg",
+    "w": 1080,
+    "h": 1350
+   },
+   {
+    "id": "08-drawn-box",
     "kind": "video",
-    "src": "/social/feeds/bold-and-bright/07-drawn-box.mp4",
-    "poster": "/social/feeds/bold-and-bright/07-drawn-box.jpg",
+    "src": "/social/feeds/bold-and-bright/08-drawn-box.mp4",
+    "poster": "/social/feeds/bold-and-bright/08-drawn-box.jpg",
     "w": 720,
     "h": 900,
     "sound": false
-   },
-   {
-    "id": "08-fresh-batch",
-    "kind": "image",
-    "src": "/social/feeds/bold-and-bright/08-fresh-batch.jpg",
-    "poster": "/social/feeds/bold-and-bright/08-fresh-batch.jpg",
-    "w": 1080,
-    "h": 1350
    },
    {
     "id": "09-love-more",
@@ -633,8 +633,8 @@
    {
     "id": "07-backseat",
     "kind": "image",
-    "src": "/social/feeds/sleek-and-electric/07-backseat-84bc5a.jpg",
-    "poster": "/social/feeds/sleek-and-electric/07-backseat-84bc5a.jpg",
+    "src": "/social/feeds/sleek-and-electric/07-backseat-8ca5d0.jpg",
+    "poster": "/social/feeds/sleek-and-electric/07-backseat-8ca5d0.jpg",
     "w": 1080,
     "h": 1350
    },
