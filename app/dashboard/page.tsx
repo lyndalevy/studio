@@ -5,7 +5,8 @@ import { isConfigured, isSignedIn } from "@/lib/dashboard/auth";
 import { loadBudget, type Budget } from "@/lib/dashboard/budget";
 import { loadIdeas, syncBusinessLinks } from "@/lib/dashboard/ideas";
 import { loadLibrary, type SavedLink } from "@/lib/dashboard/library";
-import { loadClients, today, type ClientStatus, type CyclePlan } from "@/lib/dashboard/clients";
+import { addDays } from "@/lib/dashboard/calendar";
+import { loadClients, today, type ClientStatus } from "@/lib/dashboard/clients";
 import { Sparkle } from "../components/Marks";
 import DashboardNav from "./DashboardNav";
 import Fold from "./Fold";
@@ -47,8 +48,30 @@ const TOOLS = [
   { name: "Link account", href: "https://app.link.com/activity/lbctxn_1UVB8MAOB3oAEyJYi7JPBjJp" },
 ];
 
-/** A post's week has started once its Monday has come (it's already in Linkme by then). */
-const weekStarted = (week: string | null) => week !== null && week <= today();
+/** Monday of the week the dashboard shows first: this week, or from Sunday on, the coming week. */
+function shownMonday() {
+  const d = today();
+  const dow = new Date(`${d}T12:00:00Z`).getUTCDay(); // 0 = Sunday
+  return addDays(d, dow === 0 ? 1 : 1 - dow);
+}
+
+/** One week of a client's posts: what its package needs that week, and what's made and scheduled for it. */
+type WeekPlan = { monday: string; label: string; cycle: number | null; needed: Record<TierKey, number>; made: Record<TierKey, number>; scheduled: number };
+
+function weekPlan(c: ClientStatus, monday: string): WeekPlan {
+  const items = c.sets.flatMap((s) => s.items).filter((it) => it.week === monday);
+  const made = { bronze: 0, silver: 0, gold: 0 };
+  for (const it of items) made[it.tier]++;
+  const cycle = c.cycles.find((p) => p.start <= monday && monday < addDays(p.start, 14));
+  return {
+    monday,
+    label: `${fmtDay(monday)} – ${fmtDay(addDays(monday, 6))}`,
+    cycle: cycle?.number ?? null,
+    needed: c.perWeek,
+    made,
+    scheduled: items.filter((it) => it.scheduled).length,
+  };
+}
 
 const fmtDay = (d: string) =>
   new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
@@ -142,9 +165,11 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
   const unpaid = c.invoices.filter((i) => i.status !== "paid");
   const scheduled = c.sets.flatMap((s) => s.items).filter((i) => i.scheduled).length;
   const made = c.sets.flatMap((s) => s.items).length;
-  // Deliverables only shows posts whose week hasn't started yet.
+  // The dashboard shows two weeks, moving on every Sunday: this week (or the coming one) and the week after.
+  const thisWeek = weekPlan(c, shownMonday());
+  const nextWeek = weekPlan(c, addDays(thisWeek.monday, 7));
   const showing = c.sets
-    .map((s) => ({ ...s, items: s.items.filter((it) => !weekStarted(it.week)) }))
+    .map((s) => ({ ...s, items: s.items.filter((it) => it.week === thisWeek.monday || it.week === nextWeek.monday) }))
     .filter((s) => s.items.length);
 
   return (
@@ -199,8 +224,8 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
           </p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
-            <Cycle plan={c.thisCycle} title="This cycle" />
-            <Cycle plan={c.nextCycle} title="Next cycle" todo />
+            <Week plan={thisWeek} title="This week" />
+            <Week plan={nextWeek} title="Next week" todo />
           </div>
         )}
 
@@ -228,7 +253,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
           <p className="eyebrow mb-2">Deliverables</p>
           {c.sets.length === 0 && <p className="text-sm opacity-70">No sets yet.</p>}
           {c.sets.length > 0 && showing.length === 0 && (
-            <p className="text-sm opacity-70">Every post&rsquo;s week has started. Add the next cycle.</p>
+            <p className="text-sm opacity-70">No posts for these two weeks yet.</p>
           )}
           <div className="space-y-3">
             {showing.map((s) => (
@@ -265,7 +290,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
                 {tierName[t]}
               </span>
             ))}
-            <span>filled = scheduled · click a post to mark it · posts drop off once their week starts</span>
+            <span>filled = scheduled · click a post to mark it · shows this week and next, moving on every Sunday</span>
           </p>
         </div>
 
@@ -404,21 +429,14 @@ function BudgetCard({ b }: { b: Budget }) {
   );
 }
 
-function Cycle({ plan, title, todo = false }: { plan: CyclePlan | null; title: string; todo?: boolean }) {
-  if (!plan) {
-    return (
-      <div className="border border-red-line p-4">
-        <p className="eyebrow">{title}</p>
-        <p className="mt-2 text-sm opacity-70">Add a dated CYCLE folder to start the cycles.</p>
-      </div>
-    );
-  }
+function Week({ plan, title, todo = false }: { plan: WeekPlan; title: string; todo?: boolean }) {
   const left = TIERS.filter((t) => plan.needed[t] > plan.made[t]);
   return (
     <div className="border border-red-line p-4">
       <p className="eyebrow">{title}</p>
       <p className="font-bold">
-        Cycle {plan.number} <span className="font-normal opacity-70">· {plan.label}</span>
+        {plan.label}
+        {plan.cycle !== null && <span className="font-normal opacity-70"> · Cycle {plan.cycle}</span>}
       </p>
       <ul className="mt-3 space-y-2">
         {TIERS.filter((t) => plan.needed[t] || plan.made[t]).map((t) => {
@@ -438,7 +456,7 @@ function Cycle({ plan, title, todo = false }: { plan: CyclePlan | null; title: s
           );
         })}
       </ul>
-      {todo && (
+      {todo ? (
         <p className="mt-3 text-sm font-bold">
           {!TIERS.some((t) => plan.needed[t])
             ? "Set a package to see what's needed"
@@ -446,8 +464,9 @@ function Cycle({ plan, title, todo = false }: { plan: CyclePlan | null; title: s
             ? `To make: ${left.map((t) => `${plan.needed[t] - plan.made[t]} ${tierName[t]}`).join(", ")}`
             : "All made ✓"}
         </p>
+      ) : (
+        <p className="mt-3 text-sm opacity-70">{plan.scheduled} scheduled</p>
       )}
-      {!todo && <p className="mt-3 text-sm opacity-70">{plan.scheduled} scheduled</p>}
     </div>
   );
 }
