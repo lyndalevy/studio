@@ -46,6 +46,17 @@ const cameraName = (name: string) =>
 /** A link still named by its Instagram code (DeAZsuwoiw6) or its site and page (example.com page). */
 const codeName = (name: string) =>
   (/^[A-Za-z0-9_-]{8,}$/.test(name) && /\d|[a-z][A-Z]/.test(name)) || /^[\w-]+(\.[\w-]+)*\.[a-z]{2,}( |$)/i.test(name);
+/** The photo a saved link points to when it's the dashboard's own /dashboard/idea-image?ref=<id> page. */
+function ownPhotoRef(url: string) {
+  try {
+    const u = new URL(url);
+    const ref = u.searchParams.get("ref") ?? "";
+    const own = /(^|\.)studiolphotography\.com$/.test(u.hostname) && u.pathname === "/dashboard/idea-image";
+    return own && (ref.startsWith("id:") || ref.startsWith("ideas/")) ? ref : null;
+  } catch {
+    return null;
+  }
+}
 /** A link without its tracking query, so the same reel shared twice still matches. */
 export const linkKey = (u: string) => u.replace(/\?.*$/, "").replace(/\/$/, "");
 
@@ -86,7 +97,11 @@ async function listShelf(
   for (const { path, added, text } of read) {
     const url = text.match(/^URL=(\S+)/m)?.[1] ?? text.match(/<string>(https?:[^<]+)<\/string>/)?.[1];
     const name = path.split("/").pop()!.replace(LINK, "");
-    if (url) links.push({ path, name, url: url.trim(), needsName: codeName(name), added });
+    if (!url) continue;
+    // A link to one of the dashboard's own idea photos is that photo: it shows the picture and opens it large.
+    const ref = ownPhotoRef(url.trim());
+    if (ref) links.push({ path, name, url: `photo:${ref}`, needsName: cameraName(name), added });
+    else links.push({ path, name, url: url.trim(), needsName: codeName(name), added });
   }
   return [...links, ...photos];
 }
