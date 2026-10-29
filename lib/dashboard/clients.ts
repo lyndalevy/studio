@@ -144,13 +144,16 @@ const mondayOf = (d: string) => {
 const shortDay = (d: string) =>
   new Date(toTime(d)).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
-/** "11:17 SILVER ..." (or the older "W2 10:26 ...") → the Monday of that day's week, in the year of the folder it's in. */
+/**
+ * "11:17 SILVER ..." (or the older "W2 10:26 ...") → its week, in the year of the folder it's in. Weeks run
+ * Sunday to Saturday and are known by their Monday, so a Sunday post counts toward the Monday after it.
+ */
 function weekDate(name: string, folderDate: string | null): string | null {
   const m = name.match(/^(?:W\d+\s+)?(\d{1,2})[:/](\d{1,2})\b/i);
   if (!m || !folderDate) return folderDate;
   let year = Number(folderDate.slice(0, 4));
   if (Number(m[1]) < Number(folderDate.slice(5, 7))) year++; // a cycle running into January
-  return mondayOf(`${monthKey(year, Number(m[1]))}-${m[2].padStart(2, "0")}`);
+  return mondayOf(fromTime(toTime(`${monthKey(year, Number(m[1]))}-${m[2].padStart(2, "0")}`) + DAY));
 }
 
 /** "SET 2 - 10:27:26" → 2026-10-27. Finder shows the colons as slashes, so accept those too. */
@@ -333,9 +336,12 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
       made[it.tier]++;
       if (it.scheduled) scheduled++;
     }
-    return { number: n, start, label: `${shortDay(start)} – ${shortDay(end)}`, needed, made, scheduled };
+    // Shown Sunday to Saturday: the Sunday before its Monday through the Saturday before the next cycle.
+    const label = `${shortDay(fromTime(toTime(start) - DAY))} – ${shortDay(fromTime(toTime(end) - DAY))}`;
+    return { number: n, start, label, needed, made, scheduled };
   };
-  const current = anchor ? Math.max(1, Math.floor((toTime(today()) - toTime(anchor)) / (14 * DAY)) + 1) : 0;
+  // A cycle starts on the Sunday before its Monday.
+  const current = anchor ? Math.max(1, Math.floor((toTime(today()) - toTime(anchor) + DAY) / (14 * DAY)) + 1) : 0;
 
   // Payments: invoices go out on the last Wednesday (or the client's send_day) of each month, starting the month of the first
   // invoice, and are due a set number of days after. Clients pay by check; the dashboard's buttons mark each one sent, then paid.

@@ -48,7 +48,7 @@ const TOOLS = [
   { name: "Link account", href: "https://app.link.com/activity/lbctxn_1UVB8MAOB3oAEyJYi7JPBjJp" },
 ];
 
-/** Monday of the week the dashboard shows first: this week, or from Sunday on, the coming week. */
+/** Monday of the week the dashboard shows first. Weeks run Sunday to Saturday, so a Sunday belongs to the Monday after it. */
 function shownMonday() {
   const d = today();
   const dow = new Date(`${d}T12:00:00Z`).getUTCDay(); // 0 = Sunday
@@ -65,7 +65,7 @@ function weekPlan(c: ClientStatus, monday: string): WeekPlan {
   const cycle = c.cycles.find((p) => p.start <= monday && monday < addDays(p.start, 14));
   return {
     monday,
-    label: `${fmtDay(monday)} – ${fmtDay(addDays(monday, 6))}`,
+    label: `${fmtDay(addDays(monday, -1))} – ${fmtDay(addDays(monday, 5))}`, // Sunday to Saturday
     cycle: cycle?.number ?? null,
     needed: c.perWeek,
     made,
@@ -434,7 +434,8 @@ function BudgetCard({ b }: { b: Budget }) {
 
 /** How far through its two weeks a cycle is today, 0 to 100. */
 function cycleProgress(plan: CyclePlan) {
-  const days = (Date.parse(`${today()}T00:00:00Z`) - Date.parse(`${plan.start}T00:00:00Z`)) / 86_400_000;
+  // A cycle runs from the Sunday before its Monday.
+  const days = (Date.parse(`${today()}T00:00:00Z`) - Date.parse(`${plan.start}T00:00:00Z`)) / 86_400_000 + 1;
   return Math.round(Math.min(14, Math.max(0, days)) / 14 * 100);
 }
 
