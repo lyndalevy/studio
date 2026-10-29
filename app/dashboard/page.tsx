@@ -450,7 +450,7 @@ function Cycle({ plan, title }: { plan: CyclePlan | null; title: string }) {
   }
   const through = cycleProgress(plan);
   return (
-    <div className="border border-red-line p-4">
+    <div className="relative border border-red-line p-4 pb-5">
       <p className="eyebrow">{title}</p>
       <p className="font-bold">
         Cycle {plan.number} <span className="font-normal opacity-70">· {plan.label}</span>
@@ -474,18 +474,16 @@ function Cycle({ plan, title }: { plan: CyclePlan | null; title: string }) {
         })}
       </ul>
       <p className="mt-3 text-sm opacity-70">{plan.scheduled} scheduled</p>
-      <div className="mt-3">
-        <div
-          className="h-3 bg-red-line"
-          role="progressbar"
-          aria-valuenow={through}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label="How far through the cycle"
-        >
-          <div className="h-full bg-red" style={{ width: `${through}%` }} />
-        </div>
-        <p className="mt-1 text-xs opacity-70">{through}% through the cycle</p>
+      {/* The box's bottom edge fills in as the cycle goes by. */}
+      <div
+        className="absolute -inset-x-px -bottom-px h-1.5 bg-red-line"
+        role="progressbar"
+        aria-valuenow={through}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="How far through the cycle"
+      >
+        <div className="h-full bg-red" style={{ width: `${through}%` }} />
       </div>
     </div>
   );
