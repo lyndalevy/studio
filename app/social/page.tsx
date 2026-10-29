@@ -175,7 +175,9 @@ export default async function Social() {
                 <h2 className={`text-center text-4xl sm:text-5xl ${style.font}`} style={{ color: style.color }}>
                   {look.label}
                 </h2>
-                <p className="mt-2 mb-5 text-center text-lg font-bold">{look.plan} package</p>
+                <p className="mt-2 mb-5 text-center text-lg font-bold" style={{ color: style.planColor }}>
+                  {look.plan} package
+                </p>
                 <PostGrid posts={look.posts} title={look.label} titleClass={style.font} />
               </div>
             );

@@ -14,12 +14,13 @@ const avenir = Nunito_Sans({ weight: "300", subsets: ["latin"], display: "swap",
 const sunlit = Fraunces({ weight: "400", subsets: ["latin"], display: "swap" });
 const electric = Montserrat({ weight: "600", subsets: ["latin"], display: "swap" });
 
-export const feedStyle: Record<FeedKey, { font: string; color: string }> = {
-  "bold-and-bright": { font: "feed-arial", color: "#ff7eb0" },
+/** color: the look's title; planColor: its "<Package> package" line (black when not set). */
+export const feedStyle: Record<FeedKey, { font: string; color: string; planColor?: string }> = {
+  "bold-and-bright": { font: "feed-arial", color: "#ff3d7f", planColor: "#ff8fbb" },
   "luxury-and-architectural": { font: `${didot.variable} feed-didot`, color: "#1f5c8b" },
-  "dark-and-romantic": { font: `${didot.variable} feed-didot`, color: "#c99a2e" },
+  "dark-and-romantic": { font: `${didot.variable} feed-didot`, color: "#1c1714", planColor: "#c99a2e" },
   "earthy-and-naturalistic": { font: `${avenir.variable} feed-avenir`, color: "#6b5a43" },
   "fun-and-playful": { font: `${round.variable} feed-round`, color: "#c6362f" },
-  "sculptural-and-sunlit": { font: sunlit.className, color: "#3a7fc4" },
+  "sculptural-and-sunlit": { font: sunlit.className, color: "#f2661b", planColor: "#3a7fc4" },
   "sleek-and-electric": { font: electric.className, color: "#1f47d6" },
 };
