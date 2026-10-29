@@ -6,7 +6,7 @@ import { loadBudget, type Budget } from "@/lib/dashboard/budget";
 import { loadIdeas, syncBusinessLinks } from "@/lib/dashboard/ideas";
 import { loadLibrary, type SavedLink } from "@/lib/dashboard/library";
 import { addDays } from "@/lib/dashboard/calendar";
-import { loadClients, today, type ClientStatus } from "@/lib/dashboard/clients";
+import { loadClients, today, type ClientStatus, type CyclePlan } from "@/lib/dashboard/clients";
 import { Sparkle } from "../components/Marks";
 import DashboardNav from "./DashboardNav";
 import Fold from "./Fold";
@@ -165,11 +165,14 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
   const unpaid = c.invoices.filter((i) => i.status !== "paid");
   const scheduled = c.sets.flatMap((s) => s.items).filter((i) => i.scheduled).length;
   const made = c.sets.flatMap((s) => s.items).length;
-  // The dashboard shows two weeks, moving on every Sunday: this week (or the coming one) and the week after.
+  // The cards move on every Sunday: this week (or, from Sunday, the coming one) and the week after. Deliverables
+  // lists every post from that week on.
   const thisWeek = weekPlan(c, shownMonday());
   const nextWeek = weekPlan(c, addDays(thisWeek.monday, 7));
+  // The cycle the shown week belongs to (from its last Sunday on, the coming one).
+  const thisCycle = c.cycles.find((p) => p.start <= thisWeek.monday && thisWeek.monday < addDays(p.start, 14)) ?? null;
   const showing = c.sets
-    .map((s) => ({ ...s, items: s.items.filter((it) => it.week === thisWeek.monday || it.week === nextWeek.monday) }))
+    .map((s) => ({ ...s, items: s.items.filter((it) => it.week === null || it.week >= thisWeek.monday) }))
     .filter((s) => s.items.length);
 
   return (
@@ -224,7 +227,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
           </p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
-            <Week plan={thisWeek} title="This week" />
+            <Cycle plan={thisCycle} title="This cycle" />
             <Week plan={nextWeek} title="Next week" todo />
           </div>
         )}
@@ -253,7 +256,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
           <p className="eyebrow mb-2">Deliverables</p>
           {c.sets.length === 0 && <p className="text-sm opacity-70">No sets yet.</p>}
           {c.sets.length > 0 && showing.length === 0 && (
-            <p className="text-sm opacity-70">No posts for these two weeks yet.</p>
+            <p className="text-sm opacity-70">No posts from this week on yet. Add the next cycle.</p>
           )}
           <div className="space-y-3">
             {showing.map((s) => (
@@ -290,7 +293,7 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
                 {tierName[t]}
               </span>
             ))}
-            <span>filled = scheduled · click a post to mark it · shows this week and next, moving on every Sunday</span>
+            <span>filled = scheduled · click a post to mark it · posts drop off once their week is over (on Sunday)</span>
           </p>
         </div>
 
@@ -426,6 +429,64 @@ function BudgetCard({ b }: { b: Budget }) {
 
       <OneTimeCard list={b.oneTimeYear} month={today().slice(0, 7)} />
     </Fold>
+  );
+}
+
+/** How far through its two weeks a cycle is today, 0 to 100. */
+function cycleProgress(plan: CyclePlan) {
+  const days = (Date.parse(`${today()}T00:00:00Z`) - Date.parse(`${plan.start}T00:00:00Z`)) / 86_400_000;
+  return Math.round(Math.min(14, Math.max(0, days)) / 14 * 100);
+}
+
+function Cycle({ plan, title }: { plan: CyclePlan | null; title: string }) {
+  if (!plan) {
+    return (
+      <div className="border border-red-line p-4">
+        <p className="eyebrow">{title}</p>
+        <p className="mt-2 text-sm opacity-70">Add a dated CYCLE folder to start the cycles.</p>
+      </div>
+    );
+  }
+  const through = cycleProgress(plan);
+  return (
+    <div className="border border-red-line p-4">
+      <p className="eyebrow">{title}</p>
+      <p className="font-bold">
+        Cycle {plan.number} <span className="font-normal opacity-70">· {plan.label}</span>
+      </p>
+      <ul className="mt-3 space-y-2">
+        {TIERS.filter((t) => plan.needed[t] || plan.made[t]).map((t) => {
+          const pct = plan.needed[t] ? Math.min(100, (plan.made[t] / plan.needed[t]) * 100) : 100;
+          return (
+            <li key={t} className="text-sm">
+              <div className="flex justify-between">
+                <span>{tierName[t]}</span>
+                <span>
+                  {plan.made[t]} / {plan.needed[t]}
+                </span>
+              </div>
+              <div className="mt-1 h-1.5 bg-red-line">
+                <div className="h-full" style={{ width: `${pct}%`, background: tierColor[t] }} />
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="mt-3 text-sm opacity-70">{plan.scheduled} scheduled</p>
+      <div className="mt-3">
+        <div
+          className="h-3 bg-red-line"
+          role="progressbar"
+          aria-valuenow={through}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="How far through the cycle"
+        >
+          <div className="h-full bg-red" style={{ width: `${through}%` }} />
+        </div>
+        <p className="mt-1 text-xs opacity-70">{through}% through the cycle</p>
+      </div>
+    </div>
   );
 }
 
