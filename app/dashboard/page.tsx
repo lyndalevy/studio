@@ -252,8 +252,12 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
           </details>
         )}
 
-        <div>
-          <p className="eyebrow mb-2">Deliverables</p>
+        <details open className="group">
+          <summary className="eyebrow flex cursor-pointer list-none items-center gap-2">
+            Deliverables
+            <span aria-hidden className="transition-transform group-open:rotate-180">▾</span>
+          </summary>
+          <div className="mt-2" />
           {c.sets.length === 0 && <p className="text-sm opacity-70">No sets yet.</p>}
           {c.sets.length > 0 && showing.length === 0 && (
             <p className="text-sm opacity-70">No posts from this week on yet. Add the next cycle.</p>
@@ -295,10 +299,14 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
             ))}
             <span>filled = scheduled · click a post to mark it · posts drop off the day after they go up</span>
           </p>
-        </div>
+        </details>
 
-        <div>
-          <p className="eyebrow mb-2">Payments</p>
+        <details open className="group">
+          <summary className="eyebrow flex cursor-pointer list-none items-center gap-2">
+            Payments
+            <span aria-hidden className="transition-transform group-open:rotate-180">▾</span>
+          </summary>
+          <div className="mt-2" />
           {c.invoices.length === 0 ? (
             <p className="text-sm opacity-70">The schedule starts once the first invoice is sent.</p>
           ) : unpaid.length === 0 ? (
@@ -325,9 +333,8 @@ function ClientCard({ c, links }: { c: ClientStatus; links: SavedLink[] }) {
           <p className="mt-2 text-xs opacity-70">
             {c.minimumEnds && `3-month minimum runs through ${c.minimumEnds}.`}
           </p>
-        </div>
+        </details>
 
-        {c.info.notes && <p className="border-t border-red-line pt-4 text-sm italic">{c.info.notes}</p>}
     </Fold>
   );
 }
