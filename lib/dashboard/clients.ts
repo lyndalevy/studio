@@ -7,11 +7,11 @@ import { source, type Entry, type Source } from "./source";
  *
  *   <CLIENT>/client.json            package, add-ons, cycle start, billing
  *   <CLIENT>/CYCLE 1 - 10:19:26/... one folder per 2-week cycle (or SET), dated in its name
- *   10:26 SILVER living-room.mp4    each post named by its week's Monday and tier
+ *   10:26 BRONZE living-room.mp4    each post named by its week's Monday and tier
  *   <CLIENT>/SET 1 .../captions.txt a post marked "(SCHEDULED)" or "(POSTED)" is scheduled
  *
- * A post's tier comes from what it is: a photo is Bronze, a carousel of 4+
- * slides or an .mp4 is Silver, a filmed .mov reel is Gold. client.json can
+ * A post's tier comes from what it is: a photo or an animated .mp4 is Bronze,
+ * a carousel of 4+ slides is Silver, a filmed .mov reel is Gold. client.json can
  * override any one of them.
  */
 
@@ -215,7 +215,7 @@ function deliverables(
       tier = slides >= 4 ? "silver" : "bronze";
     } else if (VIDEO.test(name)) {
       kind = "video";
-      tier = /\.mov$/i.test(name) ? "gold" : "silver";
+      tier = /\.mov$/i.test(name) ? "gold" : "bronze";
     } else if (IMAGE.test(name)) {
       kind = "photo";
       tier = "bronze";

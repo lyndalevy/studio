@@ -99,7 +99,7 @@ export default async function Social() {
       <section id="packages" className="scroll-mt-6 pt-20 sm:pt-28">
         <h2 className="text-center font-[family-name:var(--font-display)] text-5xl sm:text-6xl">Packages</h2>
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {packages.map((pkg) => (
             <div key={pkg.name} className="flex flex-col border-2 border-red p-6">
               <h3 className="font-[family-name:var(--font-display)] text-4xl">{pkg.name}</h3>
