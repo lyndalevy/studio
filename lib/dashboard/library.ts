@@ -11,10 +11,12 @@ import { source } from "./source";
  * A tier link can be assigned to one or more clients (by nickname). Each assignment takes the first cycle
  * that still has room for that tier, after the posts already made and the ideas assigned before it, and
  * keeps that cycle; once that cycle has all its posts of that tier made, the assignment is done (the link
- * stays). Tapping a client again marks the idea as not for that client (grayed out); once more clears it.
+ * stays). Tapping a client again marks the idea as not for that client (grayed out); a third tap marks it
+ * complete (made by hand), and a fourth clears it.
  */
 export type Shelf = "bronze" | "silver" | "gold" | "business";
-export type Assignment = { client: string; cycle: number; at: string; done?: boolean };
+/** made: marked complete by hand (the third tap). done: made by hand, or its cycle has all its posts of that tier. */
+export type Assignment = { client: string; cycle: number; at: string; made?: boolean; done?: boolean };
 export type SavedLink = {
   shelf: Shelf;
   name: string;
@@ -183,7 +185,7 @@ export async function loadLibrary(clients: ClientStatus[]): Promise<{ links: Sav
       if (l.url !== keep.url) delete meta[linkKey(l.url)];
       merged = changed = true;
     }
-    if (merged) meta[linkKey(keep.url)] = { assigned: keep.assigned.map((x) => ({ client: x.client, cycle: x.cycle, at: x.at })), declined: keep.declined };
+    if (merged) meta[linkKey(keep.url)] = { assigned: keep.assigned.map((x) => ({ client: x.client, cycle: x.cycle, at: x.at, ...(x.made ? { made: true } : {}) })), declined: keep.declined };
   }
   if (gone.size) links.splice(0, links.length, ...links.filter((l) => !gone.has(l)));
 
@@ -197,7 +199,7 @@ export async function loadLibrary(clients: ClientStatus[]): Promise<{ links: Sav
     for (const a of l.assigned) {
       const c = byNick.get(a.client);
       if (!c) continue;
-      if (cycleDone(c, a.cycle, tier)) {
+      if (a.made || cycleDone(c, a.cycle, tier)) {
         a.done = true;
         continue;
       }
@@ -205,7 +207,7 @@ export async function loadLibrary(clients: ClientStatus[]): Promise<{ links: Sav
         const n = openCycle(c, tier, all.filter((x) => x !== a), tiers);
         if (n && n !== a.cycle) {
           a.cycle = n;
-          meta[linkKey(l.url)].assigned = l.assigned.map((x) => ({ client: x.client, cycle: x.cycle, at: x.at }));
+          meta[linkKey(l.url)].assigned = l.assigned.map((x) => ({ client: x.client, cycle: x.cycle, at: x.at, ...(x.made ? { made: true } : {}) }));
           changed = true;
         }
       }
@@ -230,7 +232,7 @@ export async function loadLibrary(clients: ClientStatus[]): Promise<{ links: Sav
       if (n && n !== a.cycle) {
         a.cycle = n;
         const l = linkOf.get(a)!;
-        meta[linkKey(l.url)].assigned = l.assigned.map((x) => ({ client: x.client, cycle: x.cycle, at: x.at }));
+        meta[linkKey(l.url)].assigned = l.assigned.map((x) => ({ client: x.client, cycle: x.cycle, at: x.at, ...(x.made ? { made: true } : {}) }));
         changed = true;
       }
       placed.push(a);
@@ -250,7 +252,7 @@ export async function loadLibrary(clients: ClientStatus[]): Promise<{ links: Sav
 
 /**
  * Tap a client on a tier link: blank → queued (joins the end of that client's queue) → not for this client
- * (grayed out) → blank.
+ * (grayed out) → complete (✓, made in the client's current cycle) → blank.
  */
 export async function assignLink(path: string, url: string, nickname: string, clients: ClientStatus[]): Promise<void> {
   checkPath(path);
@@ -262,11 +264,15 @@ export async function assignLink(path: string, url: string, nickname: string, cl
   const key = linkKey(url);
   const entry = { assigned: meta[key]?.assigned ?? [], declined: meta[key]?.declined ?? [] };
 
-  if (entry.assigned.some((a) => a.client === nickname)) {
+  const mine = entry.assigned.find((a) => a.client === nickname);
+  if (mine?.made) {
+    entry.assigned = entry.assigned.filter((a) => a.client !== nickname);
+  } else if (mine) {
     entry.assigned = entry.assigned.filter((a) => a.client !== nickname);
     entry.declined = [...entry.declined, nickname];
   } else if (entry.declined.includes(nickname)) {
     entry.declined = entry.declined.filter((n) => n !== nickname);
+    entry.assigned = [...entry.assigned, { client: nickname, cycle: Math.max(1, c.current), at: new Date().toISOString(), made: true }];
   } else {
     if (!c.perWeek[tier]) throw new Error(`${nickname}'s package has no ${tier[0].toUpperCase() + tier.slice(1)} posts.`);
     // every other assignment, with its tier, so this one goes after them

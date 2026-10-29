@@ -64,10 +64,19 @@ export default function LibraryCard({
       const a = step.action;
       if ("delete" in a) return [];
       if ("rename" in a) return [{ ...l, name: a.rename, needsName: false }];
-      // blank → queued → grayed out → blank
-      if (l.assigned.some((x) => x.client === a.assign))
+      // blank → queued → grayed out → complete ✓ → blank
+      const mine = l.assigned.find((x) => x.client === a.assign);
+      if (mine?.made) return [{ ...l, assigned: l.assigned.filter((x) => x.client !== a.assign) }];
+      if (mine)
         return [{ ...l, assigned: l.assigned.filter((x) => x.client !== a.assign), declined: [...l.declined, a.assign] }];
-      if (l.declined.includes(a.assign)) return [{ ...l, declined: l.declined.filter((n) => n !== a.assign) }];
+      if (l.declined.includes(a.assign))
+        return [
+          {
+            ...l,
+            declined: l.declined.filter((n) => n !== a.assign),
+            assigned: [...l.assigned, { client: a.assign, cycle: 0, at: new Date().toISOString(), made: true, done: true }],
+          },
+        ];
       return [{ ...l, assigned: [...l.assigned, { client: a.assign, cycle: 0, at: new Date().toISOString() }] }];
     })
   );
@@ -164,10 +173,12 @@ export default function LibraryCard({
               aria-pressed={!!a}
               onClick={() => act(l, { assign: nick })}
               title={
-                a
-                  ? `${nick}: cycle ${a.cycle}${a.done ? ", made" : ""}. Tap to mark it not for ${nick}.`
-                  : no
-                    ? `Not for ${nick}. Tap to clear.`
+                a?.made
+                  ? `${nick}: complete. Tap to clear.`
+                  : a
+                    ? `${nick}: cycle ${a.cycle}${a.done ? ", made" : ""}. Tap to mark it not for ${nick}.`
+                    : no
+                      ? `Not for ${nick}. Tap to mark it complete.`
                     : `Queue for ${nick}'s next cycle with room`
               }
               className={`eyebrow rounded-full px-2 py-0.5 ${
@@ -287,7 +298,8 @@ export default function LibraryCard({
           Add a link or photo above, or save them to ideas/bronze, silver, or gold in Dropbox from your phone (Share → Dropbox);
           links keep the names they were saved with (rename any with ✎). Ones still named by their code or IMG number wait under
           &ldquo;Needs a name&rdquo; at the top of each tier until you rename them. Tap a client once to queue the idea into their next cycle with room (✓ once
-          that cycle&rsquo;s posts are made), twice to gray it out as not for them, and again to clear it.
+          that cycle&rsquo;s posts are made), twice to gray it out as not for them, three times to mark it complete (✓), and once
+          more to clear it.
         </p>
       </div>
     </section>
