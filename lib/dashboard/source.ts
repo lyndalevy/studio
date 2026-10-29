@@ -12,8 +12,9 @@ import path from "node:path";
 /**
  * id: Dropbox's permanent file id (stays the same when a file is renamed or moved).
  * hash: a fingerprint of the file's contents, the same for two copies of one photo.
+ * added: when the file was saved (ISO time), for sorting newest first.
  */
-export type Entry = { path: string; kind: "file" | "folder"; id?: string; hash?: string };
+export type Entry = { path: string; kind: "file" | "folder"; id?: string; hash?: string; added?: string };
 
 export interface Source {
   /** Files and folders under `dir` (every level, or just the top one), with paths relative to the studio root. */
@@ -90,14 +91,20 @@ const dropbox: Source = {
       });
       if (!res.ok) throw new Error(`Couldn't list ${base} in Dropbox (${res.status}): ${await reason(res)}`);
       const page = (await res.json()) as {
-        entries: { ".tag": string; path_display: string; id?: string; content_hash?: string }[];
+        entries: { ".tag": string; path_display: string; id?: string; content_hash?: string; server_modified?: string }[];
         has_more: boolean;
         cursor: string;
       };
       for (const e of page.entries) {
         if (e[".tag"] === "deleted") continue;
         const rel = e.path_display.slice(ROOT.length + 1);
-        out.push({ path: rel, kind: e[".tag"] === "folder" ? "folder" : "file", id: e.id, hash: e.content_hash });
+        out.push({
+          path: rel,
+          kind: e[".tag"] === "folder" ? "folder" : "file",
+          id: e.id,
+          hash: e.content_hash,
+          added: e.server_modified,
+        });
       }
       if (!page.has_more) return out;
       url = "https://api.dropboxapi.com/2/files/list_folder/continue";
@@ -208,7 +215,12 @@ function local(root: string): Source {
           const info = await stat(path.join(root, child));
           const isDir = info.isDirectory();
           // stands in for Dropbox's content hash when testing on the Mac
-          out.push({ path: child, kind: isDir ? "folder" : "file", hash: isDir ? undefined : `size:${info.size}` });
+          out.push({
+            path: child,
+            kind: isDir ? "folder" : "file",
+            hash: isDir ? undefined : `size:${info.size}`,
+            added: info.birthtime.toISOString(),
+          });
           if (isDir && recursive) await walk(child);
         }
       };

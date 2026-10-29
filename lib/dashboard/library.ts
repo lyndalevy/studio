@@ -24,6 +24,8 @@ export type SavedLink = {
   needsName?: boolean;
   /** A fingerprint of a photo's contents, to spot the same photo saved twice. */
   hash?: string;
+  /** When it was saved to Dropbox (ISO time); the newest show first. */
+  added?: string;
   path: string;
   assigned: Assignment[];
   /** Clients this idea isn't for (grayed out). */
@@ -61,9 +63,9 @@ const writeMeta = (meta: Meta) => source()!.write(META, JSON.stringify({ links: 
 
 async function listShelf(
   shelf: Shelf
-): Promise<{ path: string; name: string; url: string; needsName?: boolean; hash?: string }[]> {
+): Promise<{ path: string; name: string; url: string; needsName?: boolean; hash?: string; added?: string }[]> {
   const src = source()!;
-  let files: { path: string; id?: string; hash?: string }[];
+  let files: { path: string; id?: string; hash?: string; added?: string }[];
   try {
     files = (await src.list(folderOf(shelf), false)).filter(
       (e) => e.kind === "file" && IDEA_FILE.test(e.path) && !e.path.split("/").pop()!.startsWith("._")
@@ -75,16 +77,16 @@ async function listShelf(
     .filter((f) => PHOTO.test(f.path))
     .map((f) => {
       const name = f.path.split("/").pop()!.replace(PHOTO, "");
-      return { path: f.path, name, url: `photo:${f.id ?? f.path}`, needsName: cameraName(name), hash: f.hash };
+      return { path: f.path, name, url: `photo:${f.id ?? f.path}`, needsName: cameraName(name), hash: f.hash, added: f.added };
     });
   const read = await Promise.all(
-    files.filter((f) => LINK.test(f.path)).map(async (f) => ({ path: f.path, text: (await src.read(f.path)) ?? "" }))
+    files.filter((f) => LINK.test(f.path)).map(async (f) => ({ path: f.path, added: f.added, text: (await src.read(f.path)) ?? "" }))
   );
   const links = [];
-  for (const { path, text } of read) {
+  for (const { path, added, text } of read) {
     const url = text.match(/^URL=(\S+)/m)?.[1] ?? text.match(/<string>(https?:[^<]+)<\/string>/)?.[1];
     const name = path.split("/").pop()!.replace(LINK, "");
-    if (url) links.push({ path, name, url: url.trim(), needsName: codeName(name) });
+    if (url) links.push({ path, name, url: url.trim(), needsName: codeName(name), added });
   }
   return [...links, ...photos];
 }
@@ -195,7 +197,8 @@ export async function loadLibrary(clients: ClientStatus[]): Promise<{ links: Sav
       return { links, error: (err as Error).message };
     }
   }
-  links.sort((a, b) => a.name.localeCompare(b.name));
+  // Newest first; ties (or no date) by name.
+  links.sort((a, b) => (b.added ?? "").localeCompare(a.added ?? "") || a.name.localeCompare(b.name));
   return { links };
 }
 
