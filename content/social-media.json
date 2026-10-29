@@ -11,12 +11,13 @@
     "sound": false
    },
    {
-    "id": "02-plus-four",
-    "kind": "image",
-    "src": "/social/feeds/bold-and-bright/02-plus-four-3167fa.jpg",
-    "poster": "/social/feeds/bold-and-bright/02-plus-four-3167fa.jpg",
-    "w": 1080,
-    "h": 1350
+    "id": "02-drawn-box",
+    "kind": "video",
+    "src": "/social/feeds/bold-and-bright/02-drawn-box.mp4",
+    "poster": "/social/feeds/bold-and-bright/02-drawn-box.jpg",
+    "w": 720,
+    "h": 900,
+    "sound": false
    },
    {
     "id": "03-charger",
@@ -51,21 +52,20 @@
     "h": 1350
    },
    {
-    "id": "07-fresh-batch",
+    "id": "07-plus-four",
     "kind": "image",
-    "src": "/social/feeds/bold-and-bright/07-fresh-batch.jpg",
-    "poster": "/social/feeds/bold-and-bright/07-fresh-batch.jpg",
+    "src": "/social/feeds/bold-and-bright/07-plus-four-3167fa.jpg",
+    "poster": "/social/feeds/bold-and-bright/07-plus-four-3167fa.jpg",
     "w": 1080,
     "h": 1350
    },
    {
-    "id": "08-drawn-box",
-    "kind": "video",
-    "src": "/social/feeds/bold-and-bright/08-drawn-box.mp4",
-    "poster": "/social/feeds/bold-and-bright/08-drawn-box.jpg",
-    "w": 720,
-    "h": 900,
-    "sound": false
+    "id": "08-fresh-batch",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/08-fresh-batch.jpg",
+    "poster": "/social/feeds/bold-and-bright/08-fresh-batch.jpg",
+    "w": 1080,
+    "h": 1350
    },
    {
     "id": "09-love-more",
