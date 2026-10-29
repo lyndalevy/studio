@@ -132,11 +132,23 @@ function PostCard({ post, location }: { post: Post; location: string }) {
 /** Caption with the handle in bold, hashtags in link blue, clamped until "more" is tapped. */
 function Caption({ text }: { text: string }) {
   const [open, setOpen] = useState(false);
+  // Only offer "more" when the caption is actually cut off.
+  const ref = useRef<HTMLParagraphElement>(null);
+  const [clamped, setClamped] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const check = () => setClamped(el.scrollHeight > el.clientHeight + 1);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [text]);
   const parts = text.split(/(#[\p{L}\p{N}_]+)/u);
 
   return (
     <div className="px-3 pt-2 text-[14px] leading-[1.4]">
-      <p className={`whitespace-pre-line ${open ? "" : "line-clamp-2"}`}>
+      <p ref={ref} className={`whitespace-pre-line ${open ? "" : "line-clamp-2"}`}>
         <span className="mr-1.5 font-semibold">{social.handle}</span>
         {parts.map((part, i) =>
           part.startsWith("#") ? (
@@ -148,7 +160,7 @@ function Caption({ text }: { text: string }) {
           )
         )}
       </p>
-      {!open && (
+      {!open && clamped && (
         <button type="button" onClick={() => setOpen(true)} className="mt-0.5 text-[14px] text-black/50">
           more
         </button>
