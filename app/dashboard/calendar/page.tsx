@@ -17,7 +17,7 @@ const KINDS: Record<CalEvent["kind"], { name: string; style: string }> = {
   make: { name: "Make posts", style: "border border-red bg-cream" },
   schedule: { name: "Schedule", style: "bg-red text-cream" },
   invoice: { name: "Send invoice", style: "border-2 border-red bg-cream-deep" },
-  due: { name: "Check due", style: "border-2 border-dashed border-red" },
+  due: { name: "Payment due", style: "border-2 border-dashed border-red" },
   pickup: { name: "Pick up check", style: "border-2 border-[#1c1714] bg-cream" },
   note: { name: "Note", style: "bg-cream-deep" },
   pay: { name: "Pay yourself", style: "bg-[#c39b2a] text-[#1c1714]" },
@@ -226,7 +226,7 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
             </li>
             <li>
               Send every invoice on the last Wednesday of the month (or the last of the client&rsquo;s &ldquo;send_day&rdquo;, e.g. Tuesday for MCB). Checks show on their due date once sent; for clients whose
-              checks you pick up in person (&ldquo;pickup_checks&rdquo;: true), a pickup shows the Monday after you send it.
+              checks you pick up in person (&ldquo;pickup_checks&rdquo;: true), a pickup shows the Monday after you send it, and for clients who pay by ACH (&ldquo;ach&rdquo;: true), a reminder to check the payment went through.
             </li>
             <li>Pay yourself every other Friday: the every-other-week pay on the Budget card (from the pay chart).</li>
           </ul>

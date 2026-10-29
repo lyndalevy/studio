@@ -35,6 +35,9 @@ export type ClientFile = {
   /** true when Lynda picks up this client's checks in person: the invoice is due the Monday after it goes out
    * (instead of due_days), and the calendar shows a pickup that Monday. */
   pickup_checks?: boolean;
+  /** true when the client pays by ACH: the payment is due the Monday after the invoice goes out, and the calendar
+   * shows a reminder that Monday to check it went through. */
+  ach?: boolean;
   /** true while work is on hold: no cycles, invoices, calendar dates or budget, and nothing moves to SHIPPED. */
   paused?: boolean;
   /** Days earlier than the usual Friday to schedule this client's cycles (and start making them). Set
@@ -357,8 +360,8 @@ async function load(src: Source, folder: string, raw: string): Promise<ClientSta
         amount += p;
         lines.push(`${x.name} $${p}`);
       }
-      // Checks picked up in person are due the Monday after the invoice goes out.
-      const due = info.pickup_checks
+      // Checks picked up in person, and ACH payments, are due the Monday after the invoice goes out.
+      const due = info.pickup_checks || info.ach
         ? fromTime(toTime(sent) + (((8 - new Date(toTime(sent)).getUTCDay()) % 7) || 7) * DAY)
         : fromTime(toTime(sent) + dueDays * DAY);
       const status: Invoice["status"] = (info.paid ?? []).includes(m)

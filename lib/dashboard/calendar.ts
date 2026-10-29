@@ -202,10 +202,13 @@ export async function loadCalendar(
       // Checks picked up in person: 2 PM on the Monday after the invoice goes out. This stands in for the "check due" date.
       if (c.info.pickup_checks && inv.due >= from && inv.due <= to)
         events.push({ date: inv.due, kind: "pickup", title: `Pick up ${c.nickname} check ($${inv.amount})`, time: "2:00 PM", client: c.nickname });
+      // ACH: the Monday after the invoice goes out, check the payment went through.
+      if (c.info.ach && inv.due >= from && inv.due <= to)
+        events.push({ date: inv.due, kind: "due", title: `Check ${c.nickname}'s ACH payment went through ($${inv.amount})`, client: c.nickname });
       if (inv.status === "upcoming") {
         if (inv.sent >= from && inv.sent <= to)
           events.push({ date: inv.sent, kind: "invoice", title: `Send ${c.nickname} ${inv.label.split(" ")[0]} invoice ($${inv.amount})`, note: INVOICE_NOTE, client: c.nickname });
-      } else if (!c.info.pickup_checks && inv.due >= from && inv.due <= to) {
+      } else if (!c.info.pickup_checks && !c.info.ach && inv.due >= from && inv.due <= to) {
         events.push({ date: inv.due, kind: "due", title: `${c.nickname} check due ($${inv.amount})`, client: c.nickname });
       }
     }
