@@ -27,11 +27,11 @@ export type FeedKey =
 
 /** The looks, in the order they appear, each with the package it's a sample of. */
 export const feeds: { key: FeedKey; label: string; plan: string }[] = [
-  { key: "bold-and-bright", label: "Bold & Bright", plan: "Momentum" },
+  { key: "bold-and-bright", label: "Bold & Bright", plan: "Showcase" },
   { key: "sculptural-and-sunlit", label: "Sculptural & Sunlit", plan: "Momentum" },
   { key: "luxury-and-architectural", label: "Luxury & Architectural", plan: "Momentum" },
   { key: "dark-and-romantic", label: "Dark & Romantic", plan: "Momentum" },
-  { key: "earthy-and-naturalistic", label: "Earthy & Naturalistic", plan: "Showcase" },
+  { key: "earthy-and-naturalistic", label: "Earthy & Naturalistic", plan: "Spotlight" },
   { key: "fun-and-playful", label: "Playful & Personal", plan: "Spotlight" },
 ];
 

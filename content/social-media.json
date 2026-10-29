@@ -20,12 +20,11 @@
    },
    {
     "id": "03-charger",
-    "kind": "video",
-    "src": "/social/feeds/bold-and-bright/03-charger.mp4",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/03-charger.jpg",
     "poster": "/social/feeds/bold-and-bright/03-charger.jpg",
     "w": 720,
-    "h": 900,
-    "sound": false
+    "h": 900
    },
    {
     "id": "04-tic-tac-toe",
@@ -54,12 +53,11 @@
    },
    {
     "id": "07-how-to-trap",
-    "kind": "video",
-    "src": "/social/feeds/bold-and-bright/07-how-to-trap.mp4",
+    "kind": "image",
+    "src": "/social/feeds/bold-and-bright/07-how-to-trap.jpg",
     "poster": "/social/feeds/bold-and-bright/07-how-to-trap.jpg",
     "w": 720,
-    "h": 900,
-    "sound": false
+    "h": 900
    },
    {
     "id": "08-fresh-batch",
