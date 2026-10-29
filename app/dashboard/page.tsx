@@ -494,7 +494,7 @@ function Cycle({ plan, title, todo = false }: { plan: CyclePlan | null; title: s
       )}
       {/* This cycle's bottom edge fills in as the cycle goes by. */}
       {!todo && <div
-        className="absolute -inset-x-px -bottom-px h-1.5 bg-red-line"
+        className="absolute -inset-x-px -bottom-px h-1.5 bg-cream"
         role="progressbar"
         aria-valuenow={through}
         aria-valuemin={0}
