@@ -75,6 +75,11 @@ function weekPlan(c: ClientStatus, monday: string): WeekPlan {
   };
 }
 
+/** "today", "in 1 day", "in 5 days". */
+const inDays = (d: string) => {
+  const n = Math.round((Date.parse(`${d}T00:00:00Z`) - Date.parse(`${today()}T00:00:00Z`)) / 86_400_000);
+  return n <= 0 ? "today" : `in ${n} day${n === 1 ? "" : "s"}`;
+};
 const fmtDay = (d: string) =>
   new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
@@ -203,7 +208,7 @@ function ClientCard({ c, links, events }: { c: ClientStatus; links: SavedLink[];
                   <span className={`eyebrow rounded-full px-2 py-0.5 ${KINDS[e.kind].style} ${KINDS[e.kind].style.includes("text-") ? "" : "text-[#1c1714]"} ${e.kind === "schedule" ? "border-2 border-cream" : ""}`}>
                     {KINDS[e.kind].name}
                   </span>
-                  <span>{e.title.replace(` ${c.nickname} `, " ").replace(`${c.nickname}'s `, "")}</span>
+                  <span className="opacity-80">{inDays(e.date)}</span>
                 </span>
               ))}
             </span>
