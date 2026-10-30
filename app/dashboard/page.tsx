@@ -11,6 +11,7 @@ import { Sparkle } from "../components/Marks";
 import DashboardNav from "./DashboardNav";
 import Fold from "./Fold";
 import IdeasCard from "./IdeasCard";
+import { KINDS } from "./kinds";
 import InvoiceButton from "./InvoiceButton";
 import OneTimeCard from "./OneTimeCard";
 import LibraryCard from "./LibraryCard";
@@ -195,12 +196,15 @@ function ClientCard({ c, links, events }: { c: ClientStatus; links: SavedLink[];
             )}
           </span>
           {events.length > 0 && (
-            <span className="text-sm">
-              <span className="eyebrow mr-2">Upcoming</span>
-              {events.slice(0, 3).map((e, i) => (
-                <span key={`${e.date} ${e.title}`}>
-                  {i > 0 && " · "}
-                  <span className="font-bold">{fmtDay(e.date)}</span> {e.title.replace(` ${c.nickname} `, " ").replace(`${c.nickname}'s `, "")}
+            <span className="flex basis-full flex-col gap-1.5 text-sm">
+              <span className="eyebrow">Upcoming</span>
+              {events.slice(0, 3).map((e) => (
+                <span key={`${e.date} ${e.title}`} className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="w-24 shrink-0 font-bold">{fmtDay(e.date)}</span>
+                  <span className={`eyebrow rounded-full px-2 py-0.5 ${KINDS[e.kind].style} ${KINDS[e.kind].style.includes("text-") ? "" : "text-[#1c1714]"} ${e.kind === "schedule" ? "border-2 border-cream" : ""}`}>
+                    {KINDS[e.kind].name}
+                  </span>
+                  <span>{e.title.replace(` ${c.nickname} `, " ").replace(`${c.nickname}'s `, "")}</span>
                 </span>
               ))}
             </span>
