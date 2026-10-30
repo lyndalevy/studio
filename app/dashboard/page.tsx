@@ -140,7 +140,7 @@ export default async function Dashboard() {
 
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
         {clients.map((c) => (
-          <ClientCard key={c.folder} c={c} links={links} events={upcoming.filter((e) => e.client === c.nickname && !e.done)} />
+          <ClientCard key={c.folder} c={c} links={links} events={upcoming.filter((e) => e.client === c.nickname && !e.done && e.date >= today())} />
         ))}
       </div>
 
@@ -197,7 +197,6 @@ function ClientCard({ c, links, events }: { c: ClientStatus; links: SavedLink[];
           </span>
           {events.length > 0 && (
             <span className="flex basis-full flex-col gap-1.5 text-sm">
-              <span className="eyebrow">Upcoming</span>
               {events.slice(0, 3).map((e) => (
                 <span key={`${e.date} ${e.title}`} className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <span className="w-24 shrink-0 font-bold">{fmtDay(e.date)}</span>
